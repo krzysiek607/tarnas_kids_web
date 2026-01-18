@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplikacja edukacyjna dla dzieci 4-8 lat - gry, zabawy, bajki i rozwój przez zabawę">
+    <title>Tarnas Kids - Partner Twojego Dziecka</title>
+
+    <!-- Favicon as inline SVG data URI -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FF6B6B'/%3E%3Ccircle cx='35' cy='40' r='5' fill='%23FFF'/%3E%3Ccircle cx='65' cy='40' r='5' fill='%23FFF'/%3E%3Cpath d='M30 60 Q50 75 70 60' stroke='%23FFF' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #FF6B9D;
+            --color-primary-dark: #FF5287;
+            --color-secondary: #4ECDC4;
+            --color-tertiary: #FFD93D;
+            --color-purple: #A78BFA;
+            --color-green: #6EE7B7;
+            --color-orange: #FCA5A5;
+            --color-bg: #FFF9F5;
+            --color-bg-light: #FFF;
+            --color-text: #2D3748;
+            --color-text-light: #4A5568;
+            --color-text-muted: #718096;
+            --color-surface: #FFFFFF;
+            --color-surface-shadow: rgba(0, 0, 0, 0.08);
+
+            --font-display: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-accent: 'Baloo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, #FFF9F5 0%, #FFF5EB 50%, #FFF9F5 100%);
+        }
+
+        .geometric-shape {
+            position: absolute;
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.05));
+        }
+
+        .shape-1 {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+            animation-duration: 25s;
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 10%;
+            animation-delay: 5s;
+            animation-duration: 30s;
+        }
+
+        .shape-3 {
+            bottom: 10%;
+            left: 15%;
+            animation-delay: 10s;
+            animation-duration: 35s;
+        }
+
+        .shape-4 {
+            top: 40%;
+            right: 20%;
+            animation-delay: 15s;
+            animation-duration: 28s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translate(30px, -30px) rotate(90deg) scale(1.1);
+            }
+            50% {
+                transform: translate(60px, 20px) rotate(180deg) scale(0.9);
+            }
+            75% {
+                transform: translate(-20px, 40px) rotate(270deg) scale(1.05);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s var(--transition-smooth) forwards;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .fade-in-up.visible {
+            animation: fadeInUp 0.8s var(--transition-smooth) forwards;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 120px 0 80px;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #FFD93D 100%);
+            border: none;
+            border-radius: 100px;
+            font-family: var(--font-accent);
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 32px;
+            animation: fadeIn 0.8s var(--transition-smooth) 0.2s backwards, pulse 2s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(40px, 8vw, 84px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #A78BFA 50%, #4ECDC4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s var(--transition-smooth) 0.4s backwards;
+            text-shadow: 0 4px 20px rgba(255, 107, 157, 0.2);
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-accent);
+            font-size: clamp(20px, 3vw, 32px);
+            font-weight: 600;
+            color: var(--color-text-light);
+            margin-bottom: 24px;
+            letter-spacing: 0;
+            animation: fadeInUp 0.8s var(--transition-smooth) 0.6s backwards;
+        }
+
+        .hero-description {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--color-text-muted);
+            max-width: 680px;
+            margin: 0 auto 48px;
+            line-height: 1.8;
+            font-weight: 500;
+            animation: fadeInUp 0.8s var(--transition-smooth) 0.8s backwards;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s var(--transition-smooth) 1s backwards;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            font-family: var(--font-accent);
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B9D 0%, #A78BFA 100%);
+            color: #FFFFFF;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #FFFFFF;
+            border: 3px solid #FF6B9D;
+            color: #FF6B9D;
+            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: #FF6B9D;
+            color: #FFFFFF;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-icon {
+            transition: transform 0.3s var(--transition-smooth);
+        }
+
+        .btn:hover .btn-icon {
+            transform: translateX(4px);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #6EE7B7 100%);
+            border: none;
+            border-radius: 100px;
+            font-family: var(--font-accent);
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(36px, 6vw, 60px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #A78BFA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-description {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 80px;
+        }
+
+        .feature-card {
+            position: relative;
+            padding: 40px 32px;
+            background: #FFFFFF;
+            border: 3px solid transparent;
+            border-radius: 32px;
+            transition: all 0.4s var(--transition-bounce);
+            cursor: pointer;
+            box-shadow: 0 8px 24px var(--color-surface-shadow);
+        }
+
+        .feature-card:nth-child(1) {
+            border-color: #FF6B9D;
+        }
+
+        .feature-card:nth-child(2) {
+            border-color: #4ECDC4;
+        }
+
+        .feature-card:nth-child(3) {
+            border-color: #FFD93D;
+        }
+
+        .feature-card:nth-child(4) {
+            border-color: #A78BFA;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 32px;
+            opacity: 0;
+            transition: opacity 0.4s var(--transition-smooth);
+        }
+
+        .feature-card:nth-child(1)::before {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 107, 157, 0.02) 100%);
+        }
+
+        .feature-card:nth-child(2)::before {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.08) 0%, rgba(78, 205, 196, 0.02) 100%);
+        }
+
+        .feature-card:nth-child(3)::before {
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.08) 0%, rgba(255, 217, 61, 0.02) 100%);
+        }
+
+        .feature-card:nth-child(4)::before {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.08) 0%, rgba(167, 139, 250, 0.02) 100%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) rotate(-2deg);
+            box-shadow: 0 16px 40px var(--color-surface-shadow);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            transition: all 0.4s var(--transition-bounce);
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            background: linear-gradient(135deg, #FF6B9D 0%, #FFA8C5 100%);
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            background: linear-gradient(135deg, #4ECDC4 0%, #7FE5DD 100%);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            background: linear-gradient(135deg, #FFD93D 0%, #FFE67D 100%);
+        }
+
+        .feature-card:nth-child(4) .feature-icon {
+            background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        .feature-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: #FFFFFF;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .feature-title {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0;
+            color: var(--color-text);
+        }
+
+        .feature-description {
+            position: relative;
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--color-text-light);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 80px 0 40px;
+            border-top: 3px solid rgba(255, 107, 157, 0.1);
+            position: relative;
+            background: linear-gradient(to bottom, transparent 0%, rgba(255, 107, 157, 0.02) 100%);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF6B9D 0%, #4ECDC4 50%, #A78BFA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .footer-tagline {
+            font-family: var(--font-accent);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-light);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-link {
+            font-family: var(--font-accent);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary);
+            text-decoration: none;
+            position: relative;
+            transition: all 0.3s var(--transition-smooth);
+        }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #4ECDC4 100%);
+            border-radius: 2px;
+            transition: width 0.3s var(--transition-smooth);
+        }
+
+        .footer-link:hover {
+            color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .footer-link:hover::after {
+            width: 100%;
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 2px solid rgba(255, 107, 157, 0.1);
+            text-align: center;
+        }
+
+        .footer-copyright {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            font-family: var(--font-accent);
+        }
+
+        /* Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: particleFloat 15s infinite ease-in-out;
+        }
+
+        .particle:nth-child(odd) {
+            background: linear-gradient(135deg, #FF6B9D, #FFD93D);
+        }
+
+        .particle:nth-child(even) {
+            background: linear-gradient(135deg, #4ECDC4, #A78BFA);
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(100px, -100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 0 60px;
+            }
+
+            .features {
+                padding: 80px 0;
+            }
+
+            .features-grid {
+                gap: 24px;
+                margin-top: 60px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .footer-links {
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .feature-card {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <!-- Star -->
+        <svg class="geometric-shape shape-1" width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 20 L115 70 L165 75 L125 110 L140 160 L100 130 L60 160 L75 110 L35 75 L85 70 Z" fill="url(#gradient1)" opacity="0.7"/>
+            <defs>
+                <linearGradient id="gradient1" x1="0" y1="0" x2="200" y2="200">
+                    <stop offset="0%" stop-color="#FFD93D"/>
+                    <stop offset="100%" stop-color="#FFB84D"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- Heart -->
+        <svg class="geometric-shape shape-2" width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M90 140 C90 140 30 100 30 65 C30 45 45 30 65 30 C75 30 85 35 90 45 C95 35 105 30 115 30 C135 30 150 45 150 65 C150 100 90 140 90 140 Z" fill="url(#gradient2)" opacity="0.7"/>
+            <defs>
+                <linearGradient id="gradient2" x1="0" y1="0" x2="180" y2="180">
+                    <stop offset="0%" stop-color="#FF6B9D"/>
+                    <stop offset="100%" stop-color="#FFB1C8"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- Cloud -->
+        <svg class="geometric-shape shape-3" width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M70 110 C70 95 82 83 97 83 C100 75 108 70 117 70 C129 70 139 78 142 89 C153 91 162 101 162 113 C162 126 151 137 138 137 L82 137 C69 137 58 126 58 113 C58 105 62 98 68 94 C68 99 69 104 70 110 Z" fill="url(#gradient3)" opacity="0.7"/>
+            <defs>
+                <linearGradient id="gradient3" x1="0" y1="0" x2="220" y2="220">
+                    <stop offset="0%" stop-color="#4ECDC4"/>
+                    <stop offset="100%" stop-color="#7FE5DD"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- Balloon -->
+        <svg class="geometric-shape shape-4" width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="80" cy="70" rx="45" ry="55" fill="url(#gradient4)" opacity="0.7"/>
+            <path d="M80 125 L80 160 L70 170 L80 160 L90 170" stroke="url(#gradient4)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <defs>
+                <linearGradient id="gradient4" x1="0" y1="0" x2="160" y2="180">
+                    <stop offset="0%" stop-color="#A78BFA"/>
+                    <stop offset="100%" stop-color="#C4B5FD"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="particles" id="particles"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 1L10 6L15 6L11 9.5L13 14.5L8 11L3 14.5L5 9.5L1 6L6 6L8 1Z" fill="currentColor"/>
+                    </svg>
+                    Dla dzieci 4-8 lat
+                </div>
+
+                <h1 class="hero-title">Partner Twojego Dziecka</h1>
+
+                <p class="hero-subtitle">Rozwijamy wyobraźnię, kreatywność i wiedzę poprzez zabawę</p>
+
+                <p class="hero-description">
+                    Aplikacja edukacyjna z grami, zabawami i bajkami, która towarzyszy Twojemu dziecku w jego codziennym rozwoju. Bezpieczna przestrzeń do nauki i zabawy, stworzona we współpracy z pedagogami.
+                </p>
+
+                <div class="hero-cta">
+                    <a href="#features" class="btn btn-primary" aria-label="Rozpocznij przygodę z Tarnas Kids">
+                        <span>Rozpocznij przygodę</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#features" class="btn btn-secondary" aria-label="Zobacz co oferujemy">
+                        <span>Zobacz możliwości</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <span class="section-badge">Co oferujemy</span>
+                <h2 class="section-title">Świat pełen przygód i nauki</h2>
+                <p class="section-description">
+                    Każdy dzień z Tarnas Kids to nowa przygoda. Odkrywaj, ucz się i baw razem z Twoim dzieckiem w bezpiecznym, edukacyjnym środowisku.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <article class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="13" y="4" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="4" y="13" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="13" y="13" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Gry edukacyjne</h3>
+                    <p class="feature-description">
+                        Interaktywne gry rozwijające logiczne myślenie, pamięć i zdolności manualne. Nauka poprzez zabawę dostosowana do wieku dziecka.
+                    </p>
+                </article>
+
+                <article class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Bajki i opowiadania</h3>
+                    <p class="feature-description">
+                        Bogata biblioteka bajek na dobranoc, opowiadań edukacyjnych i interaktywnych historii rozwijających wyobraźnię dziecka.
+                    </p>
+                </article>
+
+                <article class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Rozwój kreatywności</h3>
+                    <p class="feature-description">
+                        Kreatywne zabawy, rysowanie, kolorowanki i zadania rozwijające wyobraźnię. Wspieramy artystyczne talenty Twojego dziecka.
+                    </p>
+                </article>
+
+                <article class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Bezpieczna przestrzeń</h3>
+                    <p class="feature-description">
+                        Kontrola rodzicielska, treści bez reklam i sprawdzone przez pedagogów materiały. Spokój dla rodziców, radość dla dzieci.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">Tarnas Kids</div>
+                    <p class="footer-tagline">Partner Twojego Dziecka w codziennym rozwoju</p>
+                </div>
+
+                <nav class="footer-links" aria-label="Linki stopki">
+                    <a href="mailto:kontakt@tarnaskids.pl" class="footer-link">Kontakt</a>
+                    <a href="#privacy" class="footer-link">Polityka prywatności</a>
+                </nav>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    &copy; 2025 Tarnas Kids. Wszelkie prawa zastrzeżone.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Particles Animation
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Intersection Observer for scroll animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 100);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        // Smooth scroll for anchor links
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && href !== '#privacy') {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // Cursor trail effect for buttons
+        function initButtonEffects() {
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('mouseenter', function(e) {
+                    this.style.transform = 'translateY(-2px)';
+                });
+
+                button.addEventListener('mouseleave', function(e) {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Parallax effect for geometric shapes
+        function initParallax() {
+            let ticking = false;
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const scrolled = window.pageYOffset;
+                        const shapes = document.querySelectorAll('.geometric-shape');
+
+                        shapes.forEach((shape, index) => {
+                            const speed = 0.1 + (index * 0.05);
+                            const yPos = -(scrolled * speed);
+                            shape.style.transform = `translateY(${yPos}px)`;
+                        });
+
+                        ticking = false;
+                    });
+
+                    ticking = true;
+                }
+            });
+        }
+
+        // Initialize all animations and effects
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            initScrollAnimations();
+            initSmoothScroll();
+            initButtonEffects();
+            initParallax();
+        });
+
+        // Performance optimization: reduce animations on low-end devices
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('.geometric-shape, .particle').forEach(el => {
+                el.style.animation = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

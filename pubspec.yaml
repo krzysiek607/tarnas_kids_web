@@ -1,0 +1,59 @@
+name: tarnas_kids
+description: "Interactive educational app for kids"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Audio
+  audioplayers: ^6.1.0
+
+  # Storage & Persistence
+  shared_preferences: ^2.3.3
+
+  # Sharing & Gallery
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+  gal: ^2.3.0
+
+  # Video
+  video_player: ^2.9.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Tarnas_kids_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/Tarnas_kids_icon.png"
+  remove_alpha_ios: true
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/sounds/
+    - assets/images/
+    - assets/images/icons/
+    - assets/audio/
+    - assets/videos/

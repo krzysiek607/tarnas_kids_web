@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Model smakołyka/nagrody
@@ -224,37 +225,46 @@ class DatabaseService {
   /// Konsumuje (usuwa) jeden przedmiot danego typu z ekwipunku aktualnego użytkownika
   /// Zwraca true jeśli udało się usunąć, false jeśli brak przedmiotu
   Future<bool> consumeItem(String rewardId) async {
+    debugPrint('🍪 KARMIENIE: Próba zjedzenia: $rewardId');
+
     final userId = currentUserId;
     if (userId == null) {
-      print('Brak zalogowanego użytkownika - nie można konsumować');
+      debugPrint('🍪 KARMIENIE: Brak zalogowanego użytkownika!');
       return false;
     }
+    debugPrint('🍪 KARMIENIE: User ID: $userId');
 
     try {
-      // Znajdź najstarszy przedmiot danego typu dla aktualnego użytkownika
+      // KROK A: Pobierz ID jednego najstarszego rekordu
+      debugPrint('🍪 KARMIENIE: Szukam najstarszego $rewardId...');
       final response = await _client
           .from('inventory')
           .select('id')
           .eq('user_id', userId)
           .eq('reward_id', rewardId)
           .order('created_at', ascending: true)
-          .limit(1);
+          .limit(1)
+          .maybeSingle();
 
-      final items = List<Map<String, dynamic>>.from(response);
-
-      if (items.isEmpty) {
-        print('Brak przedmiotu $rewardId do konsumpcji');
+      if (response == null) {
+        debugPrint('🍪 KARMIENIE: Brak przedmiotu $rewardId do konsumpcji!');
         return false;
       }
 
-      // Usuń znaleziony przedmiot
-      final itemId = items.first['id'];
-      await _client.from('inventory').delete().eq('id', itemId);
+      final itemId = response['id'];
+      debugPrint('🍪 KARMIENIE: Znaleziono ID do usunięcia: $itemId');
 
-      print('Skonsumowano przedmiot: $rewardId (id: $itemId)');
+      // KROK B: Usuń rekord o tym konkretnym ID (z weryfikacją user_id)
+      await _client
+          .from('inventory')
+          .delete()
+          .eq('id', itemId)
+          .eq('user_id', userId);
+
+      debugPrint('🍪 KARMIENIE: Usunięto pomyślnie! ($rewardId, id: $itemId)');
       return true;
     } catch (e) {
-      print('Błąd konsumpcji przedmiotu: $e');
+      debugPrint('🍪 KARMIENIE: BŁĄD: $e');
       return false;
     }
   }

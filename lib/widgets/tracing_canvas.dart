@@ -50,18 +50,32 @@ class TracingScore {
   final double accuracy;     // 0-100, jak blisko sciezki
   final double coverage;     // 0-100, ile sciezki pokryto
   final int errorCount;      // liczba punktow poza tolerancja
+  final int totalDrawnPoints; // ile punktow narysowano
 
   const TracingScore({
     required this.accuracy,
     required this.coverage,
     required this.errorCount,
+    required this.totalDrawnPoints,
   });
 
-  /// Czy rysunek jest wystarczajaco dobry (>90% lub <2 bledy)
-  bool get isGoodEnough => accuracy >= 90 || errorCount < 2;
+  /// Czy rysunek jest wystarczajaco dobry:
+  /// - accuracy >= 70% (narysowane punkty są blisko wzoru)
+  /// - coverage >= 40% (pokryto przynajmniej 40% wzoru)
+  /// - narysowano przynajmniej 20 punktów (żeby uniknąć oszustwa 1 punktem)
+  bool get isGoodEnough =>
+      accuracy >= 70 && coverage >= 40 && totalDrawnPoints >= 20;
 
   /// Srednia ocena
   double get overallScore => (accuracy + coverage) / 2;
+
+  @override
+  String toString() =>
+      'TracingScore(accuracy: ${accuracy.toStringAsFixed(1)}%, '
+      'coverage: ${coverage.toStringAsFixed(1)}%, '
+      'errors: $errorCount, '
+      'points: $totalDrawnPoints, '
+      'isGood: $isGoodEnough)';
 }
 
 class TracingCanvasState extends State<TracingCanvas> {
@@ -77,7 +91,12 @@ class TracingCanvasState extends State<TracingCanvas> {
   /// Oblicza wynik rysunku - porownuje z wzorem
   TracingScore calculateScore() {
     if (_drawnPoints.isEmpty) {
-      return const TracingScore(accuracy: 0, coverage: 0, errorCount: 0);
+      return const TracingScore(
+        accuracy: 0,
+        coverage: 0,
+        errorCount: 0,
+        totalDrawnPoints: 0,
+      );
     }
 
     final pathMetrics = widget.pattern.path.computeMetrics();
@@ -96,7 +115,12 @@ class TracingCanvasState extends State<TracingCanvas> {
     }
 
     if (patternPoints.isEmpty) {
-      return const TracingScore(accuracy: 100, coverage: 0, errorCount: 0);
+      return const TracingScore(
+        accuracy: 100,
+        coverage: 0,
+        errorCount: 0,
+        totalDrawnPoints: 0,
+      );
     }
 
     // Tolerancja - maksymalna odleglosc od wzoru (w pikselach)
@@ -109,7 +133,12 @@ class TracingCanvasState extends State<TracingCanvas> {
         .toList();
 
     if (drawnPositions.isEmpty) {
-      return const TracingScore(accuracy: 0, coverage: 0, errorCount: 0);
+      return const TracingScore(
+        accuracy: 0,
+        coverage: 0,
+        errorCount: 0,
+        totalDrawnPoints: 0,
+      );
     }
 
     // 1. Oblicz accuracy - ile narysowanych punktow jest blisko wzoru
@@ -160,6 +189,7 @@ class TracingCanvasState extends State<TracingCanvas> {
       accuracy: accuracy.clamp(0.0, 100.0),
       coverage: coverage.clamp(0.0, 100.0),
       errorCount: errorCount,
+      totalDrawnPoints: drawnPositions.length,
     );
   }
 

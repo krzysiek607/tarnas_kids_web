@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
@@ -54,6 +55,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
 
     // Sprawdz czy uzytkownik narysował cokolwiek
     if (canvasState == null || !canvasState.hasDrawing) {
+      debugPrint('✏️ TRACING: Brak rysunku!');
       _showTryAgainMessage('Najpierw narysuj wzór!');
       return;
     }
@@ -61,15 +63,24 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     // Oblicz wynik rysunku
     final score = canvasState.calculateScore();
 
+    // DEBUG: Pokaż szczegóły wyniku w konsoli
+    debugPrint('✏️ TRACING: ═══════════════════════════════════');
+    debugPrint('✏️ TRACING: Wzór: ${_currentPattern.name}');
+    debugPrint('✏️ TRACING: $score');
+    debugPrint('✏️ TRACING: Nagroda? ${score.isGoodEnough ? "TAK ✅" : "NIE ❌"}');
+    debugPrint('✏️ TRACING: ═══════════════════════════════════');
+
     if (!_isLast) {
       // Sprawdz czy wynik jest wystarczajaco dobry
       if (widget.enableRewards && score.isGoodEnough) {
+        debugPrint('✏️ TRACING: Przyznawanie nagrody...');
         await _grantReward();
       } else if (widget.enableRewards) {
         // Nie przyznaj nagrody, ale pozwól przejść dalej
+        debugPrint('✏️ TRACING: Za słaby wynik - brak nagrody');
         _showTryAgainMessage(
-          'Spróbuj jeszcze raz, żeby zdobyć smakołyk!\n'
-          'Dokładność: ${score.accuracy.toInt()}%',
+          'Spróbuj dokładniej! 🎯\n'
+          'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
         );
       }
 
@@ -80,12 +91,14 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     } else {
       // Ostatni wzór
       if (widget.enableRewards && score.isGoodEnough) {
+        debugPrint('✏️ TRACING: Ostatni wzór - przyznawanie nagrody...');
         await _grantReward(isLast: true);
       } else {
         if (widget.enableRewards) {
+          debugPrint('✏️ TRACING: Ostatni wzór - za słaby wynik');
           _showTryAgainMessage(
-            'Spróbuj jeszcze raz!\n'
-            'Dokładność: ${score.accuracy.toInt()}%',
+            'Spróbuj dokładniej! 🎯\n'
+            'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
           );
         }
         // Po ostatnim wzorze - wróć do menu

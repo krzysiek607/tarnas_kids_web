@@ -57,3 +57,6 @@ secrets/
 
 # MCP configuration (contains token references)
 .mcp.json
+
+# Supabase config (contains API keys)
+lib/config/supabase_config.dart

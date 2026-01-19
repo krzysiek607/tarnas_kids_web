@@ -17,6 +17,8 @@ class PatternTracingScreen extends StatelessWidget {
       emoji: '〰️',
       patterns: patterns,
       drawColor: Colors.blue,
+      rewardType: 'patterns',
+      enableRewards: true,
     );
   }
 

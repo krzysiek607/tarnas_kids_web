@@ -22,6 +22,8 @@ class LetterTracingScreen extends StatelessWidget {
       patterns: patterns,
       drawColor: const Color(0xFF66BB6A), // Zielony
       useHandwritingFont: true,
+      rewardType: 'letters',
+      enableRewards: true,
     );
   }
 

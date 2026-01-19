@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/tracing_canvas.dart';
+import '../../widgets/reward_dialog.dart';
+import '../../services/database_service.dart';
 
 /// Uniwersalny ekran gry rysowania po sladzie
 class TracingGameScreen extends StatefulWidget {
@@ -11,6 +13,8 @@ class TracingGameScreen extends StatefulWidget {
   final Color drawColor;
   final String? successMessage;
   final bool useHandwritingFont; // Czy uzywac czcionki recznej
+  final String rewardType; // Typ nagrody dla bazy danych (np. 'letters', 'patterns')
+  final bool enableRewards; // Czy wlaczone nagrody
 
   const TracingGameScreen({
     super.key,
@@ -20,6 +24,8 @@ class TracingGameScreen extends StatefulWidget {
     this.drawColor = const Color(0xFF42A5F5),
     this.successMessage,
     this.useHandwritingFont = false,
+    this.rewardType = 'tracing',
+    this.enableRewards = true,
   });
 
   @override
@@ -43,12 +49,58 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     }
   }
 
-  void _nextPattern() {
+  void _nextPattern() async {
     if (!_isLast) {
+      // Przyznaj nagrodę za ukończenie wzoru
+      if (widget.enableRewards) {
+        await _grantReward();
+      }
+
       setState(() {
         _currentIndex++;
       });
       _canvasKey.currentState?.clear();
+    } else {
+      // Ostatni wzór - przyznaj nagrodę i wróć do menu
+      if (widget.enableRewards) {
+        await _grantReward(isLast: true);
+      }
+    }
+  }
+
+  /// Przyznaje nagrodę i pokazuje popup
+  Future<void> _grantReward({bool isLast = false}) async {
+    try {
+      Reward reward;
+
+      // Jeśli baza jest dostępna, zapisz nagrodę
+      if (DatabaseService.isInitialized) {
+        reward = await DatabaseService.instance.addReward(widget.rewardType);
+      } else {
+        // Jeśli brak bazy - tylko wylosuj lokalnie
+        final random = DateTime.now().millisecondsSinceEpoch % 4;
+        reward = availableRewards[random];
+      }
+
+      // Pokaż popup nagrody
+      if (mounted) {
+        await RewardDialog.show(
+          context,
+          reward,
+          onClose: () {
+            if (isLast && mounted) {
+              // Po ostatnim wzorze - wróć do menu
+              Navigator.pop(context);
+            }
+          },
+        );
+      }
+    } catch (e) {
+      print('Błąd przyznawania nagrody: $e');
+      // W razie błędu - kontynuuj bez nagrody
+      if (isLast && mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 

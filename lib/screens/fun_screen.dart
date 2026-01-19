@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
+import '../providers/drawing_provider.dart';
 
 /// Ekran zabawy dla dzieci - menu wyboru gier
 /// Uklad lukowy z tlem
-class FunScreen extends StatelessWidget {
+class FunScreen extends StatefulWidget {
   const FunScreen({super.key});
+
+  @override
+  State<FunScreen> createState() => _FunScreenState();
+}
+
+class _FunScreenState extends State<FunScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Precache obrazków narzędzi rysowania w tle
+    // Dzięki temu DrawingScreen załaduje się szybciej
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _precacheDrawingAssets();
+    });
+  }
+
+  /// Ładuje obrazki narzędzi rysowania do cache w tle
+  Future<void> _precacheDrawingAssets() async {
+    for (final tool in availableTools) {
+      if (mounted) {
+        precacheImage(AssetImage(tool.iconPath), context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

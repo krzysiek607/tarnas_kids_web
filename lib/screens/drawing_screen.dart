@@ -23,29 +23,132 @@ class DrawingScreen extends ConsumerStatefulWidget {
 class _DrawingScreenState extends ConsumerState<DrawingScreen> {
   final GlobalKey _canvasKey = GlobalKey();
   bool _isSaving = false;
-  bool _imagesPreloaded = false;
+  bool _isInitialized = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _precacheImages();
+  void initState() {
+    super.initState();
+    // Poczekaj na pierwszą klatkę, potem załaduj zasoby
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeAsync();
+    });
   }
 
-  /// Precache obrazków narzędzi dla szybszego ładowania
-  Future<void> _precacheImages() async {
-    if (_imagesPreloaded) return;
-    _imagesPreloaded = true;
+  /// Asynchroniczna inicjalizacja - nie blokuje UI
+  Future<void> _initializeAsync() async {
+    // Precache wszystkich obrazków narzędzi
+    final futures = availableTools.map((tool) {
+      return precacheImage(AssetImage(tool.iconPath), context);
+    }).toList();
 
-    for (final tool in availableTools) {
-      precacheImage(
-        AssetImage(tool.iconPath),
-        context,
-      );
+    // Czekaj na załadowanie wszystkich obrazków
+    await Future.wait(futures);
+
+    // Oznacz jako zainicjalizowane
+    if (mounted) {
+      setState(() => _isInitialized = true);
     }
+  }
+
+  /// Skeleton UI wyświetlany podczas ładowania zasobów
+  Widget _buildLoadingSkeleton() {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: AppTheme.backgroundColor,
+        toolbarHeight: 64,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          // Skeleton dla canvas
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.grey.shade200, width: 2),
+              ),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: AppTheme.primaryColor,
+                  strokeWidth: 3,
+                ),
+              ),
+            ),
+          ),
+          // Skeleton dla panelu narzędzi
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppTheme.backgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Skeleton dla narzędzi
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(4, (index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )),
+                  ),
+                  const SizedBox(height: 10),
+                  // Skeleton dla kolorów
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(8, (index) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                      ),
+                    )),
+                  ),
+                  const SizedBox(height: 10),
+                  // Skeleton dla slidera
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Pokaż loading skeleton podczas inicjalizacji
+    if (!_isInitialized) {
+      return _buildLoadingSkeleton();
+    }
     final drawingState = ref.watch(drawingProvider);
 
     return Scaffold(

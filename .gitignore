@@ -54,3 +54,6 @@ app.*.map.json
 *.key
 *.pem
 secrets/
+
+# MCP configuration (contains token references)
+.mcp.json

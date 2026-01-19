@@ -30,7 +30,7 @@ void main() async {
 Future<void> _initializeSupabase() async {
   // Sprawdź czy konfiguracja jest ustawiona
   if (SupabaseConfig.url.isEmpty || SupabaseConfig.anonKey.isEmpty) {
-    print('Supabase nie skonfigurowany - nagrody działają lokalnie');
+    debugPrint('Supabase nie skonfigurowany - nagrody działają lokalnie');
     return;
   }
 
@@ -40,12 +40,39 @@ Future<void> _initializeSupabase() async {
       anonKey: SupabaseConfig.anonKey,
     );
 
+    // Anonymous Authentication - zaloguj użytkownika anonimowo
+    await _ensureAnonymousAuth();
+
     // Zainicjalizuj DatabaseService
     DatabaseService.initialize(Supabase.instance.client);
-    print('Supabase zainicjalizowany pomyślnie');
+    debugPrint('Supabase zainicjalizowany pomyślnie');
   } catch (e) {
-    print('Błąd inicjalizacji Supabase: $e');
+    debugPrint('Błąd inicjalizacji Supabase: $e');
     // Aplikacja działa bez bazy - nagrody tylko lokalnie
+  }
+}
+
+/// Zapewnia anonimowe uwierzytelnienie użytkownika
+Future<void> _ensureAnonymousAuth() async {
+  final supabase = Supabase.instance.client;
+
+  // Sprawdź czy użytkownik jest już zalogowany
+  final currentSession = supabase.auth.currentSession;
+
+  if (currentSession == null) {
+    // Brak sesji - zaloguj anonimowo
+    debugPrint('Brak sesji - logowanie anonimowe...');
+
+    final response = await supabase.auth.signInAnonymously();
+
+    if (response.user != null) {
+      debugPrint('Zalogowano anonimowo. User ID: ${response.user!.id}');
+    } else {
+      debugPrint('Błąd logowania anonimowego');
+    }
+  } else {
+    // Sesja istnieje
+    debugPrint('Sesja aktywna. User ID: ${currentSession.user.id}');
   }
 }
 

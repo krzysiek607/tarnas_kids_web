@@ -65,6 +65,9 @@ class DatabaseService {
   /// Czy serwis jest zainicjalizowany
   static bool get isInitialized => _instance != null;
 
+  /// Pobiera ID aktualnego użytkownika (anonimowego lub zalogowanego)
+  String? get currentUserId => _client.auth.currentUser?.id;
+
   /// Losuje nagrodę i zapisuje ją w tabeli 'inventory'
   /// Zwraca wylosowaną nagrodę
   Future<Reward> addReward(String itemType) async {
@@ -72,14 +75,22 @@ class DatabaseService {
     final random = Random();
     final reward = availableRewards[random.nextInt(availableRewards.length)];
 
+    final userId = currentUserId;
+    if (userId == null) {
+      print('Brak zalogowanego użytkownika - nagroda tylko lokalnie');
+      return reward;
+    }
+
     try {
-      // Zapisz do tabeli inventory w Supabase
+      // Zapisz do tabeli inventory w Supabase z user_id
       await _client.from('inventory').insert({
+        'user_id': userId,
         'item_type': itemType,
         'reward_id': reward.id,
         'reward_name': reward.name,
         'created_at': DateTime.now().toIso8601String(),
       });
+      print('Nagroda zapisana dla użytkownika: $userId');
     } catch (e) {
       // Jeśli błąd zapisu do bazy - loguj ale nie przerywaj
       // Nagroda i tak zostanie pokazana dziecku
@@ -89,12 +100,16 @@ class DatabaseService {
     return reward;
   }
 
-  /// Pobiera wszystkie nagrody z ekwipunku
+  /// Pobiera wszystkie nagrody z ekwipunku aktualnego użytkownika
   Future<List<Map<String, dynamic>>> getInventory() async {
+    final userId = currentUserId;
+    if (userId == null) return [];
+
     try {
       final response = await _client
           .from('inventory')
           .select()
+          .eq('user_id', userId)
           .order('created_at', ascending: false);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
@@ -103,12 +118,16 @@ class DatabaseService {
     }
   }
 
-  /// Liczy nagrody danego typu
+  /// Liczy nagrody danego typu dla aktualnego użytkownika
   Future<int> countRewards(String rewardId) async {
+    final userId = currentUserId;
+    if (userId == null) return 0;
+
     try {
       final response = await _client
           .from('inventory')
           .select()
+          .eq('user_id', userId)
           .eq('reward_id', rewardId);
       return (response as List).length;
     } catch (e) {
@@ -117,10 +136,18 @@ class DatabaseService {
     }
   }
 
-  /// Pobiera liczniki wszystkich nagród (zgrupowane)
+  /// Pobiera liczniki wszystkich nagród (zgrupowane) dla aktualnego użytkownika
   Future<Map<String, int>> getInventoryCounts() async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return {for (final r in availableRewards) r.id: 0};
+    }
+
     try {
-      final response = await _client.from('inventory').select('reward_id');
+      final response = await _client
+          .from('inventory')
+          .select('reward_id')
+          .eq('user_id', userId);
       final items = List<Map<String, dynamic>>.from(response);
 
       // Zlicz każdy typ
@@ -143,11 +170,17 @@ class DatabaseService {
     }
   }
 
-  /// Stream nasłuchujący zmian w ekwipunku (realtime)
+  /// Stream nasłuchujący zmian w ekwipunku (realtime) dla aktualnego użytkownika
   /// Zwraca mapy z licznikami dla każdego typu nagrody
   Stream<Map<String, int>> getInventoryStream() {
-    // Kontroler streamu
     final controller = StreamController<Map<String, int>>();
+    final userId = currentUserId;
+
+    if (userId == null) {
+      // Brak użytkownika - zwróć puste liczniki
+      controller.add({for (final r in availableRewards) r.id: 0});
+      return controller.stream;
+    }
 
     // Początkowe pobranie danych
     getInventoryCounts().then((counts) {
@@ -156,10 +189,11 @@ class DatabaseService {
       }
     });
 
-    // Subskrypcja realtime
+    // Subskrypcja realtime z filtrem po user_id
     final subscription = _client
         .from('inventory')
         .stream(primaryKey: ['id'])
+        .eq('user_id', userId)
         .listen((List<Map<String, dynamic>> data) async {
           // Przelicz liczniki po każdej zmianie
           final counts = <String, int>{};
@@ -187,14 +221,21 @@ class DatabaseService {
     return controller.stream;
   }
 
-  /// Konsumuje (usuwa) jeden przedmiot danego typu z ekwipunku
+  /// Konsumuje (usuwa) jeden przedmiot danego typu z ekwipunku aktualnego użytkownika
   /// Zwraca true jeśli udało się usunąć, false jeśli brak przedmiotu
   Future<bool> consumeItem(String rewardId) async {
+    final userId = currentUserId;
+    if (userId == null) {
+      print('Brak zalogowanego użytkownika - nie można konsumować');
+      return false;
+    }
+
     try {
-      // Znajdź najstarszy przedmiot danego typu
+      // Znajdź najstarszy przedmiot danego typu dla aktualnego użytkownika
       final response = await _client
           .from('inventory')
           .select('id')
+          .eq('user_id', userId)
           .eq('reward_id', rewardId)
           .order('created_at', ascending: true)
           .limit(1);

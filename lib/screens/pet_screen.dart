@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../providers/pet_provider.dart';
+import '../providers/inventory_provider.dart';
+import '../services/database_service.dart';
 
 /// Ekran gry Zwierzak (Tamagotchi)
 class PetScreen extends ConsumerWidget {
@@ -45,12 +47,19 @@ class PetScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Przyciski akcji
+              // Ekwipunek - smakołyki do karmienia
+              _InventoryPanel(
+                onFeed: (rewardId) => _feedWithItem(context, ref, rewardId),
+                isSleeping: petState.isSleeping,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Przyciski akcji (bez karmienia - przeniesione do ekwipunku)
               _ActionButtons(
                 petState: petState,
-                onFeed: () => ref.read(petProvider.notifier).feed(),
                 onPlay: () => ref.read(petProvider.notifier).play(),
                 onSleep: petState.isSleeping
                     ? () => ref.read(petProvider.notifier).wakeUp()
@@ -64,6 +73,58 @@ class PetScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Karmi zwierzaka wybranym smakołykiem
+  Future<void> _feedWithItem(BuildContext context, WidgetRef ref, String rewardId) async {
+    // Skonsumuj przedmiot z ekwipunku
+    final success = await ref.read(inventoryProvider.notifier).consumeItem(rewardId);
+
+    if (success) {
+      // Nakarm zwierzaka
+      ref.read(petProvider.notifier).feed();
+
+      // Pokaż informację
+      if (context.mounted) {
+        final reward = availableRewards.firstWhere(
+          (r) => r.id == rewardId,
+          orElse: () => availableRewards.first,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Text(_getRewardEmoji(rewardId), style: const TextStyle(fontSize: 24)),
+                const SizedBox(width: 8),
+                Text('Mniam! ${reward.name}!'),
+              ],
+            ),
+            backgroundColor: AppTheme.greenColor,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  String _getRewardEmoji(String rewardId) {
+    switch (rewardId) {
+      case 'cookie':
+        return '🍪';
+      case 'candy':
+        return '🍬';
+      case 'icecream':
+        return '🍦';
+      case 'chocolate':
+        return '🍫';
+      default:
+        return '🍖';
+    }
   }
 
   void _showResetDialog(BuildContext context, WidgetRef ref) {
@@ -383,17 +444,204 @@ class _PetDisplay extends StatelessWidget {
   }
 }
 
-/// Przyciski akcji
+/// Panel ekwipunku - smakołyki do karmienia
+class _InventoryPanel extends ConsumerWidget {
+  final Function(String rewardId) onFeed;
+  final bool isSleeping;
+
+  const _InventoryPanel({
+    required this.onFeed,
+    required this.isSleeping,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final inventory = ref.watch(inventoryProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('🎒', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text(
+                'Smakołyki',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textColor,
+                ),
+              ),
+              const Spacer(),
+              if (inventory.isEmpty)
+                Text(
+                  'Zbieraj w grach!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textLightColor,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: availableRewards.map((reward) {
+              final count = inventory.countOf(reward.id);
+              final canFeed = count > 0 && !isSleeping;
+
+              return _FoodItem(
+                rewardId: reward.id,
+                name: reward.name,
+                count: count,
+                enabled: canFeed,
+                onTap: canFeed ? () => onFeed(reward.id) : null,
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pojedynczy przedmiot w ekwipunku
+class _FoodItem extends StatelessWidget {
+  final String rewardId;
+  final String name;
+  final int count;
+  final bool enabled;
+  final VoidCallback? onTap;
+
+  const _FoodItem({
+    required this.rewardId,
+    required this.name,
+    required this.count,
+    required this.enabled,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: enabled ? 1.0 : 0.4,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: enabled
+                        ? _getRewardColor(rewardId).withOpacity(0.2)
+                        : Colors.grey.shade200,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: enabled
+                          ? _getRewardColor(rewardId)
+                          : Colors.grey.shade300,
+                      width: 2,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getRewardEmoji(rewardId),
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
+                ),
+                // Licznik
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: count > 0 ? AppTheme.primaryColor : Colors.grey,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              name,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: enabled ? AppTheme.textColor : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getRewardEmoji(String rewardId) {
+    switch (rewardId) {
+      case 'cookie':
+        return '🍪';
+      case 'candy':
+        return '🍬';
+      case 'icecream':
+        return '🍦';
+      case 'chocolate':
+        return '🍫';
+      default:
+        return '🍖';
+    }
+  }
+
+  Color _getRewardColor(String rewardId) {
+    switch (rewardId) {
+      case 'cookie':
+        return Colors.brown;
+      case 'candy':
+        return Colors.pink;
+      case 'icecream':
+        return Colors.cyan;
+      case 'chocolate':
+        return Colors.brown.shade700;
+      default:
+        return Colors.orange;
+    }
+  }
+}
+
+/// Przyciski akcji (bez karmienia - przeniesione do ekwipunku)
 class _ActionButtons extends StatelessWidget {
   final PetState petState;
-  final VoidCallback onFeed;
   final VoidCallback onPlay;
   final VoidCallback onSleep;
   final VoidCallback onWash;
 
   const _ActionButtons({
     required this.petState,
-    required this.onFeed,
     required this.onPlay,
     required this.onSleep,
     required this.onWash,
@@ -406,13 +654,6 @@ class _ActionButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _ActionButton(
-          icon: '🍖',
-          label: 'Nakarm',
-          color: Colors.orange,
-          onTap: isSleeping ? null : onFeed,
-          disabled: isSleeping,
-        ),
         _ActionButton(
           icon: '🎾',
           label: 'Baw sie',

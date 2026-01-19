@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 /// Punkt na sciezce do rysowania
@@ -44,6 +45,25 @@ class TracingCanvas extends StatefulWidget {
   State<TracingCanvas> createState() => TracingCanvasState();
 }
 
+/// Wynik oceny rysunku
+class TracingScore {
+  final double accuracy;     // 0-100, jak blisko sciezki
+  final double coverage;     // 0-100, ile sciezki pokryto
+  final int errorCount;      // liczba punktow poza tolerancja
+
+  const TracingScore({
+    required this.accuracy,
+    required this.coverage,
+    required this.errorCount,
+  });
+
+  /// Czy rysunek jest wystarczajaco dobry (>90% lub <2 bledy)
+  bool get isGoodEnough => accuracy >= 90 || errorCount < 2;
+
+  /// Srednia ocena
+  double get overallScore => (accuracy + coverage) / 2;
+}
+
 class TracingCanvasState extends State<TracingCanvas> {
   List<TracingPoint> _drawnPoints = [];
 
@@ -53,6 +73,98 @@ class TracingCanvasState extends State<TracingCanvas> {
       _drawnPoints = [];
     });
   }
+
+  /// Oblicza wynik rysunku - porownuje z wzorem
+  TracingScore calculateScore() {
+    if (_drawnPoints.isEmpty) {
+      return const TracingScore(accuracy: 0, coverage: 0, errorCount: 0);
+    }
+
+    final pathMetrics = widget.pattern.path.computeMetrics();
+
+    // Zbierz punkty wzoru (co 5 pikseli)
+    final List<Offset> patternPoints = [];
+    for (final metric in pathMetrics) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final tangent = metric.getTangentForOffset(distance);
+        if (tangent != null) {
+          patternPoints.add(tangent.position);
+        }
+        distance += 5.0; // Probkuj co 5 pikseli
+      }
+    }
+
+    if (patternPoints.isEmpty) {
+      return const TracingScore(accuracy: 100, coverage: 0, errorCount: 0);
+    }
+
+    // Tolerancja - maksymalna odleglosc od wzoru (w pikselach)
+    const double tolerance = 35.0;
+
+    // Zbierz narysowane punkty (bez przerw)
+    final drawnPositions = _drawnPoints
+        .where((p) => !p.isBreak)
+        .map((p) => p.position)
+        .toList();
+
+    if (drawnPositions.isEmpty) {
+      return const TracingScore(accuracy: 0, coverage: 0, errorCount: 0);
+    }
+
+    // 1. Oblicz accuracy - ile narysowanych punktow jest blisko wzoru
+    int pointsOnPath = 0;
+    int errorCount = 0;
+
+    for (final drawn in drawnPositions) {
+      double minDistance = double.infinity;
+      for (final pattern in patternPoints) {
+        final dist = (drawn - pattern).distance;
+        if (dist < minDistance) {
+          minDistance = dist;
+        }
+      }
+
+      if (minDistance <= tolerance) {
+        pointsOnPath++;
+      } else {
+        errorCount++;
+      }
+    }
+
+    final accuracy = drawnPositions.isNotEmpty
+        ? (pointsOnPath / drawnPositions.length) * 100
+        : 0.0;
+
+    // 2. Oblicz coverage - ile punktow wzoru zostalo pokrytych
+    int coveredPoints = 0;
+
+    for (final pattern in patternPoints) {
+      bool isCovered = false;
+      for (final drawn in drawnPositions) {
+        if ((pattern - drawn).distance <= tolerance) {
+          isCovered = true;
+          break;
+        }
+      }
+      if (isCovered) {
+        coveredPoints++;
+      }
+    }
+
+    final coverage = patternPoints.isNotEmpty
+        ? (coveredPoints / patternPoints.length) * 100
+        : 0.0;
+
+    return TracingScore(
+      accuracy: accuracy.clamp(0.0, 100.0),
+      coverage: coverage.clamp(0.0, 100.0),
+      errorCount: errorCount,
+    );
+  }
+
+  /// Czy uzytkownik narysował cokolwiek
+  bool get hasDrawing => _drawnPoints.any((p) => !p.isBreak);
 
   void _onPanStart(DragStartDetails details) {
     setState(() {

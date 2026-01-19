@@ -50,22 +50,79 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
   }
 
   void _nextPattern() async {
+    final canvasState = _canvasKey.currentState;
+
+    // Sprawdz czy uzytkownik narysował cokolwiek
+    if (canvasState == null || !canvasState.hasDrawing) {
+      _showTryAgainMessage('Najpierw narysuj wzór!');
+      return;
+    }
+
+    // Oblicz wynik rysunku
+    final score = canvasState.calculateScore();
+
     if (!_isLast) {
-      // Przyznaj nagrodę za ukończenie wzoru
-      if (widget.enableRewards) {
+      // Sprawdz czy wynik jest wystarczajaco dobry
+      if (widget.enableRewards && score.isGoodEnough) {
         await _grantReward();
+      } else if (widget.enableRewards) {
+        // Nie przyznaj nagrody, ale pozwól przejść dalej
+        _showTryAgainMessage(
+          'Spróbuj jeszcze raz, żeby zdobyć smakołyk!\n'
+          'Dokładność: ${score.accuracy.toInt()}%',
+        );
       }
 
       setState(() {
         _currentIndex++;
       });
-      _canvasKey.currentState?.clear();
+      canvasState.clear();
     } else {
-      // Ostatni wzór - przyznaj nagrodę i wróć do menu
-      if (widget.enableRewards) {
+      // Ostatni wzór
+      if (widget.enableRewards && score.isGoodEnough) {
         await _grantReward(isLast: true);
+      } else {
+        if (widget.enableRewards) {
+          _showTryAgainMessage(
+            'Spróbuj jeszcze raz!\n'
+            'Dokładność: ${score.accuracy.toInt()}%',
+          );
+        }
+        // Po ostatnim wzorze - wróć do menu
+        if (mounted) {
+          Navigator.pop(context);
+        }
       }
     }
+  }
+
+  /// Pokazuje komunikat zachęcający do ponownej próby
+  void _showTryAgainMessage(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Text('💪', style: TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppTheme.primaryColor,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   /// Przyznaje nagrodę i pokazuje popup

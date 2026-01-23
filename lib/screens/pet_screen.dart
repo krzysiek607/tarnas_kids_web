@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../providers/pet_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../services/database_service.dart';
+import '../services/analytics_service.dart';
 
 /// Ekran gry Zwierzak (Tamagotchi)
 class PetScreen extends ConsumerWidget {
@@ -83,6 +84,9 @@ class PetScreen extends ConsumerWidget {
     if (success) {
       // Nakarm zwierzaka
       ref.read(petProvider.notifier).feed();
+
+      // Loguj zdarzenie analityczne
+      analytics.logPetFed(rewardId);
 
       // Pokaż informację
       if (context.mounted) {

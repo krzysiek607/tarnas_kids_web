@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/drawing_provider.dart';
+import '../services/analytics_service.dart';
 
 /// Ekran zabawy dla dzieci - menu wyboru gier
 /// Uklad lukowy z tlem
@@ -68,7 +69,10 @@ class _FunScreenState extends State<FunScreen> {
                     iconPath: 'assets/images/icons/zabawa_rysowanie.png',
                     tooltip: 'Rysowanie',
                     color: AppTheme.primaryColor,
-                    onTap: () => context.push('/drawing'),
+                    onTap: () {
+                      analytics.logGameStart('Rysowanie');
+                      context.push('/drawing');
+                    },
                   ),
                 ),
                 // Przycisk 2 (srodkowy lewy) - wyzej
@@ -76,14 +80,20 @@ class _FunScreenState extends State<FunScreen> {
                   iconPath: 'assets/images/icons/zabawa_labirynt.png',
                   tooltip: 'Labirynt',
                   color: AppTheme.accentColor,
-                  onTap: () => context.push('/fun/maze'),
+                  onTap: () {
+                    analytics.logGameStart('Labirynt');
+                    context.push('/fun/maze');
+                  },
                 ),
                 // Przycisk 3 (srodkowy prawy) - wyzej
                 _ArchMenuButton(
                   iconPath: 'assets/images/icons/zabawa_dopasuj.png',
                   tooltip: 'Dopasuj',
                   color: AppTheme.yellowColor,
-                  onTap: () => context.push('/fun/matching'),
+                  onTap: () {
+                    analytics.logGameStart('Dopasuj');
+                    context.push('/fun/matching');
+                  },
                 ),
                 // Przycisk 4 (skrajny prawy) - nizej
                 Padding(
@@ -92,7 +102,10 @@ class _FunScreenState extends State<FunScreen> {
                     iconPath: 'assets/images/icons/zabawa_kropki.png',
                     tooltip: 'Połącz kropki',
                     color: AppTheme.purpleColor,
-                    onTap: () => context.push('/fun/dots'),
+                    onTap: () {
+                      analytics.logGameStart('Polacz_kropki');
+                      context.push('/fun/dots');
+                    },
                   ),
                 ),
               ],

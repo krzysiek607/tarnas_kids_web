@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/fade_page_route.dart';
+import '../services/analytics_service.dart';
 import 'learning/find_letter_screen.dart';
 import 'learning/connect_syllables_screen.dart';
 import 'learning/counting_game_screen.dart';
@@ -51,20 +52,26 @@ class LearningScreen extends StatelessWidget {
                         iconPath: 'assets/images/icons/nauka_szlaczki.png',
                         tooltip: 'Szlaczki',
                         color: AppTheme.primaryColor,
-                        onTap: () => Navigator.push(
-                          context,
-                          FadePageRoute(page: const PatternTracingScreen()),
-                        ),
+                        onTap: () {
+                          analytics.logGameStart('Szlaczki');
+                          Navigator.push(
+                            context,
+                            FadePageRoute(page: const PatternTracingScreen()),
+                          );
+                        },
                       ),
                     ),
                     _ArchMenuButton(
                       iconPath: 'assets/images/icons/nauka_literki.png',
                       tooltip: 'Literki',
                       color: AppTheme.greenColor,
-                      onTap: () => Navigator.push(
-                        context,
-                        FadePageRoute(page: const LetterTracingScreen()),
-                      ),
+                      onTap: () {
+                        analytics.logGameStart('Literki');
+                        Navigator.push(
+                          context,
+                          FadePageRoute(page: const LetterTracingScreen()),
+                        );
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 30),
@@ -72,10 +79,13 @@ class LearningScreen extends StatelessWidget {
                         iconPath: 'assets/images/icons/nauka_znajdz.png',
                         tooltip: 'Znajdź literę',
                         color: AppTheme.accentColor,
-                        onTap: () => Navigator.push(
-                          context,
-                          FadePageRoute(page: const FindLetterScreen()),
-                        ),
+                        onTap: () {
+                          analytics.logGameStart('Znajdz_litere');
+                          Navigator.push(
+                            context,
+                            FadePageRoute(page: const FindLetterScreen()),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -92,20 +102,26 @@ class LearningScreen extends StatelessWidget {
                         iconPath: 'assets/images/icons/nauka_sylaby.png',
                         tooltip: 'Sylaby',
                         color: AppTheme.yellowColor,
-                        onTap: () => Navigator.push(
-                          context,
-                          FadePageRoute(page: const ConnectSyllablesScreen()),
-                        ),
+                        onTap: () {
+                          analytics.logGameStart('Sylaby');
+                          Navigator.push(
+                            context,
+                            FadePageRoute(page: const ConnectSyllablesScreen()),
+                          );
+                        },
                       ),
                     ),
                     _ArchMenuButton(
                       iconPath: 'assets/images/icons/nauka_liczenie.png',
                       tooltip: 'Liczenie',
                       color: AppTheme.purpleColor,
-                      onTap: () => Navigator.push(
-                        context,
-                        FadePageRoute(page: const CountingGameScreen()),
-                      ),
+                      onTap: () {
+                        analytics.logGameStart('Liczenie');
+                        Navigator.push(
+                          context,
+                          FadePageRoute(page: const CountingGameScreen()),
+                        );
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 30),
@@ -113,10 +129,13 @@ class LearningScreen extends StatelessWidget {
                         iconPath: 'assets/images/icons/nauka_sekwencje.png',
                         tooltip: 'Sekwencje',
                         color: Colors.teal,
-                        onTap: () => Navigator.push(
-                          context,
-                          FadePageRoute(page: const SequenceGameScreen()),
-                        ),
+                        onTap: () {
+                          analytics.logGameStart('Sekwencje');
+                          Navigator.push(
+                            context,
+                            FadePageRoute(page: const SequenceGameScreen()),
+                          );
+                        },
                       ),
                     ),
                   ],

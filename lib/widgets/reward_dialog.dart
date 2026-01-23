@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../services/analytics_service.dart';
 import '../theme/app_theme.dart';
 
 /// Animowany dialog nagrody wyświetlany po ukończeniu zadania
@@ -64,6 +65,10 @@ class _RewardDialogState extends State<RewardDialog>
   @override
   void initState() {
     super.initState();
+
+    // Loguj zdarzenie zdobycia nagrody
+    analytics.logRewardEarned(widget.reward.name, source: 'game');
+
     // Animacja podskakiwania ikony
     _bounceController = AnimationController(
       duration: const Duration(milliseconds: 600),

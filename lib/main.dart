@@ -6,6 +6,7 @@ import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import 'providers/background_music_provider.dart';
 import 'services/database_service.dart';
+import 'services/analytics_service.dart';
 import 'config/supabase_config.dart';
 
 void main() async {
@@ -45,6 +46,10 @@ Future<void> _initializeSupabase() async {
 
     // Zainicjalizuj DatabaseService
     DatabaseService.initialize(Supabase.instance.client);
+
+    // Zainicjalizuj AnalyticsService
+    AnalyticsService.instance.initialize(Supabase.instance.client);
+
     debugPrint('Supabase zainicjalizowany pomyślnie');
   } catch (e) {
     debugPrint('Błąd inicjalizacji Supabase: $e');

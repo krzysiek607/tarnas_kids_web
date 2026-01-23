@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Uprawnienia sieciowe - wymagane dla Supabase -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Uprawnienia dla audio -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 

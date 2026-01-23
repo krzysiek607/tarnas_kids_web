@@ -499,6 +499,7 @@ class _InventoryPanel extends ConsumerWidget {
               final canFeed = count > 0 && !isSleeping;
 
               return _FoodItem(
+                key: ValueKey('food_${reward.id}'),
                 rewardId: reward.id,
                 name: reward.name,
                 count: count,
@@ -522,6 +523,7 @@ class _FoodItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _FoodItem({
+    super.key,
     required this.rewardId,
     required this.name,
     required this.count,

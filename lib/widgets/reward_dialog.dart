@@ -98,13 +98,20 @@ class _RewardDialogState extends State<RewardDialog>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          margin: const EdgeInsets.all(32),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
+    // SafeArea + ConstrainedBox zapobiegają błędom przy zmianie rozmiaru okna (Windows)
+    return SafeArea(
+      child: Center(
+        child: Material(
+          color: Colors.transparent,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: Container(
+              margin: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(32),
             boxShadow: [
@@ -263,6 +270,8 @@ class _RewardDialogState extends State<RewardDialog>
                 ),
               ),
             ],
+          ),
+        ),
           ),
         ),
       ),

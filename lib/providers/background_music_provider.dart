@@ -2,10 +2,21 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Funkcja do logowania - uzywamy print() dla lepszej widocznosci w Android logs
+// Funkcja do logowania - tylko bledy i wazne zdarzenia
+// Ustaw na true tylko do debugowania
+const bool _enableAudioLogs = false;
+
 void _log(String message) {
+  if (_enableAudioLogs) {
+    // ignore: avoid_print
+    print('[AUDIO] $message');
+  }
+}
+
+// Zawsze loguj bledy
+void _logError(String message) {
   // ignore: avoid_print
-  print('[AUDIO] $message');
+  print('[AUDIO ERROR] $message');
 }
 
 /// Stan muzyki w tle
@@ -72,33 +83,21 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       // Ustaw glosnosc
       await _audioPlayer!.setVolume(state.volume);
 
-      // Listener na logi
+      // Listener na logi (tylko bledy)
       _audioPlayer!.onLog.listen((msg) {
-        _log('AudioPlayer log: $msg');
-      });
-
-      // Listener na stan odtwarzacza
-      _audioPlayer!.onPlayerStateChanged.listen((playerState) {
-        _log('AudioPlayer state changed: $playerState');
-      });
-
-      // Listener na zakonczenie
-      _audioPlayer!.onPlayerComplete.listen((_) {
-        _log('AudioPlayer completed');
-      });
-
-      // Listener na czas trwania - potwierdza ze plik zostal zaladowany
-      _audioPlayer!.onDurationChanged.listen((duration) {
-        _log('AudioPlayer duration: $duration');
-      });
-
-      // Listener na pozycje
-      _audioPlayer!.onPositionChanged.listen((position) {
-        // Loguj co 5 sekund zeby nie zasmiecac
-        if (position.inSeconds % 5 == 0 && position.inMilliseconds % 1000 < 500) {
-          _log('AudioPlayer position: $position');
+        if (msg.contains('error') || msg.contains('Error')) {
+          _logError('AudioPlayer: $msg');
         }
       });
+
+      // Listener na zakonczenie (dla debug)
+      _audioPlayer!.onPlayerComplete.listen((_) {
+        _log('AudioPlayer completed - looping');
+      });
+
+      // Listenery na pozycje i czas trwania - WYLACZONE (zasmiecaly konsole)
+      // _audioPlayer!.onDurationChanged.listen((duration) { ... });
+      // _audioPlayer!.onPositionChanged.listen((position) { ... });
 
       _isInitialized = true;
       _log('AudioPlayer initialized successfully');
@@ -106,7 +105,7 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       // Sprawdz dostepne zrodla
       _log('Platform: ${kIsWeb ? "Web" : "Mobile"}');
     } catch (e) {
-      _log('AudioPlayer init error: $e');
+      _logError('AudioPlayer init error: $e');
       state = state.copyWith(error: e.toString());
     }
   }
@@ -142,7 +141,7 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       state = state.copyWith(isPlaying: true, error: null);
       _log('State updated to isPlaying: true');
     } catch (e, stack) {
-      _log('Audio play error: $e');
+      _logError('Audio play error: $e');
       _log('Stack: $stack');
       state = state.copyWith(isPlaying: false, error: e.toString());
     }
@@ -155,7 +154,7 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       await _audioPlayer!.pause();
       state = state.copyWith(isPlaying: false);
     } catch (e) {
-      _log('Audio pause error: $e');
+      _logError('Audio pause error: $e');
     }
   }
 
@@ -169,7 +168,7 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       await _audioPlayer!.resume();
       state = state.copyWith(isPlaying: true);
     } catch (e) {
-      _log('Audio resume error: $e');
+      _logError('Audio resume error: $e');
       // Sprobuj odtworzyc od nowa
       await play();
     }
@@ -214,7 +213,7 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       await _audioPlayer!.setVolume(volume);
       state = state.copyWith(volume: volume);
     } catch (e) {
-      _log('Audio setVolume error: $e');
+      _logError('Audio setVolume error: $e');
     }
   }
 

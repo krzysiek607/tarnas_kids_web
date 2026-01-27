@@ -31,70 +31,70 @@ class PatternTracingScreen extends StatelessWidget {
       // 1. Linia prosta pozioma
       TracingPattern(
         name: 'Linia prosta',
-        hint: 'Narysuj prosta linie od lewej do prawej',
+        hint: 'Narysuj prostą linię od lewej do prawej',
         path: _createStraightLine(margin, centerY, usableWidth),
       ),
 
       // 2. Fala
       TracingPattern(
         name: 'Fala',
-        hint: 'Plynnie faluj w gore i w dol',
+        hint: 'Płynnie faluj w górę i w dół',
         path: _createWave(margin, centerY, usableWidth, waves: 3),
       ),
 
       // 3. Zygzak
       TracingPattern(
         name: 'Zygzak',
-        hint: 'Ostre zakrety w gore i w dol',
+        hint: 'Ostre zakręty w górę i w dół',
         path: _createZigzag(margin, centerY, usableWidth, peaks: 4),
       ),
 
-      // 4. Petelki
+      // 4. Pętelki
       TracingPattern(
-        name: 'Petelki',
-        hint: 'Male koleczka jedno za drugim',
+        name: 'Pętelki',
+        hint: 'Małe kółeczka jedno za drugim',
         path: _createLoops(margin, centerY, usableWidth, loops: 4),
       ),
 
       // 5. Linia pionowa
       TracingPattern(
         name: 'Linia pionowa',
-        hint: 'Prosta linia z gory na dol',
+        hint: 'Prosta linia z góry na dół',
         path: _createVerticalLine(width / 2, 60, 240),
       ),
 
       // 6. Spirala
       TracingPattern(
         name: 'Spirala',
-        hint: 'Zacznij od srodka i krec na zewnatrz',
+        hint: 'Zacznij od środka i kręć na zewnątrz',
         path: _createSpiral(width / 2, centerY, 80),
       ),
 
       // 7. Schody
       TracingPattern(
         name: 'Schody',
-        hint: 'Rysuj stopnie schodow',
+        hint: 'Rysuj stopnie schodów',
         path: _createStairs(margin, 220, usableWidth, steps: 5),
       ),
 
-      // 8. Duza fala
+      // 8. Duża fala
       TracingPattern(
-        name: 'Duza fala',
-        hint: 'Plynna, szeroka fala',
+        name: 'Duża fala',
+        hint: 'Płynna, szeroka fala',
         path: _createWave(margin, centerY, usableWidth, waves: 2, amplitude: 60),
       ),
 
-      // 9. Male zeby
+      // 9. Małe zęby
       TracingPattern(
-        name: 'Male zeby',
-        hint: 'Ostre male trojkaty',
+        name: 'Małe zęby',
+        hint: 'Ostre małe trójkąty',
         path: _createZigzag(margin, centerY, usableWidth, peaks: 8, amplitude: 25),
       ),
 
-      // 10. Osmka
+      // 10. Ósemka
       TracingPattern(
-        name: 'Osmka',
-        hint: 'Narysuj lezaca osemke',
+        name: 'Ósemka',
+        hint: 'Narysuj leżącą ósemkę',
         path: _createFigureEight(width / 2, centerY, 60),
       ),
     ];

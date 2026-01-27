@@ -219,7 +219,7 @@ class _CountingGameScreenState extends State<CountingGameScreen>
                     child: const Padding(
                       padding: EdgeInsets.all(20),
                       child: Text(
-                        '🎉 Swietnie policzone! 🎉',
+                        '🎉 Świetnie policzone! 🎉',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,

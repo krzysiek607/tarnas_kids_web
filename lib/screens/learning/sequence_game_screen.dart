@@ -32,16 +32,16 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
         _SequenceStep(0, '😴', 'Budzenie'),
         _SequenceStep(1, '🚿', 'Mycie'),
         _SequenceStep(2, '👕', 'Ubieranie'),
-        _SequenceStep(3, '🥣', 'Sniadanie'),
+        _SequenceStep(3, '🥣', 'Śniadanie'),
       ],
     ),
     _SequenceData(
-      title: 'Roslina',
+      title: 'Roślina',
       icon: '🌱',
       steps: [
         _SequenceStep(0, '🌰', 'Nasiono'),
         _SequenceStep(1, '💧', 'Podlewanie'),
-        _SequenceStep(2, '🌱', 'Kietek'),
+        _SequenceStep(2, '🌱', 'Kiełek'),
         _SequenceStep(3, '🌸', 'Kwiat'),
       ],
     ),
@@ -50,18 +50,18 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
       icon: '🦋',
       steps: [
         _SequenceStep(0, '🥚', 'Jajko'),
-        _SequenceStep(1, '🐛', 'Gasienica'),
+        _SequenceStep(1, '🐛', 'Gąsienica'),
         _SequenceStep(2, '🧶', 'Kokon'),
         _SequenceStep(3, '🦋', 'Motyl'),
       ],
     ),
     _SequenceData(
-      title: 'Dzien',
+      title: 'Dzień',
       icon: '☀️',
       steps: [
-        _SequenceStep(0, '🌅', 'Wschod'),
-        _SequenceStep(1, '☀️', 'Poludnie'),
-        _SequenceStep(2, '🌇', 'Zachod'),
+        _SequenceStep(0, '🌅', 'Wschód'),
+        _SequenceStep(1, '☀️', 'Południe'),
+        _SequenceStep(2, '🌇', 'Zachód'),
         _SequenceStep(3, '🌙', 'Noc'),
       ],
     ),
@@ -198,7 +198,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Uloz kolejnosc'),
+        title: const Text('Ułóż kolejność'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.pop(context),
@@ -353,7 +353,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
                     return Transform.scale(
                       scale: _successScale.value,
                       child: const Text(
-                        '⭐ Swietna kolejnosc! ⭐',
+                        '⭐ Świetna kolejność! ⭐',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -501,7 +501,7 @@ class _CompletionDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Swietnie!',
+              'Świetnie!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -510,7 +510,7 @@ class _CompletionDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Ukonczyles wszystkie sekwencje!',
+              'Ukończyłeś wszystkie sekwencje!',
               style: TextStyle(
                 fontSize: 16,
                 color: AppTheme.textLightColor,
@@ -522,7 +522,7 @@ class _CompletionDialog extends StatelessWidget {
               children: [
                 Expanded(
                   child: _DialogButton(
-                    label: 'Wyjdz',
+                    label: 'Wyjdź',
                     icon: Icons.home_rounded,
                     color: Colors.grey.shade400,
                     onTap: onExit,

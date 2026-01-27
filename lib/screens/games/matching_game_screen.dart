@@ -26,49 +26,49 @@ class _MatchingGameScreenState extends ConsumerState<MatchingGameScreen> {
 
   final Map<int, LevelData> levelData = {
     1: LevelData(
-      title: 'Zwierze i dzwiek',
-      description: 'Polacz zwierze z dzwiekiem',
+      title: 'Zwierzę i dźwięk',
+      description: 'Połącz zwierzę z dźwiękiem',
       pairs: [
         MatchPair(left: MatchItem('🐶', 'Pies'), right: MatchItem('💬', 'Hau Hau!', soundFile: 'dog.mp3')),
         MatchPair(left: MatchItem('🐱', 'Kot'), right: MatchItem('💬', 'Miau!', soundFile: 'cat.mp3')),
         MatchPair(left: MatchItem('🐄', 'Krowa'), right: MatchItem('💬', 'Muuuu!', soundFile: 'cow.mp3')),
-        MatchPair(left: MatchItem('🐷', 'Swinka'), right: MatchItem('💬', 'Chrum!', soundFile: 'pig.mp3')),
-        MatchPair(left: MatchItem('🐸', 'Zaba'), right: MatchItem('💬', 'Kum kum!', soundFile: 'frog.mp3')),
+        MatchPair(left: MatchItem('🐷', 'Świnka'), right: MatchItem('💬', 'Chrum!', soundFile: 'pig.mp3')),
+        MatchPair(left: MatchItem('🐸', 'Żaba'), right: MatchItem('💬', 'Kum kum!', soundFile: 'frog.mp3')),
         MatchPair(left: MatchItem('🦁', 'Lew'), right: MatchItem('💬', 'Roarrr!', soundFile: 'lion.mp3')),
         MatchPair(left: MatchItem('🐔', 'Kura'), right: MatchItem('💬', 'Ko ko ko!', soundFile: 'chicken.mp3')),
         MatchPair(left: MatchItem('🐑', 'Owca'), right: MatchItem('💬', 'Bee bee!', soundFile: 'sheep.mp3')),
         MatchPair(left: MatchItem('🦆', 'Kaczka'), right: MatchItem('💬', 'Kwa kwa!', soundFile: 'duck.mp3')),
-        MatchPair(left: MatchItem('🐴', 'Kon'), right: MatchItem('💬', 'Ihaha!', soundFile: 'horse.mp3')),
+        MatchPair(left: MatchItem('🐴', 'Koń'), right: MatchItem('💬', 'Ihaha!', soundFile: 'horse.mp3')),
       ],
     ),
     2: LevelData(
-      title: 'Zwierze i dom',
-      description: 'Gdzie mieszka zwierze?',
+      title: 'Zwierzę i dom',
+      description: 'Gdzie mieszka zwierzę?',
       pairs: [
         MatchPair(left: MatchItem('🐟', 'Ryba'), right: MatchItem('🌊', 'Woda')),
         MatchPair(left: MatchItem('🐦', 'Ptak'), right: MatchItem('☁️', 'Niebo')),
-        MatchPair(left: MatchItem('🐪', 'Wielblad'), right: MatchItem('🏜️', 'Pustynia')),
-        MatchPair(left: MatchItem('🐧', 'Pingwin'), right: MatchItem('🧊', 'Lod')),
-        MatchPair(left: MatchItem('🐒', 'Malpa'), right: MatchItem('🌴', 'Dzungla')),
-        MatchPair(left: MatchItem('🐻', 'Niedzwiedz'), right: MatchItem('🌲', 'Las')),
-        MatchPair(left: MatchItem('🦔', 'Jez'), right: MatchItem('🍂', 'Liscie')),
-        MatchPair(left: MatchItem('🐝', 'Pszczola'), right: MatchItem('🍯', 'Ul')),
-        MatchPair(left: MatchItem('🐜', 'Mrowka'), right: MatchItem('🏔️', 'Mrowisko')),
+        MatchPair(left: MatchItem('🐪', 'Wielbłąd'), right: MatchItem('🏜️', 'Pustynia')),
+        MatchPair(left: MatchItem('🐧', 'Pingwin'), right: MatchItem('🧊', 'Lód')),
+        MatchPair(left: MatchItem('🐒', 'Małpa'), right: MatchItem('🌴', 'Dżungla')),
+        MatchPair(left: MatchItem('🐻', 'Niedźwiedź'), right: MatchItem('🌲', 'Las')),
+        MatchPair(left: MatchItem('🦔', 'Jeż'), right: MatchItem('🍂', 'Liście')),
+        MatchPair(left: MatchItem('🐝', 'Pszczoła'), right: MatchItem('🍯', 'Ul')),
+        MatchPair(left: MatchItem('🐜', 'Mrówka'), right: MatchItem('🏔️', 'Mrowisko')),
         MatchPair(left: MatchItem('🦈', 'Rekin'), right: MatchItem('🌊', 'Ocean')),
       ],
     ),
     3: LevelData(
-      title: 'Zawod i narzedzie',
-      description: 'Czego uzywa w pracy?',
+      title: 'Zawód i narzędzie',
+      description: 'Czego używa w pracy?',
       pairs: [
         MatchPair(left: MatchItem('👨‍🍳', 'Kucharz'), right: MatchItem('🍳', 'Patelnia')),
-        MatchPair(left: MatchItem('👨‍🚒', 'Strazak'), right: MatchItem('🚒', 'Woz strazacki')),
-        MatchPair(left: MatchItem('👮', 'Policjant'), right: MatchItem('🚔', 'Radiowoz')),
+        MatchPair(left: MatchItem('👨‍🚒', 'Strażak'), right: MatchItem('🚒', 'Wóz strażacki')),
+        MatchPair(left: MatchItem('👮', 'Policjant'), right: MatchItem('🚔', 'Radiowóz')),
         MatchPair(left: MatchItem('👨‍⚕️', 'Lekarz'), right: MatchItem('💉', 'Strzykawka')),
-        MatchPair(left: MatchItem('👨‍🏫', 'Nauczyciel'), right: MatchItem('📚', 'Ksiazki')),
+        MatchPair(left: MatchItem('👨‍🏫', 'Nauczyciel'), right: MatchItem('📚', 'Książki')),
         MatchPair(left: MatchItem('👨‍🌾', 'Rolnik'), right: MatchItem('🚜', 'Traktor')),
-        MatchPair(left: MatchItem('💇', 'Fryzjer'), right: MatchItem('✂️', 'Nozyczki')),
-        MatchPair(left: MatchItem('🎨', 'Malarz'), right: MatchItem('🖌️', 'Pedzel')),
+        MatchPair(left: MatchItem('💇', 'Fryzjer'), right: MatchItem('✂️', 'Nożyczki')),
+        MatchPair(left: MatchItem('🎨', 'Malarz'), right: MatchItem('🖌️', 'Pędzel')),
         MatchPair(left: MatchItem('👨‍🍞', 'Piekarz'), right: MatchItem('🍞', 'Chleb')),
         MatchPair(left: MatchItem('🚌', 'Kierowca'), right: MatchItem('🛞', 'Kierownica')),
       ],
@@ -188,7 +188,7 @@ class _MatchingGameScreenState extends ConsumerState<MatchingGameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => GameResultDialog(
-        title: 'Swietnie!',
+        title: 'Świetnie!',
         emoji: '⭐',
         message: 'Wszystko dopasowane!',
         buttons: [
@@ -201,7 +201,7 @@ class _MatchingGameScreenState extends ConsumerState<MatchingGameScreen> {
               },
             ),
           KidFriendlyButton.playAgain(
-            label: 'Od poczatku',
+            label: 'Od początku',
             onPressed: () {
               Navigator.pop(context);
               _loadLevel(1);

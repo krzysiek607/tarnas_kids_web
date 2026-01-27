@@ -37,19 +37,19 @@ class _FindLetterScreenState extends State<FindLetterScreen> with TickerProvider
     'F': [LetterItem('🏳️', 'Flaga', 'F'), LetterItem('🎆', 'Fajerwerki', 'F'), LetterItem('🦩', 'Flaming', 'F')],
     'G': [LetterItem('⭐', 'Gwiazda', 'G'), LetterItem('🎸', 'Gitara', 'G'), LetterItem('🍄', 'Grzyb', 'G'), LetterItem('🍐', 'Gruszka', 'G')],
     'H': [LetterItem('🚁', 'Helikopter', 'H'), LetterItem('🍵', 'Herbata', 'H')],
-    'J': [LetterItem('🥚', 'Jajko', 'J'), LetterItem('🍎', 'Jablko', 'J'), LetterItem('🦎', 'Jaszczurka', 'J')],
-    'K': [LetterItem('🐱', 'Kot', 'K'), LetterItem('🔑', 'Klucz', 'K'), LetterItem('📖', 'Ksiazka', 'K'), LetterItem('🦀', 'Krab', 'K'), LetterItem('🌸', 'Kwiat', 'K')],
-    'L': [LetterItem('🦁', 'Lew', 'L'), LetterItem('🍃', 'Lisc', 'L'), LetterItem('🍭', 'Lizak', 'L'), LetterItem('🦊', 'Lis', 'L')],
+    'J': [LetterItem('🥚', 'Jajko', 'J'), LetterItem('🍎', 'Jabłko', 'J'), LetterItem('🦎', 'Jaszczurka', 'J')],
+    'K': [LetterItem('🐱', 'Kot', 'K'), LetterItem('🔑', 'Klucz', 'K'), LetterItem('📖', 'Książka', 'K'), LetterItem('🦀', 'Krab', 'K'), LetterItem('🌸', 'Kwiat', 'K')],
+    'L': [LetterItem('🦁', 'Lew', 'L'), LetterItem('🍃', 'Liść', 'L'), LetterItem('🍭', 'Lizak', 'L'), LetterItem('🦊', 'Lis', 'L')],
     'M': [LetterItem('🐭', 'Mysz', 'M'), LetterItem('🦋', 'Motyl', 'M'), LetterItem('🥕', 'Marchewka', 'M')],
-    'N': [LetterItem('🔪', 'Noz', 'N'), LetterItem('🦏', 'Nosorozec', 'N'), LetterItem('✂️', 'Nozyczki', 'N')],
-    'O': [LetterItem('👀', 'Oczy', 'O'), LetterItem('🔥', 'Ogien', 'O'), LetterItem('✏️', 'Olowek', 'O'), LetterItem('🐙', 'Osmornica', 'O')],
+    'N': [LetterItem('🔪', 'Nóż', 'N'), LetterItem('🦏', 'Nosorozec', 'N'), LetterItem('✂️', 'Nożyczki', 'N')],
+    'O': [LetterItem('👀', 'Oczy', 'O'), LetterItem('🔥', 'Ogień', 'O'), LetterItem('✏️', 'Ołówek', 'O'), LetterItem('🐙', 'Ośmiornica', 'O')],
     'P': [LetterItem('🐕', 'Pies', 'P'), LetterItem('🐦', 'Ptak', 'P'), LetterItem('🍕', 'Pizza', 'P'), LetterItem('🎁', 'Prezent', 'P')],
-    'R': [LetterItem('🐟', 'Ryba', 'R'), LetterItem('🌹', 'Roza', 'R'), LetterItem('🚀', 'Rakieta', 'R'), LetterItem('🤖', 'Robot', 'R')],
-    'S': [LetterItem('☀️', 'Slonce', 'S'), LetterItem('🐘', 'Slon', 'S'), LetterItem('🦉', 'Sowa', 'S'), LetterItem('🧦', 'Skarpeta', 'S')],
+    'R': [LetterItem('🐟', 'Ryba', 'R'), LetterItem('🌹', 'Róża', 'R'), LetterItem('🚀', 'Rakieta', 'R'), LetterItem('🤖', 'Robot', 'R')],
+    'S': [LetterItem('☀️', 'Słońce', 'S'), LetterItem('🐘', 'Słoń', 'S'), LetterItem('🦉', 'Sowa', 'S'), LetterItem('🧦', 'Skarpeta', 'S')],
     'T': [LetterItem('🐅', 'Tygrys', 'T'), LetterItem('📺', 'Telewizor', 'T'), LetterItem('🚜', 'Traktor', 'T'), LetterItem('🌷', 'Tulipan', 'T')],
-    'U': [LetterItem('👂', 'Ucho', 'U'), LetterItem('😊', 'Usmiech', 'U')],
-    'W': [LetterItem('💧', 'Woda', 'W'), LetterItem('🍇', 'Winogrona', 'W'), LetterItem('🐋', 'Wieloryb', 'W'), LetterItem('🐿️', 'Wiewiorka', 'W')],
-    'Z': [LetterItem('🦓', 'Zebra', 'Z'), LetterItem('⏰', 'Zegar', 'Z'), LetterItem('🐸', 'Zaba', 'Z'), LetterItem('🦷', 'Zab', 'Z')],
+    'U': [LetterItem('👂', 'Ucho', 'U'), LetterItem('😊', 'Uśmiech', 'U')],
+    'W': [LetterItem('💧', 'Woda', 'W'), LetterItem('🍇', 'Winogrona', 'W'), LetterItem('🐋', 'Wieloryb', 'W'), LetterItem('🐿️', 'Wiewiórka', 'W')],
+    'Z': [LetterItem('🦓', 'Zebra', 'Z'), LetterItem('⏰', 'Zegar', 'Z'), LetterItem('🐸', 'Żaba', 'Z'), LetterItem('🦷', 'Ząb', 'Z')],
   };
 
   late List<String> availableLetters;
@@ -115,15 +115,15 @@ class _FindLetterScreenState extends State<FindLetterScreen> with TickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(title: const Text('Znajdz literke'), leading: IconButton(icon: const Icon(Icons.arrow_back_rounded), onPressed: () => Navigator.pop(context))),
+      appBar: AppBar(title: const Text('Znajdź literkę'), leading: IconButton(icon: const Icon(Icons.arrow_back_rounded), onPressed: () => Navigator.pop(context))),
       body: SafeArea(child: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
         _ProgressIndicator(current: round + 1, total: maxRounds),
         const SizedBox(height: 20),
         Container(padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: AppTheme.cardShadow),
-          child: Column(children: [Text('Co zaczyna sie na', style: TextStyle(fontSize: 18, color: AppTheme.textLightColor)), const SizedBox(height: 8), Text(targetLetter, style: TextStyle(fontSize: 72, fontWeight: FontWeight.bold, color: AppTheme.primaryColor))])),
+          child: Column(children: [Text('Co zaczyna się na', style: TextStyle(fontSize: 18, color: AppTheme.textLightColor)), const SizedBox(height: 8), Text(targetLetter, style: TextStyle(fontSize: 72, fontWeight: FontWeight.bold, color: AppTheme.primaryColor))])),
         const SizedBox(height: 32),
         Expanded(child: Center(child: Wrap(spacing: 16, runSpacing: 16, alignment: WrapAlignment.center, children: List.generate(displayedItems.length, (i) => _ItemButton(item: displayedItems[i], isCorrect: displayedItems[i] == correctItem, isTapped: tappedIndex == i, showSuccess: showSuccess && displayedItems[i] == correctItem, onTap: () => _onItemTap(i), successAnimation: _successScale))))),
-        if (showSuccess) AnimatedBuilder(animation: _successScale, builder: (ctx, _) => Transform.scale(scale: _successScale.value, child: Column(children: [const Text('⭐ Swietnie! ⭐', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)), const SizedBox(height: 4), Text('${correctItem.name} zaczyna sie na $targetLetter', style: TextStyle(fontSize: 16, color: AppTheme.textLightColor))]))),
+        if (showSuccess) AnimatedBuilder(animation: _successScale, builder: (ctx, _) => Transform.scale(scale: _successScale.value, child: Column(children: [const Text('⭐ Świetnie! ⭐', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)), const SizedBox(height: 4), Text('${correctItem.name} zaczyna się na $targetLetter', style: TextStyle(fontSize: 16, color: AppTheme.textLightColor))]))),
         const SizedBox(height: 20),
       ]))));
   }
@@ -164,7 +164,7 @@ class _CompletionDialog extends StatelessWidget {
   Widget build(BuildContext context) => Dialog(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)), child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
     const Text('🌟', style: TextStyle(fontSize: 64)), const SizedBox(height: 16),
     Text('Wspaniale!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppTheme.textColor)), const SizedBox(height: 8),
-    Text('Znalazles $score z $maxScore przedmiotow!', style: TextStyle(fontSize: 18, color: AppTheme.textLightColor)), const SizedBox(height: 24),
+    Text('Znalazłeś $score z $maxScore przedmiotów!', style: TextStyle(fontSize: 18, color: AppTheme.textLightColor)), const SizedBox(height: 24),
     Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_DialogButton(emoji: '🔄', label: 'Jeszcze raz', color: AppTheme.primaryColor, onTap: onPlayAgain), _DialogButton(emoji: '🏠', label: 'Koniec', color: AppTheme.accentColor, onTap: onExit)])])));
 }
 

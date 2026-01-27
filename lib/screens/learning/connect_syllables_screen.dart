@@ -177,7 +177,7 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Polacz sylaby'),
+        title: const Text('Połącz sylaby'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.pop(context),
@@ -427,7 +427,7 @@ class _CompletionDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Ulozyles $score z $maxScore slow!',
+              'Ułożyłeś $score z $maxScore słów!',
               style: TextStyle(fontSize: 18, color: AppTheme.textLightColor),
             ),
             const SizedBox(height: 24),

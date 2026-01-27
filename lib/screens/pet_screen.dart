@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../providers/pet_provider.dart';
-import '../providers/inventory_provider.dart';
 import '../services/database_service.dart';
 import '../services/analytics_service.dart';
 
@@ -15,71 +15,90 @@ class PetScreen extends ConsumerWidget {
     final petState = ref.watch(petProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Moj Zwierzak'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        // Bez tytułu - czysta górna belka
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: () => _showResetDialog(context, ref),
             tooltip: 'Resetuj',
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Paski statystyk
-              _StatsPanel(petState: petState),
-
-              const SizedBox(height: 20),
-
-              // Kontener na animacje zwierzaka
-              Expanded(
-                child: _PetDisplay(
-                  mood: petState.currentMood,
-                  isSleeping: petState.isSleeping,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Ekwipunek - smakołyki do karmienia
-              _InventoryPanel(
-                onFeed: (rewardId) => _feedWithItem(context, ref, rewardId),
-                isSleeping: petState.isSleeping,
-              ),
-
-              const SizedBox(height: 16),
-
-              // Przyciski akcji (bez karmienia - przeniesione do ekwipunku)
-              _ActionButtons(
-                petState: petState,
-                onPlay: () => ref.read(petProvider.notifier).play(),
-                onSleep: petState.isSleeping
-                    ? () => ref.read(petProvider.notifier).wakeUp()
-                    : () => ref.read(petProvider.notifier).sleep(),
-                onWash: () => ref.read(petProvider.notifier).wash(),
-              ),
-
-              const SizedBox(height: 16),
-            ],
+      body: Stack(
+        children: [
+          // WARSTWA 1: Tło - grafika na całą powierzchnię
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/petscreen_background.png',
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+
+          // WARSTWA 2: Zawartość ekranu
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Paski statystyk
+                  _StatsPanel(petState: petState),
+
+                  const SizedBox(height: 20),
+
+                  // Kontener na animacje zwierzaka
+                  Expanded(
+                    child: _PetDisplay(
+                      mood: petState.currentMood,
+                      isSleeping: petState.isSleeping,
+                      sleepStartTime: petState.sleepStartTime,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Ekwipunek - smakołyki do karmienia
+                  _InventoryPanel(
+                    onFeed: (rewardId) => _feedWithItem(context, ref, rewardId),
+                    isSleeping: petState.isSleeping,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Przyciski akcji (bez karmienia - przeniesione do ekwipunku)
+                  _ActionButtons(
+                    petState: petState,
+                    onPlay: () => ref.read(petProvider.notifier).play(),
+                    onSleep: petState.isSleeping
+                        ? () => ref.read(petProvider.notifier).wakeUp()
+                        : () => ref.read(petProvider.notifier).sleep(),
+                    onWash: () => ref.read(petProvider.notifier).wash(),
+                  ),
+
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   /// Karmi zwierzaka wybranym smakołykiem
   Future<void> _feedWithItem(BuildContext context, WidgetRef ref, String rewardId) async {
-    // Skonsumuj przedmiot z ekwipunku
-    final success = await ref.read(inventoryProvider.notifier).consumeItem(rewardId);
+    // Skonsumuj przedmiot BEZPOŚREDNIO z bazy - StreamBuilder automatycznie zaktualizuje UI
+    final success = await DatabaseService.instance.consumeItem(rewardId);
 
     if (success) {
       // Nakarm zwierzaka
@@ -173,21 +192,22 @@ class _StatsPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // GLASSMORPHISM: Półprzezroczyste tło
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: AppTheme.cardShadow,
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
       ),
       child: Column(
         children: [
           _StatBar(
-            label: 'Glod',
+            label: 'Głód',
             value: petState.hunger,
             icon: '🍖',
             color: Colors.orange,
           ),
           const SizedBox(height: 12),
           _StatBar(
-            label: 'Szczescie',
+            label: 'Szczęście',
             value: petState.happiness,
             icon: '😊',
             color: Colors.pink,
@@ -297,112 +317,134 @@ class _StatBar extends StatelessWidget {
 }
 
 /// Wyswietlanie zwierzaka
-class _PetDisplay extends StatelessWidget {
+class _PetDisplay extends StatefulWidget {
   final String mood;
   final bool isSleeping;
+  final DateTime? sleepStartTime;
 
   const _PetDisplay({
     required this.mood,
     required this.isSleeping,
+    this.sleepStartTime,
   });
 
   @override
+  State<_PetDisplay> createState() => _PetDisplayState();
+}
+
+class _PetDisplayState extends State<_PetDisplay> {
+  /// Formatuje czas snu jako "Xh Ym" lub "Xm"
+  String _formatSleepTime() {
+    if (widget.sleepStartTime == null) return '';
+    final duration = DateTime.now().difference(widget.sleepStartTime!);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    return '${minutes}m';
+  }
+
+  /// Wybiera plik animacji na podstawie nastroju (logika z overallHealth)
+  /// - happy: overallHealth > 70%
+  /// - sad/hungry/tired/dirty: overallHealth < 20% lub pojedyncza statystyka < 30%
+  /// - neutral: pozostałe przypadki
+  String _getEggAsset() {
+    if (widget.mood == 'happy') {
+      return 'assets/images/Creature/happy_egg.webp';
+    } else if (widget.mood == 'sad' ||
+        widget.mood == 'hungry' ||
+        widget.mood == 'tired' ||
+        widget.mood == 'dirty') {
+      return 'assets/images/Creature/sad_egg.webp';
+    }
+    // Neutralny, sleeping, eating, playing, bathing -> idle egg
+    return 'assets/images/Creature/Egg.webp';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            _getBackgroundColor().withOpacity(0.3),
-            _getBackgroundColor().withOpacity(0.1),
-          ],
-        ),
+    return Opacity(
+      opacity: 0.8, // 80% widoczności, 20% przezroczystości
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: _getBackgroundColor().withOpacity(0.5),
-          width: 3,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Placeholder na animacje - tutaj mozna pozniej dodac video/Lottie
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            child: _buildPetImage(),
-          ),
-          const SizedBox(height: 16),
-          // Etykieta nastroju
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(_getEggAsset()),
+              fit: BoxFit.cover,
             ),
-            child: Text(
-              _getMoodText(),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textColor,
+          ),
+          child: Stack(
+          children: [
+            // Etykiety na wierzchu (na dole)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 16,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Etykieta nastroju
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.5), width: 1),
+                    ),
+                    child: Text(
+                      _getMoodText(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textColor,
+                      ),
+                    ),
+                  ),
+                  // Wskaźnik czasu snu
+                  if (widget.isSleeping && widget.sleepStartTime != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('💤', style: TextStyle(fontSize: 14)),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Śpi od ${_formatSleepTime()} (+${DateTime.now().difference(widget.sleepStartTime!).inMinutes} energii)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.indigo.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
       ),
     );
-  }
-
-  Widget _buildPetImage() {
-    // Placeholder - duze emoji reprezentujace nastroj
-    // W przyszlosci zamien na Image.asset lub video
-    return Text(
-      _getMoodEmoji(),
-      key: ValueKey(mood),
-      style: const TextStyle(fontSize: 120),
-    );
-  }
-
-  String _getMoodEmoji() {
-    switch (mood) {
-      case 'happy':
-        return '🐱';
-      case 'eating':
-        return '😋';
-      case 'playing':
-        return '🎉';
-      case 'sleeping':
-        return '😴';
-      case 'tired':
-        return '😫';
-      case 'hungry':
-        return '🥺';
-      case 'dirty':
-        return '🙀';
-      case 'bathing':
-        return '🛁';
-      case 'sad':
-        return '😢';
-      case 'neutral':
-        return '😺';
-      default:
-        return '🐱';
-    }
   }
 
   String _getMoodText() {
-    switch (mood) {
+    switch (widget.mood) {
       case 'happy':
-        return 'Szczesliwy!';
+        return 'Szczęśliwy!';
       case 'eating':
         return 'Mniam mniam!';
       case 'playing':
@@ -410,46 +452,27 @@ class _PetDisplay extends StatelessWidget {
       case 'sleeping':
         return 'Zzz...';
       case 'tired':
-        return 'Zmeczony...';
+        return 'Zmęczony...';
       case 'hungry':
-        return 'Glodny!';
+        return 'Głodny!';
       case 'dirty':
-        return 'Potrzebuje kapieli!';
+        return 'Potrzebuje kąpieli!';
       case 'bathing':
         return 'Plusk plusk!';
       case 'sad':
         return 'Smutny...';
       case 'neutral':
-        return 'W porzadku';
+        return 'W porządku';
       default:
         return 'Hej!';
     }
   }
 
-  Color _getBackgroundColor() {
-    switch (mood) {
-      case 'happy':
-      case 'playing':
-        return AppTheme.greenColor;
-      case 'eating':
-        return AppTheme.yellowColor;
-      case 'sleeping':
-        return AppTheme.purpleColor;
-      case 'bathing':
-        return AppTheme.accentColor;
-      case 'sad':
-      case 'hungry':
-      case 'tired':
-      case 'dirty':
-        return Colors.grey;
-      default:
-        return AppTheme.primaryColor;
-    }
-  }
 }
 
 /// Panel ekwipunku - smakołyki do karmienia
-class _InventoryPanel extends ConsumerWidget {
+/// Używa StreamBuilder dla real-time aktualizacji z Supabase
+class _InventoryPanel extends StatelessWidget {
   final Function(String rewardId) onFeed;
   final bool isSleeping;
 
@@ -459,15 +482,38 @@ class _InventoryPanel extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final inventory = ref.watch(inventoryProvider);
+  Widget build(BuildContext context) {
+    // Jeśli baza nie jest dostępna - pokaż puste
+    if (!DatabaseService.isInitialized) {
+      return _buildPanel(context, {});
+    }
+
+    // StreamBuilder nasłuchuje BEZPOŚREDNIO zmian z Supabase
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: DatabaseService.instance.getInventoryStream(),
+      builder: (context, snapshot) {
+        // Oblicz liczniki z surowych danych
+        final counts = snapshot.hasData
+            ? DatabaseService.calculateCounts(snapshot.data!)
+            : <String, int>{};
+
+        debugPrint('[INVENTORY UI] Stream update: $counts');
+
+        return _buildPanel(context, counts);
+      },
+    );
+  }
+
+  Widget _buildPanel(BuildContext context, Map<String, int> counts) {
+    final isEmpty = counts.values.every((count) => count == 0);
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // GLASSMORPHISM: Półprzezroczyste tło
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: AppTheme.cardShadow,
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,7 +531,7 @@ class _InventoryPanel extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              if (inventory.isEmpty)
+              if (isEmpty)
                 Text(
                   'Zbieraj w grach!',
                   style: TextStyle(
@@ -499,11 +545,11 @@ class _InventoryPanel extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: availableRewards.map((reward) {
-              final count = inventory.countOf(reward.id);
+              final count = counts[reward.id] ?? 0;
               final canFeed = count > 0 && !isSleeping;
 
               return _FoodItem(
-                key: ValueKey('food_${reward.id}'),
+                key: ValueKey('food_${reward.id}_$count'),
                 rewardId: reward.id,
                 name: reward.name,
                 count: count,

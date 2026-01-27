@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,22 +35,45 @@ class TracingGameScreen extends StatefulWidget {
 }
 
 class _TracingGameScreenState extends State<TracingGameScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
   final GlobalKey<TracingCanvasState> _canvasKey = GlobalKey();
+  final Random _random = Random();
+  int _completedCount = 0; // Licznik ukończonych wzorów
 
-  TracingPattern get _currentPattern => widget.patterns[_currentIndex];
-  bool get _isFirst => _currentIndex == 0;
-  bool get _isLast => _currentIndex == widget.patterns.length - 1;
-
-  void _previousPattern() {
-    if (!_isFirst) {
-      setState(() {
-        _currentIndex--;
-      });
-      _canvasKey.currentState?.clear();
-    }
+  @override
+  void initState() {
+    super.initState();
+    // LOSOWANIE POZIOMÓW: Zacznij od losowego wzoru
+    _currentIndex = _random.nextInt(widget.patterns.length);
+    debugPrint('✏️ TRACING: Losowy start od wzoru $_currentIndex/${widget.patterns.length}');
   }
 
+  TracingPattern get _currentPattern => widget.patterns[_currentIndex];
+
+  /// Losuje nowy indeks różny od obecnego
+  int _getNextRandomIndex() {
+    if (widget.patterns.length <= 1) return 0;
+
+    int newIndex = _currentIndex;
+    // Upewnij się, że nowy indeks jest różny od poprzedniego
+    while (newIndex == _currentIndex) {
+      newIndex = _random.nextInt(widget.patterns.length);
+    }
+    return newIndex;
+  }
+
+  /// Pomiń wzór - czyści canvas i losuje nowy wzór
+  void _previousPattern() {
+    // WAŻNE: Wyczyść canvas PRZED zmianą wzoru
+    _canvasKey.currentState?.clear();
+
+    setState(() {
+      _currentIndex = _getNextRandomIndex();
+    });
+    debugPrint('✏️ TRACING: Pominięto - nowy wzór: $_currentIndex');
+  }
+
+  /// INFINITE RANDOM LOOP: Zawsze losuje nowy wzór
   void _nextPattern() async {
     final canvasState = _canvasKey.currentState;
 
@@ -70,43 +94,30 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     debugPrint('✏️ TRACING: Nagroda? ${score.isGoodEnough ? "TAK ✅" : "NIE ❌"}');
     debugPrint('✏️ TRACING: ═══════════════════════════════════');
 
-    if (!_isLast) {
-      // Sprawdz czy wynik jest wystarczajaco dobry
-      if (widget.enableRewards && score.isGoodEnough) {
-        debugPrint('✏️ TRACING: Przyznawanie nagrody...');
-        await _grantReward();
-      } else if (widget.enableRewards) {
-        // Nie przyznaj nagrody, ale pozwól przejść dalej
-        debugPrint('✏️ TRACING: Za słaby wynik - brak nagrody');
-        _showTryAgainMessage(
-          'Spróbuj dokładniej! 🎯\n'
-          'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
-        );
-      }
-
-      setState(() {
-        _currentIndex++;
-      });
-      canvasState.clear();
-    } else {
-      // Ostatni wzór
-      if (widget.enableRewards && score.isGoodEnough) {
-        debugPrint('✏️ TRACING: Ostatni wzór - przyznawanie nagrody...');
-        await _grantReward(isLast: true);
-      } else {
-        if (widget.enableRewards) {
-          debugPrint('✏️ TRACING: Ostatni wzór - za słaby wynik');
-          _showTryAgainMessage(
-            'Spróbuj dokładniej! 🎯\n'
-            'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
-          );
-        }
-        // Po ostatnim wzorze - wróć do menu
-        if (mounted) {
-          Navigator.pop(context);
-        }
-      }
+    // Sprawdz czy wynik jest wystarczajaco dobry
+    if (widget.enableRewards && score.isGoodEnough) {
+      debugPrint('✏️ TRACING: Przyznawanie nagrody...');
+      await _grantReward();
+    } else if (widget.enableRewards) {
+      // Nie przyznaj nagrody, ale pozwól przejść dalej
+      debugPrint('✏️ TRACING: Za słaby wynik - brak nagrody');
+      _showTryAgainMessage(
+        'Spróbuj dokładniej! 🎯\n'
+        'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
+      );
     }
+
+    // BULLETPROOF: Sprawdź mounted po await
+    if (!mounted) return;
+
+    // INFINITE RANDOM LOOP: Losuj nowy wzór (różny od obecnego)
+    setState(() {
+      _currentIndex = _getNextRandomIndex();
+      _completedCount++;
+    });
+    canvasState.clear();
+
+    debugPrint('✏️ TRACING: Następny losowy wzór: $_currentIndex (ukończono: $_completedCount)');
   }
 
   /// Pokazuje komunikat zachęcający do ponownej próby
@@ -139,7 +150,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
   }
 
   /// Przyznaje nagrodę i pokazuje popup
-  Future<void> _grantReward({bool isLast = false}) async {
+  Future<void> _grantReward() async {
     try {
       Reward reward;
 
@@ -154,23 +165,10 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
 
       // Pokaż popup nagrody
       if (mounted) {
-        await RewardDialog.show(
-          context,
-          reward,
-          onClose: () {
-            if (isLast && mounted) {
-              // Po ostatnim wzorze - wróć do menu
-              Navigator.pop(context);
-            }
-          },
-        );
+        await RewardDialog.show(context, reward);
       }
     } catch (e) {
-      print('Błąd przyznawania nagrody: $e');
-      // W razie błędu - kontynuuj bez nagrody
-      if (isLast && mounted) {
-        Navigator.pop(context);
-      }
+      debugPrint('Błąd przyznawania nagrody: $e');
     }
   }
 
@@ -189,7 +187,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          // Licznik
+          // Licznik ukończonych wzorów
           Center(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -198,13 +196,20 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
                 color: AppTheme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                '${_currentIndex + 1}/${widget.patterns.length}',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryColor,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('⭐', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$_completedCount',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -230,9 +235,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
                       child: Text(
                         _currentPattern.name,
                         style: widget.useHandwritingFont
-                            ? GoogleFonts.caveat(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
+                            ? GoogleFonts.nunito(
+                                fontSize: 56,
+                                fontWeight: FontWeight.w800,
                                 color: AppTheme.textColor,
                               )
                             : Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -293,33 +298,33 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
 
             const SizedBox(height: 16),
 
-            // Przyciski nawigacji
+            // Przyciski nawigacji - INFINITE LOOP (zawsze aktywne)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Poprzedni
+                  // Pomiń (losuje inny wzór bez sprawdzania rysunku)
                   _NavButton(
-                    icon: Icons.arrow_back_rounded,
-                    label: 'Wstecz',
-                    onTap: _isFirst ? null : _previousPattern,
+                    icon: Icons.skip_next_rounded,
+                    label: 'Pomiń',
+                    onTap: _previousPattern,
                     color: AppTheme.primaryColor,
                   ),
 
                   // Wyczysc
                   _NavButton(
                     icon: Icons.delete_outline_rounded,
-                    label: 'Wyczysc',
+                    label: 'Wyczyść',
                     onTap: _clearCanvas,
                     color: Colors.orange,
                   ),
 
-                  // Nastepny
+                  // Dalej (sprawdza rysunek i przyznaje nagrodę)
                   _NavButton(
                     icon: Icons.arrow_forward_rounded,
                     label: 'Dalej',
-                    onTap: _isLast ? null : _nextPattern,
+                    onTap: _nextPattern,
                     color: AppTheme.accentColor,
                   ),
                 ],

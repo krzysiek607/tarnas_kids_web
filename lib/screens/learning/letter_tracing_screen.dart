@@ -48,7 +48,7 @@ class LetterTracingScreen extends StatelessWidget {
       // A a
       TracingPattern(
         name: 'A a',
-        hint: 'Dwie kreski do gory i poprzeczka',
+        hint: 'Dwie kreski do góry i poprzeczka',
         path: _combinePaths([
           _createBigA(bigLetterCenterX, topY, bigLetterWidth, bigLetterHeight),
           _createSmallA(smallLetterCenterX, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -84,7 +84,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ć ć
       TracingPattern(
         name: 'Ć ć',
-        hint: 'Litera C z kreska na gorze',
+        hint: 'Litera C z kreską na górze',
         path: _combinePaths([
           _createBigCKreska(bigLetterCenterX, topY + bigLetterHeight / 2, bigLetterHeight / 2.2, topY),
           _createSmallCKreska(smallLetterCenterX, smallLetterTopY + smallLetterHeight / 2, smallLetterHeight / 2.2, smallLetterTopY),
@@ -120,7 +120,7 @@ class LetterTracingScreen extends StatelessWidget {
       // F f
       TracingPattern(
         name: 'F f',
-        hint: 'Kreska i dwie poziome na gorze',
+        hint: 'Kreska i dwie poziome na górze',
         path: _combinePaths([
           _createBigF(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallF(smallLetterCenterX, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -138,7 +138,7 @@ class LetterTracingScreen extends StatelessWidget {
       // H h
       TracingPattern(
         name: 'H h',
-        hint: 'Dwie pionowe polaczone w srodku',
+        hint: 'Dwie pionowe połączone w środku',
         path: _combinePaths([
           _createBigH(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallH(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -147,7 +147,7 @@ class LetterTracingScreen extends StatelessWidget {
       // I i
       TracingPattern(
         name: 'I i',
-        hint: 'Prosta kreska w dol',
+        hint: 'Prosta kreska w dół',
         path: _combinePaths([
           _createBigI(bigLetterCenterX, topY, bigLetterHeight),
           _createSmallI(smallLetterCenterX, smallLetterTopY, smallLetterHeight),
@@ -156,7 +156,7 @@ class LetterTracingScreen extends StatelessWidget {
       // J j
       TracingPattern(
         name: 'J j',
-        hint: 'Kreska zakrecona w lewo na dole',
+        hint: 'Kreska zakręcona w lewo na dole',
         path: _combinePaths([
           _createBigJ(bigLetterCenterX, topY, bigLetterHeight),
           _createSmallJ(smallLetterCenterX, smallLetterTopY, smallLetterHeight),
@@ -165,7 +165,7 @@ class LetterTracingScreen extends StatelessWidget {
       // K k
       TracingPattern(
         name: 'K k',
-        hint: 'Pionowa i dwie skosne',
+        hint: 'Pionowa i dwie skośne',
         path: _combinePaths([
           _createBigK(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallK(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -174,7 +174,7 @@ class LetterTracingScreen extends StatelessWidget {
       // L l
       TracingPattern(
         name: 'L l',
-        hint: 'Kreska w dol i w prawo',
+        hint: 'Kreska w dół i w prawo',
         path: _combinePaths([
           _createBigL(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallL(smallLetterCenterX, smallLetterTopY, smallLetterHeight),
@@ -192,7 +192,7 @@ class LetterTracingScreen extends StatelessWidget {
       // M m
       TracingPattern(
         name: 'M m',
-        hint: 'Dwa szczyty jak gory',
+        hint: 'Dwa szczyty jak góry',
         path: _combinePaths([
           _createBigM(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallM(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -210,7 +210,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ń ń
       TracingPattern(
         name: 'Ń ń',
-        hint: 'Litera N z kreska na gorze',
+        hint: 'Litera N z kreską na górze',
         path: _combinePaths([
           _createBigNKreska(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallNKreska(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -219,7 +219,7 @@ class LetterTracingScreen extends StatelessWidget {
       // O o
       TracingPattern(
         name: 'O o',
-        hint: 'Duze kolko',
+        hint: 'Duże kółko',
         path: _combinePaths([
           _createBigO(bigLetterCenterX, topY + bigLetterHeight / 2, bigLetterHeight / 2.2),
           _createSmallO(smallLetterCenterX, smallLetterTopY + smallLetterHeight / 2, smallLetterHeight / 2.2),
@@ -228,7 +228,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ó ó
       TracingPattern(
         name: 'Ó ó',
-        hint: 'Litera O z kreska na gorze',
+        hint: 'Litera O z kreską na górze',
         path: _combinePaths([
           _createBigOKreska(bigLetterCenterX, topY + bigLetterHeight / 2, bigLetterHeight / 2.2, topY),
           _createSmallOKreska(smallLetterCenterX, smallLetterTopY + smallLetterHeight / 2, smallLetterHeight / 2.2, smallLetterTopY),
@@ -237,7 +237,7 @@ class LetterTracingScreen extends StatelessWidget {
       // P p
       TracingPattern(
         name: 'P p',
-        hint: 'Pionowa i brzuszek na gorze',
+        hint: 'Pionowa i brzuszek na górze',
         path: _combinePaths([
           _createBigP(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallP(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -264,7 +264,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ś ś
       TracingPattern(
         name: 'Ś ś',
-        hint: 'Litera S z kreska na gorze',
+        hint: 'Litera S z kreską na górze',
         path: _combinePaths([
           _createBigSKreska(bigLetterCenterX, topY, bigLetterWidth * 0.6, bigLetterHeight),
           _createSmallSKreska(smallLetterCenterX, smallLetterTopY, smallLetterWidth * 0.6, smallLetterHeight),
@@ -273,7 +273,7 @@ class LetterTracingScreen extends StatelessWidget {
       // T t
       TracingPattern(
         name: 'T t',
-        hint: 'Kreska pozioma i pionowa w dol',
+        hint: 'Kreska pozioma i pionowa w dół',
         path: _combinePaths([
           _createBigT(bigLetterCenterX, topY, bigLetterWidth, bigLetterHeight),
           _createSmallT(smallLetterCenterX, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -300,7 +300,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Y y
       TracingPattern(
         name: 'Y y',
-        hint: 'Dwie skosne i kreska w dol',
+        hint: 'Dwie skośne i kreska w dół',
         path: _combinePaths([
           _createBigY(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallY(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -318,7 +318,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ź ź
       TracingPattern(
         name: 'Ź ź',
-        hint: 'Litera Z z kreska na gorze',
+        hint: 'Litera Z z kreską na górze',
         path: _combinePaths([
           _createBigZKreska(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallZKreska(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -327,7 +327,7 @@ class LetterTracingScreen extends StatelessWidget {
       // Ż ż
       TracingPattern(
         name: 'Ż ż',
-        hint: 'Litera Z z kropka na gorze',
+        hint: 'Litera Z z kropką na górze',
         path: _combinePaths([
           _createBigZKropka(bigLetterCenterX - bigLetterWidth / 2, topY, bigLetterWidth, bigLetterHeight),
           _createSmallZKropka(smallLetterCenterX - smallLetterWidth / 2, smallLetterTopY, smallLetterWidth, smallLetterHeight),
@@ -949,7 +949,7 @@ class LetterTracingScreen extends StatelessWidget {
   }
 
   Path _createSmallP(double left, double top, double w, double h) {
-    // Mala litera 'p' - kreska w dol i kolko na gorze
+    // Mala litera 'p' - kreska w dół i kolko na gorze
     final r = h * 0.28;
     final circleY = top + r + h * 0.05;
     final tailBottom = top + h + h * 0.35;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
+import '../../services/sound_effects_controller.dart';
 
 class CountingGameScreen extends StatefulWidget {
   const CountingGameScreen({super.key});
@@ -85,6 +86,7 @@ class _CountingGameScreenState extends State<CountingGameScreen>
     if (collectedCount == targetCount) {
       setState(() => showSuccess = true);
       _successController.forward(from: 0);
+      SoundEffectsController().playSuccess();
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           if (round < maxRounds - 1) {
@@ -271,19 +273,40 @@ class _CollectableButton extends StatefulWidget {
 }
 
 class _CollectableButtonState extends State<_CollectableButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scale;
+    with TickerProviderStateMixin {
+  late AnimationController _bounceController;
+  late AnimationController _flyController;
+  late Animation<double> _bounceScale;
+  late Animation<double> _flyOffset;
+  late Animation<double> _flyScale;
+  late Animation<double> _flyOpacity;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+    // Animacja bounce (podskok)
+    _bounceController = AnimationController(
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scale = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    _bounceScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.4), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.4, end: 1.2), weight: 50),
+    ]).animate(CurvedAnimation(parent: _bounceController, curve: Curves.easeOut));
+
+    // Animacja lotu do góry
+    _flyController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _flyOffset = Tween<double>(begin: 0, end: -80).animate(
+      CurvedAnimation(parent: _flyController, curve: Curves.easeOut),
+    );
+    _flyScale = Tween<double>(begin: 1.2, end: 0.3).animate(
+      CurvedAnimation(parent: _flyController, curve: Curves.easeIn),
+    );
+    _flyOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _flyController, curve: Curves.easeIn),
     );
   }
 
@@ -291,41 +314,59 @@ class _CollectableButtonState extends State<_CollectableButton>
   void didUpdateWidget(_CollectableButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.collected && !oldWidget.collected) {
-      _controller.forward();
+      // Najpierw bounce, potem lot
+      _bounceController.forward().then((_) {
+        _flyController.forward();
+      });
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _bounceController.dispose();
+    _flyController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _scale,
+      animation: Listenable.merge([_bounceScale, _flyController]),
       builder: (context, child) {
-        return Transform.scale(
-          scale: _scale.value,
-          child: GestureDetector(
-            onTap: widget.collected ? null : widget.onTap,
-            child: Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+        final scale = _flyController.isAnimating || _flyController.isCompleted
+            ? _flyScale.value
+            : _bounceScale.value;
+        final offset = _flyOffset.value;
+        final opacity = _flyController.isAnimating || _flyController.isCompleted
+            ? _flyOpacity.value
+            : 1.0;
+
+        return Transform.translate(
+          offset: Offset(0, offset),
+          child: Opacity(
+            opacity: opacity,
+            child: Transform.scale(
+              scale: scale,
+              child: GestureDetector(
+                onTap: widget.collected ? null : widget.onTap,
+                child: Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Center(
-                child: Text(widget.emoji, style: const TextStyle(fontSize: 36)),
+                  child: Center(
+                    child: Text(widget.emoji, style: const TextStyle(fontSize: 36)),
+                  ),
+                ),
               ),
             ),
           ),

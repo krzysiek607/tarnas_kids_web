@@ -1,26 +1,36 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../models/drawing_point.dart';
 
 /// CustomPainter do renderowania linii na canvas
+/// OPTYMALIZACJA: Obsługuje backing image dla wydajności
 class DrawingPainter extends CustomPainter {
   final List<DrawingLine> lines;
   final DrawingLine? currentLine;
-  
+  final ui.Image? backingImage; // Wypalone poprzednie linie
+  final int bakedLinesCount; // Ile linii jest już w backingImage
 
   DrawingPainter({
     required this.lines,
     this.currentLine,
+    this.backingImage,
+    this.bakedLinesCount = 0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Rysuj wszystkie zakonczone linie
-    for (final line in lines) {
-      _drawLine(canvas, line);
+    // 1. OPTYMALIZACJA: Narysuj backing image (już wypalone linie)
+    if (backingImage != null) {
+      canvas.drawImage(backingImage!, Offset.zero, Paint());
     }
 
-    // Rysuj aktualna linie (w trakcie rysowania)
+    // 2. Rysuj tylko NOWE linie (po bakedLinesCount)
+    for (int i = bakedLinesCount; i < lines.length; i++) {
+      _drawLine(canvas, lines[i]);
+    }
+
+    // 3. Rysuj aktualna linie (w trakcie rysowania)
     if (currentLine != null) {
       _drawLine(canvas, currentLine!);
     }
@@ -185,6 +195,13 @@ class DrawingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant DrawingPainter oldDelegate) {
-    return oldDelegate.lines != lines || oldDelegate.currentLine != currentLine;
+    // OPTYMALIZACJA: Przerysuj tylko gdy zmieni się backing, nowe linie lub aktualna linia
+    return oldDelegate.backingImage != backingImage ||
+        oldDelegate.bakedLinesCount != bakedLinesCount ||
+        oldDelegate.lines.length != lines.length ||
+        oldDelegate.currentLine != currentLine ||
+        (currentLine != null &&
+            oldDelegate.currentLine != null &&
+            currentLine!.points.length != oldDelegate.currentLine!.points.length);
   }
 }

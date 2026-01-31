@@ -5,14 +5,81 @@ import '../theme/app_theme.dart';
 import '../providers/pet_provider.dart';
 import '../services/database_service.dart';
 import '../services/analytics_service.dart';
+import '../widgets/evolution_overlay.dart';
 
 /// Ekran gry Zwierzak (Tamagotchi)
-class PetScreen extends ConsumerWidget {
+class PetScreen extends ConsumerStatefulWidget {
   const PetScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PetScreen> createState() => _PetScreenState();
+}
+
+class _PetScreenState extends ConsumerState<PetScreen> {
+  bool _runawayDialogShown = false;
+
+  // Stan dla Evolution Overlay
+  bool _showEvolutionOverlay = false;
+  EvolutionStage? _evolutionFromStage;
+  EvolutionStage? _evolutionToStage;
+  EvolutionStage? _lastKnownStage;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ustaw początkowy stage po pierwszym renderze
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _lastKnownStage = ref.read(petProvider).evolutionStage;
+    });
+  }
+
+  /// Sprawdza czy nastąpiła ewolucja i pokazuje overlay
+  void _checkForEvolution(PetState petState) {
+    if (_lastKnownStage == null) {
+      _lastKnownStage = petState.evolutionStage;
+      return;
+    }
+
+    final oldIndex = EvolutionStage.values.indexOf(_lastKnownStage!);
+    final newIndex = EvolutionStage.values.indexOf(petState.evolutionStage);
+
+    // Ewolucja do wyższej fazy
+    if (newIndex > oldIndex && !_showEvolutionOverlay) {
+      debugPrint('🌟 EVOLUTION DETECTED! ${_lastKnownStage} -> ${petState.evolutionStage}');
+      setState(() {
+        _evolutionFromStage = _lastKnownStage;
+        _evolutionToStage = petState.evolutionStage;
+        _showEvolutionOverlay = true;
+      });
+    }
+
+    _lastKnownStage = petState.evolutionStage;
+  }
+
+  void _onEvolutionComplete() {
+    setState(() {
+      _showEvolutionOverlay = false;
+      _evolutionFromStage = null;
+      _evolutionToStage = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final petState = ref.watch(petProvider);
+
+    // Sprawdź ewolucję przy każdej zmianie stanu
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForEvolution(petState);
+    });
+
+    // Pokaż dialog pożegnalny jeśli zwierzak uciekł (tylko raz)
+    if (petState.hasRunAway && !_runawayDialogShown) {
+      _runawayDialogShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showRunawayDialog(context, petState.evolutionPoints);
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -28,7 +95,7 @@ class PetScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-            onPressed: () => _showResetDialog(context, ref),
+            onPressed: () => _showResetDialog(context),
             tooltip: 'Resetuj',
           ),
         ],
@@ -62,6 +129,8 @@ class PetScreen extends ConsumerWidget {
                       mood: petState.currentMood,
                       isSleeping: petState.isSleeping,
                       sleepStartTime: petState.sleepStartTime,
+                      evolutionStage: petState.evolutionStage,
+                      evolutionPoints: petState.evolutionPoints,
                     ),
                   ),
 
@@ -69,7 +138,7 @@ class PetScreen extends ConsumerWidget {
 
                   // Ekwipunek - smakołyki do karmienia
                   _InventoryPanel(
-                    onFeed: (rewardId) => _feedWithItem(context, ref, rewardId),
+                    onFeed: (rewardId) => _feedWithItem(context, rewardId),
                     isSleeping: petState.isSleeping,
                   ),
 
@@ -90,13 +159,25 @@ class PetScreen extends ConsumerWidget {
               ),
             ),
           ),
+
+          // EVOLUTION OVERLAY - pełnoekranowa animacja ewolucji
+          if (_showEvolutionOverlay &&
+              _evolutionFromStage != null &&
+              _evolutionToStage != null)
+            Positioned.fill(
+              child: EvolutionOverlay(
+                fromStage: _evolutionFromStage!,
+                toStage: _evolutionToStage!,
+                onComplete: _onEvolutionComplete,
+              ),
+            ),
         ],
       ),
     );
   }
 
   /// Karmi zwierzaka wybranym smakołykiem
-  Future<void> _feedWithItem(BuildContext context, WidgetRef ref, String rewardId) async {
+  Future<void> _feedWithItem(BuildContext context, String rewardId) async {
     // Skonsumuj przedmiot BEZPOŚREDNIO z bazy - StreamBuilder automatycznie zaktualizuje UI
     final success = await DatabaseService.instance.consumeItem(rewardId);
 
@@ -150,7 +231,7 @@ class PetScreen extends ConsumerWidget {
     }
   }
 
-  void _showResetDialog(BuildContext context, WidgetRef ref) {
+  void _showResetDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -174,6 +255,95 @@ class PetScreen extends ConsumerWidget {
               Navigator.pop(ctx);
             },
             child: const Text('Tak'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Dialog pożegnalny - zwierzak uciekł po 72h nieobecności
+  void _showRunawayDialog(BuildContext context, int evolutionPoints) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Column(
+          children: [
+            const Text('💌', style: TextStyle(fontSize: 64)),
+            const SizedBox(height: 12),
+            Text(
+              'List od Jajka',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textColor,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber.shade200),
+              ),
+              child: Text(
+                'Cześć!\n\n'
+                'Czekałem na Ciebie, ale chyba byłeś bardzo zajęty. '
+                'Postanowiłem wyruszyć na przygodę!\n\n'
+                'Nie martw się - zostawiłem Ci nowe jajko. '
+                'Może tym razem będziemy się częściej bawić?\n\n'
+                '🌟 Do zobaczenia! 🌟',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: AppTheme.textColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Twój przyjaciel miał $evolutionPoints punktów',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.textLightColor,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                ref.read(petProvider.notifier).acknowledgeRunaway();
+                setState(() {
+                  _runawayDialogShown = false;
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Zaopiekuję się nowym jajkiem!',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -321,11 +491,15 @@ class _PetDisplay extends StatefulWidget {
   final String mood;
   final bool isSleeping;
   final DateTime? sleepStartTime;
+  final EvolutionStage evolutionStage;
+  final int evolutionPoints;
 
   const _PetDisplay({
     required this.mood,
     required this.isSleeping,
     this.sleepStartTime,
+    required this.evolutionStage,
+    required this.evolutionPoints,
   });
 
   @override
@@ -333,6 +507,61 @@ class _PetDisplay extends StatefulWidget {
 }
 
 class _PetDisplayState extends State<_PetDisplay> {
+  /// Flaga animacji przejścia między fazami
+  bool _isEvolving = false;
+
+  /// Timer dla animacji przejścia
+  Timer? _evolutionTimer;
+
+  /// Czas trwania animacji przejścia (w sekundach)
+  static const int _evolutionAnimationDuration = 4;
+
+  @override
+  void didUpdateWidget(covariant _PetDisplay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Detekcja ewolucji - czy nastąpiła zmiana fazy?
+    if (oldWidget.evolutionStage != widget.evolutionStage) {
+      // Sprawdź czy to "upgrade" (np. z egg na firstCrack)
+      final oldIndex = EvolutionStage.values.indexOf(oldWidget.evolutionStage);
+      final newIndex = EvolutionStage.values.indexOf(widget.evolutionStage);
+
+      if (newIndex > oldIndex) {
+        // Ewolucja do wyższej fazy - uruchom animację przejścia
+        _startEvolutionAnimation();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _evolutionTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Uruchamia animację przejścia między fazami
+  void _startEvolutionAnimation() {
+    debugPrint('🌟 EVOLUTION! Rozpoczynam animację przejścia do fazy: ${widget.evolutionStage}');
+
+    setState(() {
+      _isEvolving = true;
+    });
+
+    // Po zakończeniu animacji przejdź do normalnego stanu
+    _evolutionTimer?.cancel();
+    _evolutionTimer = Timer(
+      Duration(seconds: _evolutionAnimationDuration),
+      () {
+        if (mounted) {
+          debugPrint('🌟 EVOLUTION! Animacja zakończona - przechodzę do IDLE');
+          setState(() {
+            _isEvolving = false;
+          });
+        }
+      },
+    );
+  }
+
   /// Formatuje czas snu jako "Xh Ym" lub "Xm"
   String _formatSleepTime() {
     if (widget.sleepStartTime == null) return '';
@@ -345,20 +574,77 @@ class _PetDisplayState extends State<_PetDisplay> {
     return '${minutes}m';
   }
 
-  /// Wybiera plik animacji na podstawie nastroju (logika z overallHealth)
-  /// - happy: overallHealth > 70%
-  /// - sad/hungry/tired/dirty: overallHealth < 20% lub pojedyncza statystyka < 30%
-  /// - neutral: pozostałe przypadki
-  String _getEggAsset() {
-    if (widget.mood == 'happy') {
-      return 'assets/images/Creature/happy_egg.webp';
-    } else if (widget.mood == 'sad' ||
-        widget.mood == 'hungry' ||
-        widget.mood == 'tired' ||
-        widget.mood == 'dirty') {
-      return 'assets/images/Creature/sad_egg.webp';
+  /// Określa kategorię nastroju
+  /// HAPPY = happy, playing, bathing, eating
+  /// SAD = sad, hungry, tired, dirty
+  /// IDLE = neutral, sleeping (i inne)
+  String _getMoodCategory() {
+    switch (widget.mood) {
+      case 'happy':
+      case 'playing':
+      case 'bathing':
+      case 'eating':
+        return 'HAPPY';
+      case 'sad':
+      case 'hungry':
+      case 'tired':
+      case 'dirty':
+        return 'SAD';
+      default:
+        return 'IDLE'; // neutral, sleeping, etc.
     }
-    // Neutralny, sleeping, eating, playing, bathing -> idle egg
+  }
+
+  /// Wybiera plik animacji na podstawie fazy ewolucji i nastroju
+  ///
+  /// NOWA Macierz wyboru (z animacją przejścia):
+  /// | Faza              | EVOLVING              | IDLE                    | HAPPY                   | SAD                   |
+  /// |-------------------|-----------------------|-------------------------|-------------------------|-----------------------|
+  /// | 1 (0-30 pkt)      | -                     | Egg.webp                | happy_egg.webp          | sad_egg.webp          |
+  /// | 2 (31-70 pkt)     | first_crack.webp      | first_crack_idle.webp   | first_crack_happy.webp  | first_crack_sad.webp  |
+  /// | 3 (71-100 pkt)    | (placeholder)         | first_crack_idle.webp   | first_crack_happy.webp  | first_crack_sad.webp  |
+  /// | 4 (>100 pkt)      | (placeholder)         | first_crack_idle.webp   | first_crack_happy.webp  | first_crack_sad.webp  |
+  String _getEggAsset() {
+    final moodCategory = _getMoodCategory();
+
+    // PRIORYTET 1: Animacja przejścia (ewolucja w toku)
+    if (_isEvolving) {
+      debugPrint('🌟 EVOLVING: Wyświetlam animację przejścia dla fazy ${widget.evolutionStage}');
+      // Animacja przejścia do Fazy 2
+      if (widget.evolutionStage == EvolutionStage.firstCrack) {
+        return 'assets/images/Creature/first_crack.webp';
+      }
+      // Placeholder dla wyższych faz (używamy first_crack.webp)
+      return 'assets/images/Creature/first_crack.webp';
+    }
+
+    // Faza 4 - Wyklucie (>100 pkt)
+    if (widget.evolutionStage == EvolutionStage.hatched) {
+      debugPrint('🐣 HATCHING! evolutionPoints: ${widget.evolutionPoints}');
+      // Placeholder - używamy assetów Fazy 2 do czasu stworzenia dedykowanych
+      if (moodCategory == 'HAPPY') return 'assets/images/Creature/first_crack_happy.webp';
+      if (moodCategory == 'SAD') return 'assets/images/Creature/first_crack_sad.webp';
+      return 'assets/images/Creature/first_crack_idle.webp';
+    }
+
+    // Faza 3 - Drugie pęknięcie (71-100 pkt)
+    if (widget.evolutionStage == EvolutionStage.secondCrack) {
+      // Placeholder - używamy assetów Fazy 2 do czasu stworzenia dedykowanych
+      if (moodCategory == 'HAPPY') return 'assets/images/Creature/first_crack_happy.webp';
+      if (moodCategory == 'SAD') return 'assets/images/Creature/first_crack_sad.webp';
+      return 'assets/images/Creature/first_crack_idle.webp';
+    }
+
+    // Faza 2 - Pierwsze pęknięcie (31-70 pkt) - KOMPLETNE ASSETY
+    if (widget.evolutionStage == EvolutionStage.firstCrack) {
+      if (moodCategory == 'HAPPY') return 'assets/images/Creature/first_crack_happy.webp';
+      if (moodCategory == 'SAD') return 'assets/images/Creature/first_crack_sad.webp';
+      return 'assets/images/Creature/first_crack_idle.webp';
+    }
+
+    // Faza 1 - Jajko (0-30 pkt)
+    if (moodCategory == 'HAPPY') return 'assets/images/Creature/happy_egg.webp';
+    if (moodCategory == 'SAD') return 'assets/images/Creature/sad_egg.webp';
     return 'assets/images/Creature/Egg.webp';
   }
 

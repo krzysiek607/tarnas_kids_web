@@ -104,6 +104,10 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
 
       // Sprawdz dostepne zrodla
       _log('Platform: ${kIsWeb ? "Web" : "Mobile"}');
+    } on UnimplementedError catch (e) {
+      // BULLETPROOF: Windows/Linux może nie obsługiwać audio
+      _logError('AudioPlayer nie obsługiwany na tej platformie: $e');
+      state = state.copyWith(error: 'Audio niedostępne na tej platformie');
     } catch (e) {
       _logError('AudioPlayer init error: $e');
       state = state.copyWith(error: e.toString());

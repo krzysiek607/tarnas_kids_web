@@ -6,6 +6,7 @@ import '../screens/drawing_screen.dart';
 import '../screens/learning_screen.dart';
 import '../screens/fun_screen.dart';
 import '../screens/pet_screen.dart';
+import '../screens/settings_screen.dart';
 import '../screens/games/maze_game_screen.dart';
 import '../screens/games/matching_game_screen.dart';
 import '../screens/games/dots_game_screen.dart';
@@ -74,6 +75,15 @@ final appRouter = GoRouter(
         context: context,
         state: state,
         child: const LearningScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      pageBuilder: (context, state) => _buildFadeTransition(
+        context: context,
+        state: state,
+        child: const SettingsScreen(),
       ),
     ),
     GoRoute(

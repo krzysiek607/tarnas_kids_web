@@ -41,7 +41,10 @@ class InventoryState {
 
 /// Notifier dla ekwipunku
 class InventoryNotifier extends StateNotifier<InventoryState> {
-  StreamSubscription<Map<String, int>>? _subscription;
+  StreamSubscription<List<Map<String, dynamic>>>? _subscription;
+
+  /// BULLETPROOF: Zestaw przedmiotów obecnie przetwarzanych (debouncing)
+  final Set<String> _processingItems = {};
 
   InventoryNotifier() : super(const InventoryState(isLoading: true)) {
     _initialize();
@@ -58,9 +61,11 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
       return;
     }
 
-    // Nasłuchuj streamu z bazy danych
+    // Nasłuchuj SUROWEGO streamu z bazy danych
     _subscription = DatabaseService.instance.getInventoryStream().listen(
-      (counts) {
+      (List<Map<String, dynamic>> items) {
+        // Przelicz liczniki z surowych danych
+        final counts = DatabaseService.calculateCounts(items);
         state = InventoryState(counts: counts, isLoading: false);
       },
       onError: (error) {
@@ -88,22 +93,36 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
 
   /// Konsumuje przedmiot (nakarm zwierzaka)
   /// Zwraca true jeśli udało się skonsumować
+  /// BULLETPROOF: Debouncing - ignoruje wielokrotne kliknięcia na ten sam przedmiot
   Future<bool> consumeItem(String rewardId) async {
+    // BULLETPROOF: Sprawdź czy przedmiot jest już przetwarzany
+    if (_processingItems.contains(rewardId)) {
+      return false; // Ignoruj - już w trakcie przetwarzania
+    }
+
     // Sprawdź czy mamy przedmiot
     if (!state.hasItem(rewardId)) {
       return false;
     }
 
-    if (DatabaseService.isInitialized) {
-      // Usuń z bazy - stream automatycznie zaktualizuje stan
-      final success = await DatabaseService.instance.consumeItem(rewardId);
-      return success;
-    } else {
-      // Lokalny tryb - zmniejsz licznik
-      final newCounts = Map<String, int>.from(state.counts);
-      newCounts[rewardId] = (newCounts[rewardId] ?? 1) - 1;
-      state = state.copyWith(counts: newCounts);
-      return true;
+    // Oznacz jako przetwarzany
+    _processingItems.add(rewardId);
+
+    try {
+      if (DatabaseService.isInitialized) {
+        // Usuń z bazy - stream automatycznie zaktualizuje stan
+        final success = await DatabaseService.instance.consumeItem(rewardId);
+        return success;
+      } else {
+        // Lokalny tryb - zmniejsz licznik
+        final newCounts = Map<String, int>.from(state.counts);
+        newCounts[rewardId] = (newCounts[rewardId] ?? 1) - 1;
+        state = state.copyWith(counts: newCounts);
+        return true;
+      }
+    } finally {
+      // Zawsze odznacz jako przetworzony
+      _processingItems.remove(rewardId);
     }
   }
 

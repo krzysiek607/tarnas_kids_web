@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -241,28 +242,22 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
                 borderRadius: BorderRadius.circular(22),
                 child: RepaintBoundary(
                   key: _canvasKey,
-                  child: Container(
-                    color: Colors.white,
-                    child: GestureDetector(
-                      onPanStart: (details) {
-                        ref.read(drawingProvider.notifier)
-                            .startLine(details.localPosition);
-                      },
-                      onPanUpdate: (details) {
-                        ref.read(drawingProvider.notifier)
-                            .addPoint(details.localPosition);
-                      },
-                      onPanEnd: (_) {
-                        ref.read(drawingProvider.notifier).endLine();
-                      },
-                      child: CustomPaint(
-                        painter: DrawingPainter(
-                          lines: drawingState.lines,
-                          currentLine: drawingState.currentLine,
-                        ),
-                        size: Size.infinite,
-                      ),
-                    ),
+                  child: _OptimizedDrawingCanvas(
+                    drawingState: drawingState,
+                    onPanStart: (details) {
+                      ref.read(drawingProvider.notifier)
+                          .startLine(details.localPosition);
+                    },
+                    onPanUpdate: (details) {
+                      ref.read(drawingProvider.notifier)
+                          .addPoint(details.localPosition);
+                    },
+                    onPanEnd: () {
+                      ref.read(drawingProvider.notifier).endLine();
+                    },
+                    onClear: () {
+                      // Callback gdy canvas jest czyszczony
+                    },
                   ),
                 ),
               ),
@@ -330,9 +325,15 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
         return;
       }
 
+      // BULLETPROOF: Sprawdź mounted po await
+      if (!mounted) return;
+
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/moj_rysunek_${DateTime.now().millisecondsSinceEpoch}.png');
       await file.writeAsBytes(bytes);
+
+      // BULLETPROOF: Sprawdź mounted po await
+      if (!mounted) return;
 
       await Share.shareXFiles(
         [XFile(file.path)],
@@ -341,7 +342,8 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
     } catch (e) {
       _showErrorSnackBar('Blad podczas udostepniania');
     } finally {
-      setState(() => _isSaving = false);
+      // BULLETPROOF: Sprawdź mounted w finally
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -358,23 +360,34 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
         final granted = await Gal.requestAccess(toAlbum: true);
         if (!granted) {
           _showErrorSnackBar('Brak uprawnien do zapisania');
-          setState(() => _isSaving = false);
+          // BULLETPROOF: Sprawdź mounted po await
+          if (mounted) setState(() => _isSaving = false);
           return;
         }
       }
 
+      // BULLETPROOF: Sprawdź mounted po await
+      if (!mounted) return;
+
       final bytes = await _captureDrawing();
       if (bytes == null) {
         _showErrorSnackBar('Nie udalo sie przechwycic rysunku');
-        setState(() => _isSaving = false);
+        // BULLETPROOF: Sprawdź mounted po await
+        if (mounted) setState(() => _isSaving = false);
         return;
       }
+
+      // BULLETPROOF: Sprawdź mounted po await
+      if (!mounted) return;
 
       // Zapisz do pliku tymczasowego
       final tempDir = await getTemporaryDirectory();
       final filePath = '${tempDir.path}/tarnas_kids_rysunek_${DateTime.now().millisecondsSinceEpoch}.png';
       final file = File(filePath);
       await file.writeAsBytes(bytes);
+
+      // BULLETPROOF: Sprawdź mounted po await
+      if (!mounted) return;
 
       // Zapisz do galerii
       await Gal.putImage(filePath, album: 'Tarnas Kids');
@@ -383,7 +396,8 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
     } catch (e) {
       _showErrorSnackBar('Blad podczas zapisywania');
     } finally {
-      setState(() => _isSaving = false);
+      // BULLETPROOF: Sprawdź mounted w finally
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -683,6 +697,178 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
         },
         onCancel: () => Navigator.pop(context),
       ),
+    );
+  }
+}
+
+/// OPTYMALIZACJA: Canvas z backing image dla wydajności
+/// Wypala linie do bitmapy przy onPanEnd lub przekroczeniu limitu punktów
+class _OptimizedDrawingCanvas extends StatefulWidget {
+  final DrawingState drawingState;
+  final void Function(DragStartDetails) onPanStart;
+  final void Function(DragUpdateDetails) onPanUpdate;
+  final VoidCallback onPanEnd;
+  final VoidCallback onClear;
+
+  const _OptimizedDrawingCanvas({
+    required this.drawingState,
+    required this.onPanStart,
+    required this.onPanUpdate,
+    required this.onPanEnd,
+    required this.onClear,
+  });
+
+  @override
+  State<_OptimizedDrawingCanvas> createState() => _OptimizedDrawingCanvasState();
+}
+
+class _OptimizedDrawingCanvasState extends State<_OptimizedDrawingCanvas> {
+  ui.Image? _backingImage;
+  int _bakedLinesCount = 0;
+  Size _canvasSize = Size.zero;
+  Timer? _sprayBakeTimer;
+
+  // Limit punktów w aktualnej linii przed wymuszeniem bake'a
+  static const int _maxPointsBeforeBake = 500;
+
+  @override
+  void didUpdateWidget(_OptimizedDrawingCanvas oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Wykryj wyczyszczenie canvas
+    if (widget.drawingState.lines.isEmpty && _bakedLinesCount > 0) {
+      _clearBackingImage();
+    }
+
+    // Wykryj undo - jeśli linii jest mniej niż wypalone, przebuduj
+    if (widget.drawingState.lines.length < _bakedLinesCount) {
+      _rebuildBackingImage();
+    }
+
+    // OPTYMALIZACJA SPRAY: Sprawdź czy aktualna linia ma za dużo punktów
+    final currentLine = widget.drawingState.currentLine;
+    if (currentLine != null && currentLine.points.length > _maxPointsBeforeBake) {
+      // Wymuś bake aktualnej linii (dla sprayu)
+      _scheduleSprayBake();
+    }
+  }
+
+  /// Planuje bake dla sprayu (debounced)
+  void _scheduleSprayBake() {
+    _sprayBakeTimer?.cancel();
+    _sprayBakeTimer = Timer(const Duration(milliseconds: 100), () {
+      if (mounted && widget.drawingState.currentLine != null) {
+        // Wymuś zakończenie linii i bake
+        widget.onPanEnd();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _sprayBakeTimer?.cancel();
+    _backingImage?.dispose();
+    super.dispose();
+  }
+
+  /// Czyści backing image
+  void _clearBackingImage() {
+    _backingImage?.dispose();
+    setState(() {
+      _backingImage = null;
+      _bakedLinesCount = 0;
+    });
+  }
+
+  /// Przebudowuje backing image po undo
+  Future<void> _rebuildBackingImage() async {
+    _backingImage?.dispose();
+    _backingImage = null;
+    _bakedLinesCount = 0;
+
+    // Wypiekaj wszystkie istniejące linie
+    if (widget.drawingState.lines.isNotEmpty) {
+      await _bakeLinesToImage(widget.drawingState.lines.length);
+    } else {
+      setState(() {});
+    }
+  }
+
+  /// Wypala linie do backing image
+  Future<void> _bakeLinesToImage(int upToIndex) async {
+    if (_canvasSize == Size.zero) return;
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    // Narysuj poprzedni backing image
+    if (_backingImage != null) {
+      canvas.drawImage(_backingImage!, Offset.zero, Paint());
+    }
+
+    // Narysuj nowe linie (od _bakedLinesCount do upToIndex)
+    final painter = DrawingPainter(
+      lines: widget.drawingState.lines.sublist(_bakedLinesCount, upToIndex),
+      currentLine: null,
+      backingImage: null,
+      bakedLinesCount: 0,
+    );
+    painter.paint(canvas, _canvasSize);
+
+    // Stwórz nowy obraz
+    final picture = recorder.endRecording();
+    final newImage = await picture.toImage(
+      _canvasSize.width.toInt(),
+      _canvasSize.height.toInt(),
+    );
+
+    // Zwolnij stary obraz
+    _backingImage?.dispose();
+
+    if (mounted) {
+      setState(() {
+        _backingImage = newImage;
+        _bakedLinesCount = upToIndex;
+      });
+    }
+  }
+
+  /// Obsługuje zakończenie rysowania - wypala nowe linie
+  void _handlePanEnd() {
+    widget.onPanEnd();
+
+    // Po zakończeniu linii - wypiekaj wszystkie niewypieczone linie
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.drawingState.lines.length > _bakedLinesCount) {
+        _bakeLinesToImage(widget.drawingState.lines.length);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _canvasSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+        return Container(
+          color: Colors.white,
+          child: GestureDetector(
+            onPanStart: widget.onPanStart,
+            onPanUpdate: widget.onPanUpdate,
+            onPanEnd: (_) => _handlePanEnd(),
+            child: CustomPaint(
+              painter: DrawingPainter(
+                lines: widget.drawingState.lines,
+                currentLine: widget.drawingState.currentLine,
+                backingImage: _backingImage,
+                bakedLinesCount: _bakedLinesCount,
+              ),
+              size: Size.infinite,
+            ),
+          ),
+        );
+      },
     );
   }
 }

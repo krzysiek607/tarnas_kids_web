@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../widgets/kid_friendly_button.dart';
+import '../../services/sound_effects_controller.dart';
 
 /// Gra Labirynt - dziecko prowadzi postac od startu do mety (cukierka)
 class MazeGameScreen extends StatefulWidget {
@@ -171,6 +172,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
           setState(() {
             gameWon = true;
           });
+          SoundEffectsController().playSuccess();
           _showWinDialog();
         }
       }
@@ -184,7 +186,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
       builder: (context) => GameResultDialog(
         title: 'Brawo!',
         emoji: '🍬',
-        message: 'Zdobyles cukierka!',
+        message: 'Zdobyłeś cukierka!',
         buttons: [
           if (currentLevel < maxLevel)
             KidFriendlyButton.nextLevel(
@@ -195,7 +197,7 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
               },
             ),
           KidFriendlyButton.playAgain(
-            label: 'Od poczatku',
+            label: 'Od początku',
             onPressed: () {
               Navigator.pop(context);
               _loadLevel(1);

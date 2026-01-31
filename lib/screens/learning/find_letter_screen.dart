@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
+import '../../services/sound_effects_controller.dart';
 
 class LetterItem {
   final String emoji;
@@ -94,6 +95,7 @@ class _FindLetterScreenState extends State<FindLetterScreen> with TickerProvider
     if (displayedItems[index] == correctItem) {
       setState(() { score++; showSuccess = true; });
       _successController.forward(from: 0);
+      SoundEffectsController().playSuccess();
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           if (round < maxRounds - 1) setState(() { round++; _generateRound(); });

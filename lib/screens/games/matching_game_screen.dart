@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/kid_friendly_button.dart';
 import '../../providers/background_music_provider.dart';
+import '../../services/sound_effects_controller.dart';
 
 /// Gra Dopasowywanie - dziecko laczy pary elementow
 class MatchingGameScreen extends ConsumerStatefulWidget {
@@ -173,6 +174,7 @@ class _MatchingGameScreenState extends ConsumerState<MatchingGameScreen> {
         matchedPairs[selectedLeftIndex!] = actualRightIndex;
         selectedLeftIndex = null;
       });
+      SoundEffectsController().playSuccess();
       if (matchedPairs.length == 3) {
         Future.delayed(const Duration(milliseconds: 500), _showWinDialog);
       }

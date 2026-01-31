@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308840052640",
+    "project_id": "tarnas-kids",
+    "storage_bucket": "tarnas-kids.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308840052640:android:849334a8a90accec9196c5",
+        "android_client_info": {
+          "package_name": "com.example.tarnas_kids"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi5UuLNmLkFUoJfOT71bsnAzhsjoUe54M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

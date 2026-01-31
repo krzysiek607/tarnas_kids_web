@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
+import '../../services/sound_effects_controller.dart';
 
 class SequenceGameScreen extends StatefulWidget {
   const SequenceGameScreen({super.key});
@@ -149,6 +150,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
     if (isCorrect) {
       setState(() => showSuccess = true);
       _successController.forward(from: 0);
+      SoundEffectsController().playSuccess();
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           if (round < maxRounds - 1) {
@@ -289,9 +291,9 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
                               ),
                               child: Center(
                                 child: placedSteps[index] != null
-                                    ? Text(
-                                        placedSteps[index]!.emoji,
-                                        style: const TextStyle(fontSize: 32),
+                                    ? _AnimatedSlotContent(
+                                        key: ValueKey('slot_${index}_${placedSteps[index]!.order}'),
+                                        emoji: placedSteps[index]!.emoji,
                                       )
                                     : null,
                               ),
@@ -374,6 +376,71 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
 }
 
 // === Klasy pomocnicze ===
+
+/// Widget z animacją wlotu do slotu (bounce + scale)
+class _AnimatedSlotContent extends StatefulWidget {
+  final String emoji;
+
+  const _AnimatedSlotContent({super.key, required this.emoji});
+
+  @override
+  State<_AnimatedSlotContent> createState() => _AnimatedSlotContentState();
+}
+
+class _AnimatedSlotContentState extends State<_AnimatedSlotContent>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _offsetAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    // Animacja scale z bounce
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.3), weight: 60),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 0.9), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 20),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    // Animacja przesunięcia z góry
+    _offsetAnimation = Tween<double>(begin: -30, end: 0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _offsetAnimation.value),
+          child: Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Text(
+              widget.emoji,
+              style: const TextStyle(fontSize: 32),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _SequenceData {
   final String title;

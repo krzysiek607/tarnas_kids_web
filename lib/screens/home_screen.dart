@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/background_music_provider.dart';
+import '../providers/pet_provider.dart';
 
 /// Ekran glowny aplikacji Tarnas Kids
 class HomeScreen extends ConsumerStatefulWidget {
@@ -36,9 +37,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// Zwraca ścieżkę do ikony zwierzaka na podstawie fazy ewolucji
+  /// Przycisk "Zwierzak" na menu pokazuje aktualny stan jajka/zwierzaka
+  String _getPetIconPath(EvolutionStage stage) {
+    switch (stage) {
+      case EvolutionStage.egg:
+        // Faza 1: Jajko
+        return 'assets/images/Creature/Egg.webp';
+      case EvolutionStage.firstCrack:
+      case EvolutionStage.secondCrack:
+      case EvolutionStage.hatched:
+        // Faza 2+: Pęknięte jajko (lub wykluty zwierzak)
+        return 'assets/images/Creature/first_crack_idle.webp';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final musicState = ref.watch(backgroundMusicProvider);
+    final petState = ref.watch(petProvider);
+
+    // Dynamiczna ikona dla przycisku "Zwierzak" na podstawie fazy ewolucji
+    final petIconPath = _getPetIconPath(petState.evolutionStage);
 
     return Scaffold(
       body: Stack(
@@ -51,11 +71,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Warstwa 2: Przycisk glosnosci
+          // Warstwa 2: Przyciski górne (ustawienia + muzyka)
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
             right: 16,
-            child: _buildMusicButton(musicState),
+            child: Row(
+              children: [
+                _buildSettingsButton(),
+                const SizedBox(width: 8),
+                _buildMusicButton(musicState),
+              ],
+            ),
           ),
 
           // Warstwa 3: Menu przyciskow w ksztalcie luku
@@ -85,8 +111,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 // Przycisk 2 (srodkowy lewy) - wyzej
+                // DYNAMICZNA IKONA: Pokazuje aktualną fazę ewolucji zwierzaka
                 _ArchMenuButton(
-                  iconPath: 'assets/images/icons/main_zwierzak.png',
+                  iconPath: petIconPath,
                   tooltip: 'Zwierzak',
                   color: AppTheme.primaryColor,
                   onTap: () => context.push('/pet'),
@@ -112,6 +139,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Przycisk ustawień
+  Widget _buildSettingsButton() {
+    return GestureDetector(
+      onTap: () => context.push('/settings'),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.settings_rounded,
+          color: AppTheme.textLightColor,
+          size: 24,
+        ),
       ),
     );
   }

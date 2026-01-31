@@ -197,7 +197,7 @@ class _DotsGameScreenState extends State<DotsGameScreen>
       message = 'Dobrze!';
       emoji = '👍';
     } else {
-      message = 'Sprobuj jeszcze raz!';
+      message = 'Spróbuj jeszcze raz!';
       emoji = '💪';
     }
 
@@ -207,7 +207,7 @@ class _DotsGameScreenState extends State<DotsGameScreen>
       builder: (context) => GameResultDialog(
         title: message,
         emoji: emoji,
-        message: 'Zdobyles $score punktow!',
+        message: 'Zdobyłeś $score punktów!',
         buttons: [
           KidFriendlyButton.playAgain(
             label: 'Jeszcze raz',

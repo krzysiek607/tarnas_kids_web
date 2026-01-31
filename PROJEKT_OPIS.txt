@@ -1,0 +1,507 @@
+================================================================================
+                         TARNAS KIDS - DOKUMENTACJA PROJEKTU
+================================================================================
+
+Data utworzenia: 2026-01-25
+Wersja: 1.0
+
+================================================================================
+                              1. OPIS OGOLNY
+================================================================================
+
+NAZWA: Tarnas Kids
+TYP: Edukacyjna aplikacja mobilna dla dzieci
+TECHNOLOGIA: Flutter (Dart)
+PLATFORMY: Android, iOS, Web
+
+GRUPA DOCELOWA:
+- Dzieci w wieku 4-8 lat
+- Rodziny z malymi dziecmi
+- Przedszkola i szkoly podstawowe
+
+CEL APLIKACJI:
+Nauka przez zabawe - aplikacja laczy elementy edukacyjne z grami i systemem
+opieki nad wirtualnym zwierzakiem (Tamagotchi). Dziecko zdobywa nagrody za
+ukonczenie zadan edukacyjnych, ktorymi moze karmic swojego zwierzaka.
+
+GLOWNE POSTACIE:
+- Taro - glowna postac (zolty)
+- Lumi - towarzysz
+- Zwierzak (Egg) - wirtualne stworzenie do opieki
+
+================================================================================
+                              2. ARCHITEKTURA
+================================================================================
+
+STATE MANAGEMENT: Riverpod
+BAZA DANYCH: Supabase (PostgreSQL)
+ANALITYKA: Firebase Analytics + PostHog
+AUTENTYKACJA: Anonimowa (Supabase Auth)
+NAWIGACJA: GoRouter
+
+STRUKTURA FOLDEROW:
+```
+lib/
+  main.dart                    # Punkt wejscia aplikacji
+  config/                      # Konfiguracja (Supabase)
+  models/                      # Modele danych
+  providers/                   # State management (Riverpod)
+  services/                    # Serwisy (baza, analityka)
+  router/                      # Nawigacja
+  screens/                     # Ekrany aplikacji
+    learning/                  # Modul nauki
+    games/                     # Modul gier
+  widgets/                     # Reuzywalne widgety
+  theme/                       # Style i kolory
+  utils/                       # Pomocnicze funkcje
+```
+
+================================================================================
+                           3. EKRANY GLOWNE
+================================================================================
+
+3.1 PRELOADER SCREEN (preloader_screen.dart)
+---------------------------------------------
+- Ekran ladowania aplikacji
+- Preload emoji i czcionek
+- Odtwarza wideo intro (Taro_Lumi_intro.mp4)
+- Inicjalizuje muzyke w tle
+
+3.2 HOME SCREEN (home_screen.dart)
+----------------------------------
+Tlo: home_background.png
+Menu w ksztalcie luku z 4 przyciskami:
+  1. Przygoda - NIEAKTYWNA (placeholder)
+  2. Nauka - prowadzi do LearningScreen
+  3. Zabawa - prowadzi do FunScreen
+  4. Zwierzak - prowadzi do PetScreen
+
+Dodatkowe elementy:
+- Przycisk kontroli muzyki (prawy gorny rog)
+- Automatyczne uruchomienie muzyki w tle
+
+3.3 PET SCREEN (pet_screen.dart) - ZWIERZAK/TAMAGOTCHI
+------------------------------------------------------
+Tlo: petscreen_background.png
+
+STATYSTYKI ZWIERZAKA:
+- Glod (hunger): 0-100%
+- Szczescie (happiness): 0-100%
+- Energia (energy): 0-100%
+- Higiena (hygiene): 0-100%
+
+LOGIKA NASTROJU (overallHealth = srednia 4 statystyk):
+- happy: overallHealth > 70%
+- sad: overallHealth < 20%
+- hungry: hunger < 30%
+- tired: energy < 30%
+- dirty: hygiene < 30%
+- neutral: pozostale przypadki
+
+ANIMACJE JAJKA:
+- Egg.webp - stan neutralny
+- happy_egg.webp - stan szczesliwy
+- sad_egg.webp - stan smutny/glodny/zmeczony/brudny
+
+AKCJE:
+- Nakarm (wymaga smakołykow z ekwipunku)
+- Baw sie (happiness +12, energy -8)
+- Spij/Obudz (regeneracja energii: 1 min = 1 punkt)
+- Umyj (hygiene +18)
+
+MECHANIKA:
+- Tick co 10 sekund: spadek statystyk o 0.5
+- Offline: -2 punkty/godzine (poza snem)
+- Sen time-based: uzytkownik sam budzi zwierzaka
+
+3.4 LEARNING SCREEN (learning_screen.dart)
+------------------------------------------
+Tlo: learning_background.png
+Hub z 6 modulami edukacyjnymi (opisane w sekcji 4)
+
+3.5 FUN SCREEN (fun_screen.dart)
+--------------------------------
+Tlo: fun_background.png
+Hub z 4 grami (opisane w sekcji 5)
+
+3.6 DRAWING SCREEN (drawing_screen.dart)
+----------------------------------------
+Pelna aplikacja do rysowania dla dzieci.
+
+NARZEDZIA:
+1. Pedzel (brush) - miekkie, rozmyte linie
+2. Kredka (crayon) - teksturowane linie z szumem
+3. Spray - rozpylone punkty
+4. Gumka (eraser) - wymazywanie
+
+KOLORY: 8 opcji w paletce
+GRUBOSC: 5-20px (regulowana)
+FUNKCJE: Undo/Redo, Wyczysc, Udostepnij, Zapisz do galerii
+
+OPTYMALIZACJA:
+- Backing image dla linii "wypalonych" na bitmape
+- Maksymalnie 500 punktow przed bake'owaniem
+
+================================================================================
+                        4. MODULY EDUKACYJNE (NAUKA)
+================================================================================
+
+4.1 SZLACZKI (pattern_tracing_screen.dart)
+------------------------------------------
+Cel: Cwiczenie motoryki malej przez rysowanie wzorkow
+
+WZORY (8 sztuk):
+1. Linia prosta
+2. Fala
+3. Zygzak
+4. Petelki
+5. Linia pionowa
+6. Spirala
+7. Schody
+8. Fala duza
+
+PARAMETRY:
+- Kolor rysowania: niebieski
+- Nawigacja: losowa bez powtorzen (infinite loop)
+- Nagroda za kazdy ukonczony wzor
+
+4.2 LITERKI (letter_tracing_screen.dart)
+----------------------------------------
+Cel: Nauka pisania polskiego alfabetu
+
+LITERY: A-Z + polskie znaki diakrytyczne (A, C, E, L, N, O, S, Z, Z)
+WYSWIETLANIE: Para duza + mala (np. "A a")
+KOLOR: zielony
+
+WARUNKI ZALICZENIA:
+- Dokladnosc >= 70%
+- Pokrycie sciezki >= 40%
+- Minimum 20 narysowanych punktow
+- FINISH LINE: ostatni punkt w promieniu 35px od endPoint
+
+NAWIGACJA: Losowa bez powtorzen
+
+4.3 ZNAJDZ LITERE (find_letter_screen.dart)
+-------------------------------------------
+Cel: Rozpoznawanie liter i kojarzenie z przedmiotami
+
+RUNDY: 10
+MECHANIKA: Wyswietla litere, dziecko klika odpowiedni przedmiot/emoji
+ZBIOR: 26 liter, kazda ma 3-5 przypisanych przedmiotow
+
+Przyklad: Litera "A" -> Arbuz, Auto, Ananas
+
+4.4 LICZENIE (counting_game_screen.dart)
+----------------------------------------
+Cel: Nauka liczenia przez zbieranie przedmiotow
+
+RUNDY: 6
+MECHANIKA: Losowa liczba przedmiotow (3-7), dziecko klika aby zbierac
+EMOJI: 8 rodzajow (jablko, banan, pomarancza, winogrona, truskawka, gwiazdka, kwiat, motyl)
+ANIMACJA: Scale + elastic przy sukcesie
+
+4.5 SYLABY (connect_syllables_screen.dart)
+------------------------------------------
+Cel: Nauka podzialu slow na sylaby
+
+RUNDY: 10
+SLOWA: 20 polskich slow
+MECHANIKA: Wyswietla slowo, dziecko laczy sylaby w odpowiedniej kolejnosci
+
+PRZYKLADOWE SLOWA:
+- MAMA -> ["MA", "MA"]
+- TATA -> ["TA", "TA"]
+- BUTY -> ["BU", "TY"]
+- KWIATY -> ["KWIA", "TY"]
+- SAMOLOT -> ["SA", "MO", "LOT"]
+
+4.6 SEKWENCJE/KOLEJNOSC (sequence_game_screen.dart)
+---------------------------------------------------
+Cel: Nauka logicznego myslenia i kolejnosci zdarzen
+
+RUNDY: 5
+SEKWENCJE: 6 tematow, kazdy po 4 kroki
+
+TEMATY:
+1. Poranek: Budzenie -> Mycie -> Ubieranie -> Sniadanie
+2. Roslina: Nasiono -> Podlewanie -> Kielek -> Kwiat
+3. Motyl: Jajko -> Gasienica -> Kokon -> Motyl
+4. Dzien: Wschod -> Poludnie -> Zachod -> Noc
+5. Pizza: Ciasto -> Sos -> Ser -> Gotowe
+6. Kurczak: Jajko -> Wykluwanie -> Pisklak -> Kura
+
+MECHANIKA: Dziecko przeciaga kroki na odpowiednie miejsca
+
+================================================================================
+                           5. GRY (ZABAWA)
+================================================================================
+
+5.1 LABIRYNT (maze_game_screen.dart)
+------------------------------------
+Cel: Rozwoj logicznego myslenia i orientacji przestrzennej
+
+POZIOMY: 10 (rosnaca trudnosc)
+ROZMIARY: od 5x5 do 11x11
+GENERACJA: Proceduralna (depth-first search algorithm)
+
+MECHANIKA:
+- Dziecko prowadzi postac od startu do celu (cukierek)
+- Touch control
+- Animacje ruchu postaci
+- Nagroda za kazdy poziom
+
+5.2 DOPASOWYWANIE (matching_game_screen.dart)
+---------------------------------------------
+Cel: Kojarzenie i pamieci
+
+POZIOMY: 3 tematy
+PARY: 10 par na poziom
+
+TEMATY:
+1. Zwierzeta - Dzwieki (pies-szczekanie, kot-miauczenie, etc.)
+2. Zwierzeta - Domy (ptak-gniazdo, pies-buda, etc.)
+3. Zawody - Narzedzia (lekarz-stetoskop, strażak-wąż, etc.)
+
+AUDIO: Dzwieki zwierzat (dog.mp3, cat.mp3, cow.mp3, etc.)
+ANIMACJE: Polaczenie linią miedzy parami
+
+5.3 KROPKI (dots_game_screen.dart)
+----------------------------------
+Cel: Cwiczenie refleksu i koordynacji
+
+CZAS GRY: 25 sekund
+KROPKI: 6 losowych na ekranie
+MECHANIKA: Dziecko klika kropki jak najszybciej
+ANIMACJA: Pulse przy pojawieniu sie kropki
+PUNKTACJA: W zaleznosci od czasu reakcji
+
+5.4 RYSOWANIE (drawing_screen.dart)
+-----------------------------------
+Opisane w sekcji 3.6
+
+================================================================================
+                         6. SYSTEM NAGROD
+================================================================================
+
+DOSTEPNE NAGRODY (losowane):
+1. Cookie (Ciastko)
+2. Candy (Cukierek)
+3. Ice Cream (Lody)
+4. Chocolate (Czekolada)
+
+FLOW NAGRADZANIA:
+1. Dziecko ukonczy zadanie/gre
+2. RewardDialog pokazuje nagrode z animacja (elastic scale)
+3. DatabaseService.addReward() losuje nagrode i zapisuje w Supabase
+4. InventoryProvider automatycznie aktualizuje (real-time stream)
+5. Nagrody mozna uzyc do karmienia zwierzaka w PetScreen
+
+WYSWIETLANIE:
+- Dialog z animacja przy zdobyciu
+- Panel ekwipunku na PetScreen pokazuje ilosci
+- Glassmorphism effect na kontenerach
+
+================================================================================
+                          7. STAN APLIKACJI
+================================================================================
+
+7.1 PET PROVIDER (pet_provider.dart)
+------------------------------------
+Stan: PetState
+- hunger, happiness, energy, hygiene (0-100)
+- isSleeping (bool)
+- currentMood (string)
+- lastUpdateTime (DateTime)
+- sleepStartTime (DateTime?)
+
+Akcje: feed(), play(), sleep(), wakeUp(), wash(), reset()
+Tick: Co 10 sekund, spadek statystyk
+Persistencja: SharedPreferences + Supabase
+
+7.2 INVENTORY PROVIDER (inventory_provider.dart)
+------------------------------------------------
+Stan: InventoryState
+- counts (Map<String, int>)
+- isLoading, error
+
+Stream: Real-time z Supabase
+Debouncing: Zapobiega wielokrotnym klikniecm
+
+7.3 BACKGROUND MUSIC PROVIDER (background_music_provider.dart)
+--------------------------------------------------------------
+Stan: BackgroundMusicState
+- isPlaying, volume, userMuted, error
+
+Plik: Tarnas_kids_theme.mp3 (loop)
+Lifecycle: Pause na APP_PAUSED, resume na APP_RESUMED
+
+7.4 DRAWING PROVIDER (drawing_provider.dart)
+--------------------------------------------
+Stan: DrawingState
+- lines, currentLine
+- selectedColor, strokeWidth
+- selectedTool (brush/crayon/spray/eraser)
+- undoHistory
+
+================================================================================
+                           8. SERWISY
+================================================================================
+
+8.1 DATABASE SERVICE (database_service.dart)
+--------------------------------------------
+Singleton: DatabaseService.instance
+Baza: Supabase
+
+TABELE:
+- inventory (user_id, item_type, reward_id, reward_name, created_at)
+
+METODY:
+- addReward(itemType) - dodaje losowa nagrode
+- getInventory() - lista nagrod uzytkownika
+- getInventoryCounts() - mapa licznikow
+- getInventoryStream() - real-time stream
+- consumeItem(rewardId) - zuzywa przedmiot
+- getSleepStartTime(), startSleep(), wakeUpAndCalculateEnergy()
+
+8.2 ANALYTICS SERVICE (analytics_service.dart)
+----------------------------------------------
+Singleton: AnalyticsService.instance
+
+INTEGRACJE:
+- Firebase Analytics
+- PostHog (EU host)
+- Supabase (userId)
+
+ZDARZENIA:
+- logScreenView(screenName)
+- logGameStart(gameName)
+- logGameComplete(gameName, score, level)
+- logRewardEarned(rewardName, source)
+- logPetFed(foodType)
+- logPetAction(action)
+- logDrawingCreated()
+
+BULLETPROOF: Wszystkie bledy lapane, nie crashuja aplikacji
+
+================================================================================
+                          9. KONFIGURACJA
+================================================================================
+
+9.1 SUPABASE
+------------
+URL: https://efnxsjneewsqhxcglelz.supabase.co
+Auth: Anonimowa
+Tabele: inventory, pet_sleep
+
+9.2 FIREBASE
+------------
+Projekt: Tarnas Kids
+Analytics: Wlaczone
+Crashlytics: Do dodania
+
+9.3 POSTHOG
+-----------
+Host: https://eu.posthog.com (EU)
+Key: phc_BL81wy8lEm6vrX1OVV2Y7oINDk99N1wubbhsLEVA3pg
+Session Recording: Wlaczone
+flushAt: 1 (natychmiastowy wysyl)
+
+================================================================================
+                           10. ASSETY
+================================================================================
+
+10.1 OBRAZY (assets/images/)
+----------------------------
+Tla ekranow:
+- home_background.png
+- learning_background.png
+- fun_background.png
+- petscreen_background.png
+- intro_background.png
+
+Ikony menu (assets/images/icons/):
+- main_przygoda.png, main_nauka.png, main_zabawa.png, main_zwierzak.png
+- nauka_szlaczki.png, nauka_literki.png, nauka_sylaby.png, etc.
+- zabawa_rysowanie.png, zabawa_labirynt.png, etc.
+
+Zwierzak (assets/images/Creature/):
+- Egg.webp (neutralny)
+- happy_egg.webp (szczesliwy)
+- sad_egg.webp (smutny)
+- first crack.webp (wykluwanie - przyszlosc)
+
+Nagrody (assets/images/rewards/):
+- cookie.png, candy.png, icecream.png, chocolate.png
+
+10.2 AUDIO
+----------
+Muzyka:
+- assets/audio/Tarnas_kids_theme.mp3
+
+Dzwieki zwierzat (assets/sounds/):
+- dog.mp3, cat.mp3, cow.mp3, pig.mp3, duck.mp3
+- frog.mp3, horse.mp3, lion.mp3, chicken.mp3, sheep.mp3
+
+10.3 VIDEO
+----------
+- assets/videos/Taro_Lumi_intro.mp4
+
+================================================================================
+                            11. THEME
+================================================================================
+
+PALETA KOLOROW (app_theme.dart):
+- PRIMARY: #FF6B9D (rozowy)
+- ACCENT: #4ECDC4 (turkusowy)
+- BACKGROUND: #FFF9F5 (mleczny)
+- YELLOW: #FFD93D
+- PURPLE: #A78BFA
+- GREEN: #6EE7B7
+- ORANGE: #FCA5A5
+
+CZCIONKA: Nunito (Google Fonts, Latin Extended)
+BORDER RADIUS: 30-32px (zaokraglone, przyjazne dla dzieci)
+CIENIE: Miekkie, 3D efekt
+
+================================================================================
+                        12. NAWIGACJA
+================================================================================
+
+GoRouter (app_router.dart):
+
+SCIEZKI:
+/           -> PreloaderScreen
+/home       -> HomeScreen
+/drawing    -> DrawingScreen
+/pet        -> PetScreen
+/learning   -> LearningScreen
+/fun        -> FunScreen
+/fun/maze   -> MazeGameScreen
+/fun/matching -> MatchingGameScreen
+/fun/dots   -> DotsGameScreen
+
+PRZEJSCIA: FadeTransition (600ms)
+
+================================================================================
+                     13. BRAKUJACE FUNKCJONALNOSCI
+================================================================================
+
+- Sekcja "Przygoda" - placeholder, do implementacji
+- System poziomow/postepow dziecka
+- Wiecej etapow rozwoju zwierzaka (po jajku)
+- Dzwieki UI (klikniecia, sukces, porazka)
+- Tryb offline
+- Profil rodzica z statystykami
+- Wiele profili dzieci
+
+================================================================================
+                          14. KONTAKT
+================================================================================
+
+Projekt: Tarnas Kids
+Repozytorium: (do uzupelnienia)
+Autor: (do uzupelnienia)
+
+================================================================================
+                         KONIEC DOKUMENTACJI
+================================================================================

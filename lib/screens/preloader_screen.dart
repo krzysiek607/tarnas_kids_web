@@ -103,9 +103,10 @@ class _VideoIntroContent extends StatefulWidget {
 }
 
 class _VideoIntroContentState extends State<_VideoIntroContent> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   bool _isInitialized = false;
   bool _videoEnded = false;
+  bool _videoUnavailable = false;
 
   @override
   void initState() {
@@ -114,35 +115,46 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
   }
 
   Future<void> _initializeVideo() async {
-    _controller = VideoPlayerController.asset(
-      'assets/videos/Taro_Lumi_intro.mp4',
-    );
-
     try {
-      await _controller.initialize();
+      _controller = VideoPlayerController.asset(
+        'assets/videos/Taro_Lumi_intro.mp4',
+      );
+
+      await _controller!.initialize();
 
       if (mounted) {
         setState(() => _isInitialized = true);
 
         // Listener na zakonczenie wideo
-        _controller.addListener(_onVideoUpdate);
+        _controller!.addListener(_onVideoUpdate);
 
         // Rozpocznij odtwarzanie
-        await _controller.play();
+        await _controller!.play();
       }
+    } on UnimplementedError catch (e) {
+      // BULLETPROOF: Windows/Linux może nie obsługiwać wideo
+      debugPrint('[VIDEO] Platform nie obsługuje wideo: $e');
+      if (mounted) {
+        setState(() => _videoUnavailable = true);
+      }
+      await Future.delayed(const Duration(seconds: 1));
+      _navigateToHome();
     } catch (e) {
       // Jesli wideo nie zaladuje sie - przejdz do ekranu glownego po 2s
-      debugPrint('Blad ladowania wideo: $e');
+      debugPrint('[VIDEO] Blad ladowania wideo: $e');
+      if (mounted) {
+        setState(() => _videoUnavailable = true);
+      }
       await Future.delayed(const Duration(seconds: 2));
       _navigateToHome();
     }
   }
 
   void _onVideoUpdate() {
-    if (!mounted) return;
+    if (!mounted || _controller == null) return;
 
-    final position = _controller.value.position;
-    final duration = _controller.value.duration;
+    final position = _controller!.value.position;
+    final duration = _controller!.value.duration;
 
     // Sprawdz czy wideo sie zakonczylo
     if (position >= duration && duration.inMilliseconds > 0 && !_videoEnded) {
@@ -153,7 +165,11 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
 
   Future<void> _onVideoComplete() async {
     // Zatrzymaj na ostatniej klatce przez 2 sekundy
-    await _controller.pause();
+    try {
+      await _controller?.pause();
+    } catch (e) {
+      debugPrint('[VIDEO] Błąd pauzy: $e');
+    }
     await Future.delayed(const Duration(seconds: 2));
 
     _navigateToHome();
@@ -169,24 +185,42 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
 
   @override
   void dispose() {
-    _controller.removeListener(_onVideoUpdate);
-    _controller.dispose();
+    try {
+      _controller?.removeListener(_onVideoUpdate);
+      _controller?.dispose();
+    } catch (e) {
+      debugPrint('[VIDEO] Błąd dispose: $e');
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // BULLETPROOF: Jeśli wideo niedostępne - pokaż loader i przejdź dalej
+    if (_videoUnavailable) {
+      return Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppTheme.primaryColor,
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: _isInitialized
+        child: _isInitialized && _controller != null
             ? SizedBox.expand(
                 child: FittedBox(
                   fit: BoxFit.cover,
                   child: SizedBox(
-                    width: _controller.value.size.width,
-                    height: _controller.value.size.height,
-                    child: VideoPlayer(_controller),
+                    width: _controller!.value.size.width,
+                    height: _controller!.value.size.height,
+                    child: VideoPlayer(_controller!),
                   ),
                 ),
               )

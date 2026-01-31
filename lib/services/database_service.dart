@@ -172,54 +172,38 @@ class DatabaseService {
   }
 
   /// Stream nasłuchujący zmian w ekwipunku (realtime) dla aktualnego użytkownika
-  /// Zwraca mapy z licznikami dla każdego typu nagrody
-  Stream<Map<String, int>> getInventoryStream() {
-    final controller = StreamController<Map<String, int>>();
+  /// Zwraca SUROWE dane z Supabase - StreamBuilder sam przelicza
+  Stream<List<Map<String, dynamic>>> getInventoryStream() {
     final userId = currentUserId;
-
     if (userId == null) {
-      // Brak użytkownika - zwróć puste liczniki
-      controller.add({for (final r in availableRewards) r.id: 0});
-      return controller.stream;
+      // Brak użytkownika - zwróć pusty stream
+      return Stream.value([]);
     }
 
-    // Początkowe pobranie danych
-    getInventoryCounts().then((counts) {
-      if (!controller.isClosed) {
-        controller.add(counts);
-      }
-    });
+    debugPrint('[INVENTORY STREAM] Uruchamiam stream dla user: $userId');
 
-    // Subskrypcja realtime z filtrem po user_id
-    final subscription = _client
+    // Bezpośredni stream z Supabase - automatycznie emituje przy każdej zmianie
+    return _client
         .from('inventory')
         .stream(primaryKey: ['id'])
-        .eq('user_id', userId)
-        .listen((List<Map<String, dynamic>> data) async {
-          // Przelicz liczniki po każdej zmianie
-          final counts = <String, int>{};
-          for (final reward in availableRewards) {
-            counts[reward.id] = 0;
-          }
+        .eq('user_id', userId);
+  }
 
-          for (final item in data) {
-            final rewardId = item['reward_id'] as String?;
-            if (rewardId != null && counts.containsKey(rewardId)) {
-              counts[rewardId] = counts[rewardId]! + 1;
-            }
-          }
+  /// Pomocnicza metoda do przeliczenia surowych danych na liczniki
+  static Map<String, int> calculateCounts(List<Map<String, dynamic>> items) {
+    final counts = <String, int>{};
+    for (final reward in availableRewards) {
+      counts[reward.id] = 0;
+    }
 
-          if (!controller.isClosed) {
-            controller.add(counts);
-          }
-        });
+    for (final item in items) {
+      final rewardId = item['reward_id'] as String?;
+      if (rewardId != null && counts.containsKey(rewardId)) {
+        counts[rewardId] = counts[rewardId]! + 1;
+      }
+    }
 
-    // Zamknij subskrypcję gdy stream zostanie zamknięty
-    controller.onCancel = () {
-      subscription.cancel();
-    };
-
-    return controller.stream;
+    return counts;
   }
 
   /// Konsumuje (usuwa) jeden przedmiot danego typu z ekwipunku aktualnego użytkownika
@@ -273,5 +257,175 @@ class DatabaseService {
   Future<bool> hasItem(String rewardId) async {
     final count = await countRewards(rewardId);
     return count > 0;
+  }
+
+  // ============================================
+  // PET STATE - stan zwierzaka w bazie
+  // ============================================
+
+  /// Pobiera stan zwierzaka z bazy (tabela pet_states)
+  Future<Map<String, dynamic>?> getPetState() async {
+    final userId = currentUserId;
+    if (userId == null) return null;
+
+    try {
+      final response = await _client
+          .from('pet_states')
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
+      return response;
+    } catch (e) {
+      debugPrint('[PET] Błąd pobierania stanu: $e');
+      return null;
+    }
+  }
+
+  /// Zapisuje stan zwierzaka do bazy (upsert)
+  Future<bool> savePetState({
+    required double hunger,
+    required double happiness,
+    required double energy,
+    required double hygiene,
+    int? evolutionPoints,
+  }) async {
+    final userId = currentUserId;
+    if (userId == null) return false;
+
+    try {
+      final data = {
+        'user_id': userId,
+        'hunger': hunger,
+        'happiness': happiness,
+        'energy': energy,
+        'hygiene': hygiene,
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+
+      // Dodaj evolution_points tylko jeśli przekazano
+      if (evolutionPoints != null) {
+        data['evolution_points'] = evolutionPoints;
+      }
+
+      await _client.from('pet_states').upsert(data, onConflict: 'user_id');
+      return true;
+    } catch (e) {
+      debugPrint('[PET] Błąd zapisywania stanu: $e');
+      return false;
+    }
+  }
+
+  /// Dodaje punkty ewolucji i zwraca nową wartość
+  Future<int> addEvolutionPoints(int points) async {
+    final userId = currentUserId;
+    if (userId == null) return 0;
+
+    try {
+      // Pobierz aktualny stan
+      final state = await getPetState();
+      final currentPoints = (state?['evolution_points'] as int?) ?? 0;
+      final newPoints = currentPoints + points;
+
+      // Zapisz nową wartość
+      await _client.from('pet_states').upsert({
+        'user_id': userId,
+        'evolution_points': newPoints,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id');
+
+      debugPrint('[PET] Evolution points: $currentPoints + $points = $newPoints');
+      return newPoints;
+    } catch (e) {
+      debugPrint('[PET] Błąd aktualizacji evolution_points: $e');
+      return 0;
+    }
+  }
+
+  /// Pobiera aktualne punkty ewolucji
+  Future<int> getEvolutionPoints() async {
+    final state = await getPetState();
+    return (state?['evolution_points'] as int?) ?? 0;
+  }
+
+  /// Resetuje punkty ewolucji do 0
+  Future<bool> resetEvolutionPoints() async {
+    final userId = currentUserId;
+    if (userId == null) return false;
+
+    try {
+      await _client.from('pet_states').upsert({
+        'user_id': userId,
+        'evolution_points': 0,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id');
+      debugPrint('[PET] Evolution points zresetowane do 0');
+      return true;
+    } catch (e) {
+      debugPrint('[PET] Błąd resetowania evolution_points: $e');
+      return false;
+    }
+  }
+
+  /// Rozpoczyna sen - zapisuje sleep_start_time
+  Future<bool> startSleep() async {
+    final userId = currentUserId;
+    if (userId == null) return false;
+
+    try {
+      await _client.from('pet_states').upsert({
+        'user_id': userId,
+        'sleep_start_time': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id');
+      debugPrint('[PET] Sen rozpoczęty');
+      return true;
+    } catch (e) {
+      debugPrint('[PET] Błąd rozpoczynania snu: $e');
+      return false;
+    }
+  }
+
+  /// Budzi zwierzaka - oblicza regenerację energii i czyści sleep_start_time
+  /// Zwraca ilość zregenerowanej energii (1 minuta = 1 punkt)
+  Future<int> wakeUpAndCalculateEnergy() async {
+    final userId = currentUserId;
+    if (userId == null) return 0;
+
+    try {
+      // Pobierz aktualny stan
+      final state = await getPetState();
+      if (state == null) return 0;
+
+      final sleepStartStr = state['sleep_start_time'] as String?;
+      if (sleepStartStr == null) return 0;
+
+      // Oblicz czas snu
+      final sleepStart = DateTime.parse(sleepStartStr);
+      final now = DateTime.now();
+      final minutesSlept = now.difference(sleepStart).inMinutes;
+
+      // Wyczyść sleep_start_time
+      await _client.from('pet_states').update({
+        'sleep_start_time': null,
+        'updated_at': now.toIso8601String(),
+      }).eq('user_id', userId);
+
+      debugPrint('[PET] Obudzony po $minutesSlept minutach snu');
+      return minutesSlept;
+    } catch (e) {
+      debugPrint('[PET] Błąd budzenia: $e');
+      return 0;
+    }
+  }
+
+  /// Sprawdza czy zwierzak śpi (czy sleep_start_time jest ustawione)
+  Future<DateTime?> getSleepStartTime() async {
+    final state = await getPetState();
+    if (state == null) return null;
+
+    final sleepStartStr = state['sleep_start_time'] as String?;
+    if (sleepStartStr == null) return null;
+
+    return DateTime.tryParse(sleepStartStr);
   }
 }

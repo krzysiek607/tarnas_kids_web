@@ -1,0 +1,113 @@
+{
+  "project": "Tarnas Kids",
+  "branchName": "ralph/ui-sounds",
+  "description": "UI Sound Effects - Dźwięki interfejsu użytkownika (kliknięcia, sukces, błąd)",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Serwis dźwięków UI",
+      "description": "Jako developer, potrzebuję serwisu do zarządzania dźwiękami UI, aby móc je łatwo odtwarzać z dowolnego miejsca aplikacji.",
+      "acceptanceCriteria": [
+        "Utworzyć plik lib/services/sound_effects_service.dart",
+        "Singleton pattern (SoundEffectsService.instance)",
+        "Metody: playClick(), playSuccess(), playError()",
+        "Preload dźwięków przy inicjalizacji",
+        "Obsługa włączania/wyłączania dźwięków (isMuted)",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Provider stanu dźwięków",
+      "description": "Jako developer, potrzebuję providera Riverpod do zarządzania stanem dźwięków UI.",
+      "acceptanceCriteria": [
+        "Utworzyć plik lib/providers/sound_effects_provider.dart",
+        "Stan: isSoundEnabled (bool), volume (double 0-1)",
+        "Persystencja w SharedPreferences",
+        "Metody: toggleSound(), setVolume()",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Pliki dźwiękowe",
+      "description": "Jako developer, potrzebuję plików dźwiękowych dla UI.",
+      "acceptanceCriteria": [
+        "Sprawdzić czy istnieje assets/sounds/click.mp3, jeśli nie - utworzyć placeholder lub pobrać darmowy dźwięk",
+        "Sprawdzić czy istnieje assets/sounds/success.mp3, jeśli nie - utworzyć placeholder",
+        "Sprawdzić czy istnieje assets/sounds/error.mp3, jeśli nie - utworzyć placeholder",
+        "Zarejestrować pliki w pubspec.yaml w sekcji assets",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Uwaga: Pliki dźwiękowe mogą wymagać ręcznego dodania przez użytkownika"
+    },
+    {
+      "id": "US-004",
+      "title": "Integracja dźwięku kliknięcia w HomeScreen",
+      "description": "Jako użytkownik, chcę słyszeć dźwięk przy kliknięciu przycisków menu głównego.",
+      "acceptanceCriteria": [
+        "Dodać dźwięk kliknięcia do 4 przycisków menu (Przygoda, Nauka, Zabawa, Zwierzak)",
+        "Dodać dźwięk do przycisku muzyki",
+        "Dźwięk odtwarzany przed nawigacją",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Integracja dźwięku sukcesu w grach",
+      "description": "Jako użytkownik, chcę słyszeć dźwięk sukcesu gdy ukończę rundę/poziom w grze.",
+      "acceptanceCriteria": [
+        "Dodać dźwięk sukcesu w MazeGameScreen (przy ukończeniu poziomu)",
+        "Dodać dźwięk sukcesu w DotsGameScreen (przy trafieniu kropki)",
+        "Dodać dźwięk sukcesu w MatchingGameScreen (przy dopasowaniu pary)",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Integracja dźwięku sukcesu w modułach nauki",
+      "description": "Jako użytkownik, chcę słyszeć dźwięk sukcesu gdy poprawnie ukończę zadanie edukacyjne.",
+      "acceptanceCriteria": [
+        "Dodać dźwięk sukcesu w PatternTracingScreen",
+        "Dodać dźwięk sukcesu w LetterTracingScreen",
+        "Dodać dźwięk sukcesu w FindLetterScreen",
+        "Dodać dźwięk sukcesu w CountingGameScreen",
+        "Dodać dźwięk sukcesu w ConnectSyllablesScreen",
+        "Dodać dźwięk sukcesu w SequenceGameScreen",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Integracja dźwięku błędu",
+      "description": "Jako użytkownik, chcę słyszeć delikatny dźwięk gdy popełnię błąd.",
+      "acceptanceCriteria": [
+        "Dodać dźwięk błędu w FindLetterScreen (zła odpowiedź)",
+        "Dodać dźwięk błędu w MatchingGameScreen (złe dopasowanie)",
+        "Dodać dźwięk błędu w ConnectSyllablesScreen (zła kolejność)",
+        "Dźwięk delikatny, nie straszący dzieci",
+        "flutter analyze passes without errors"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

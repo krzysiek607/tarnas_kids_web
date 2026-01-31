@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
 import '../../theme/app_theme.dart';
+import '../../services/sound_effects_controller.dart';
 
 class ConnectSyllablesScreen extends StatefulWidget {
   const ConnectSyllablesScreen({super.key});
@@ -24,6 +26,9 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
 
   late AnimationController _successController;
   late Animation<double> _successScale;
+
+  // Audio player dla sylab
+  final AudioPlayer _syllablePlayer = AudioPlayer();
 
   // 20 slow z poprawna polska sylabifikacja
   final List<_WordData> wordData = [
@@ -65,7 +70,20 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
   @override
   void dispose() {
     _successController.dispose();
+    _syllablePlayer.dispose();
     super.dispose();
+  }
+
+  /// Odtwarza dźwięk sylaby (jeśli plik istnieje)
+  Future<void> _playSyllableSound(String syllable) async {
+    try {
+      // Normalizacja nazwy pliku: lowercase
+      final fileName = syllable.toLowerCase();
+      await _syllablePlayer.play(AssetSource('sounds/syllables/$fileName.mp3'));
+    } catch (e) {
+      // Brak pliku audio - ignoruj, gra działa dalej
+      debugPrint('[SYLLABLE AUDIO] Brak pliku dla: $syllable');
+    }
   }
 
   void _generateRound() {
@@ -123,6 +141,7 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
         showSuccess = true;
       });
       _successController.forward(from: 0);
+      SoundEffectsController().playSuccess();
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
@@ -275,7 +294,10 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
                       opacity: 0.3,
                       child: _SyllableChip(syllable: syllable),
                     ),
-                    child: _SyllableChip(syllable: syllable),
+                    child: GestureDetector(
+                      onTap: () => _playSyllableSound(syllable),
+                      child: _SyllableChip(syllable: syllable),
+                    ),
                   );
                 }).toList(),
               ),

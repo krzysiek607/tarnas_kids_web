@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/kid_friendly_button.dart';
 import '../../providers/background_music_provider.dart';
 import '../../services/sound_effects_controller.dart';
+import '../../services/sound_effects_service.dart';
 
 /// Gra Dopasowywanie - dziecko laczy pary elementow
 class MatchingGameScreen extends ConsumerStatefulWidget {
@@ -179,6 +180,8 @@ class _MatchingGameScreenState extends ConsumerState<MatchingGameScreen> {
         Future.delayed(const Duration(milliseconds: 500), _showWinDialog);
       }
     } else {
+      // Dźwięk błędu przy złym dopasowaniu
+      SoundEffectsService.instance.playError();
       setState(() {
         selectedLeftIndex = null;
       });

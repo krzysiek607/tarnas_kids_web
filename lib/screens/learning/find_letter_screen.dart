@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../services/sound_effects_controller.dart';
+import '../../services/sound_effects_service.dart';
 
 class LetterItem {
   final String emoji;
@@ -103,6 +104,7 @@ class _FindLetterScreenState extends State<FindLetterScreen> with TickerProvider
         }
       });
     } else {
+      SoundEffectsService.instance.playError();
       _bounceController.forward(from: 0).then((_) { if (mounted) setState(() { tappedIndex = null; }); });
     }
   }

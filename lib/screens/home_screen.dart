@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/background_music_provider.dart';
 import '../providers/pet_provider.dart';
+import '../services/sound_effects_service.dart';
 
 /// Ekran glowny aplikacji Tarnas Kids
 class HomeScreen extends ConsumerStatefulWidget {
@@ -146,7 +147,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// Przycisk ustawień
   Widget _buildSettingsButton() {
     return GestureDetector(
-      onTap: () => context.push('/settings'),
+      onTap: () {
+        SoundEffectsService.instance.playClick();
+        context.push('/settings');
+      },
       child: Container(
         width: 44,
         height: 44,
@@ -174,6 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildMusicButton(BackgroundMusicState musicState) {
     return GestureDetector(
       onTap: () {
+        SoundEffectsService.instance.playClick();
         ref.read(backgroundMusicProvider.notifier).toggle();
       },
       child: Container(
@@ -250,6 +255,9 @@ class _ArchMenuButtonState extends State<_ArchMenuButton>
   void _handleTap() {
     if (_isNavigating) return;
     _isNavigating = true;
+
+    // Dźwięk kliknięcia
+    SoundEffectsService.instance.playClick();
 
     // Pokaz tooltip
     final dynamic tooltip = _tooltipKey.currentState;

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import '../../theme/app_theme.dart';
 import '../../services/sound_effects_controller.dart';
+import '../../services/sound_effects_service.dart';
 
 class ConnectSyllablesScreen extends StatefulWidget {
   const ConnectSyllablesScreen({super.key});
@@ -156,6 +157,7 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
         }
       });
     } else {
+      SoundEffectsService.instance.playError();
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           setState(() {

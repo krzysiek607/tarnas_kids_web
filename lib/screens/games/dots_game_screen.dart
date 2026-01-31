@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../widgets/kid_friendly_button.dart';
+import '../../services/sound_effects_service.dart';
 
 /// Gra Kropki - dziecko klika na pojawiajace sie kropki
 class DotsGameScreen extends StatefulWidget {
@@ -157,6 +158,9 @@ class _DotsGameScreenState extends State<DotsGameScreen>
       });
       pulseControllers[index].reset();
       dotTimer?.cancel();
+
+      // Dźwięk sukcesu przy trafieniu
+      SoundEffectsService.instance.playSuccess();
 
       // Generuj nowe losowe pozycje po kazdym trafieniu
       if (gameAreaSize != null) {

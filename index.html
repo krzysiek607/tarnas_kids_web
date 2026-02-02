@@ -176,18 +176,17 @@
         
         .video-showcase {
             width: 100%;
-            margin: 0; /* Bez marginesów */
+            margin: 0;
             padding: 0;
             overflow: hidden;
             position: relative;
             background: #000;
+            /* Zapewnienie, że tło nie 'świeci' pod spodem */
         }
         
         .video-player {
             width: 100%;
-            height: auto;
-            max-height: 80vh; /* Zapobiega zbyt wysokiemu wideo na monitorach panoramicznych */
-            object-fit: cover; /* Wypełnia przestrzeń */
+            height: auto; /* Kluczowe: wysokość wynika z szerokości */
             display: block;
         }
 

@@ -175,20 +175,20 @@
         .evolution-teaser { padding: 80px 0; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,107,157,0.05) 100%); }
         
         .video-showcase {
-            max-width: 800px;
-            margin: 40px auto 60px;
-            border-radius: 30px;
+            width: 100%;
+            margin: 0; /* Bez marginesów */
+            padding: 0;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(255, 107, 157, 0.25);
-            border: 8px solid #ffffff;
             position: relative;
-            transform: translateZ(0); /* Fix for Safari border-radius */
+            background: #000;
         }
         
         .video-player {
             width: 100%;
+            height: auto;
+            max-height: 80vh; /* Zapobiega zbyt wysokiemu wideo na monitorach panoramicznych */
+            object-fit: cover; /* Wypełnia przestrzeń */
             display: block;
-            background: #000;
         }
 
         .evo-steps { display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-top: 50px; }
@@ -332,15 +332,18 @@
         <div class="container">
             <div class="section-header fade-in-up">
                 <span class="section-badge">Mechanika Gry</span>
-            <h2 class="section-title" style="font-size: 28px; margin-bottom: 20px;">Jak to działa?</h2>
-            
-            <div class="video-showcase fade-in-up">
-                <video class="video-player" autoplay muted loop playsinline controls>
-                    <source src="videos/intro_petscreen.mp4" type="video/mp4">
-                    Twoja przeglądarka nie obsługuje wideo.
-                </video>
+                <h2 class="section-title" style="font-size: 28px; margin-bottom: 20px;">Jak to działa?</h2>
             </div>
+        </div>
 
+        <div class="video-showcase">
+            <video class="video-player" autoplay muted loop playsinline controls>
+                <source src="videos/intro_petscreen.mp4" type="video/mp4">
+                Twoja przeglądarka nie obsługuje wideo.
+            </video>
+        </div>
+
+        <div class="container">
             <div class="evo-steps fade-in-up">
                 <!-- Step 1 -->
                 <div class="evo-card">

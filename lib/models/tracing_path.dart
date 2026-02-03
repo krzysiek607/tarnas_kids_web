@@ -97,7 +97,7 @@ class TracingPath {
     required this.name,
     required this.waypoints,
     this.hint,
-    this.hitRadiusPx = 35.0,  // 35 pikseli (spójne z istniejącą tolerancją)
+    this.hitRadiusPx = 22.0,  // 22 pikseli (zmniejszona tolerancja dla większej precyzji)
     this.maxErrorPx = 50.0,   // 50 pikseli marginesu błędu
   });
 

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Funkcja do logowania - tylko bledy i wazne zdarzenia
 // Ustaw na true tylko do debugowania
-const bool _enableAudioLogs = false;
+const bool _enableAudioLogs = true;
 
 void _log(String message) {
   if (_enableAudioLogs) {

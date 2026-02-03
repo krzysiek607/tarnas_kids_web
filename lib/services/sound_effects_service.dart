@@ -40,28 +40,36 @@ class SoundEffectsService {
       _successPlayer = AudioPlayer();
       _errorPlayer = AudioPlayer();
 
-      // Konfiguracja audio context dla każdego playera
-      final audioContext = AudioContext(
-        android: AudioContextAndroid(
-          isSpeakerphoneOn: false,
-          stayAwake: false,
-          contentType: AndroidContentType.sonification,
-          usageType: AndroidUsageType.game,
-          audioFocus: AndroidAudioFocus.gainTransientMayDuck,
-        ),
-        iOS: AudioContextIOS(
-          category: AVAudioSessionCategory.ambient,
-          options: {
-            AVAudioSessionOptions.mixWithOthers,
-          },
-        ),
-      );
+      // Konfiguracja audio context tylko dla mobile (iOS/Android)
+      // Na Windows/Linux/Web pomijamy - domyślna konfiguracja działa
+      if (!kIsWeb) {
+        try {
+          final audioContext = AudioContext(
+            android: AudioContextAndroid(
+              isSpeakerphoneOn: false,
+              stayAwake: false,
+              contentType: AndroidContentType.sonification,
+              usageType: AndroidUsageType.game,
+              audioFocus: AndroidAudioFocus.none, // Nie zabieraj fokusu muzyce
+            ),
+            iOS: AudioContextIOS(
+              // playback + mixWithOthers = gra dźwięki bez przerywania muzyki
+              category: AVAudioSessionCategory.playback,
+              options: {
+                AVAudioSessionOptions.mixWithOthers,
+              },
+            ),
+          );
 
-      await Future.wait([
-        _clickPlayer!.setAudioContext(audioContext),
-        _successPlayer!.setAudioContext(audioContext),
-        _errorPlayer!.setAudioContext(audioContext),
-      ]);
+          await Future.wait([
+            _clickPlayer!.setAudioContext(audioContext),
+            _successPlayer!.setAudioContext(audioContext),
+            _errorPlayer!.setAudioContext(audioContext),
+          ]);
+        } catch (e) {
+          // Windows/Linux nie obsługują AudioContext - ignoruj
+        }
+      }
 
       // Ustaw tryb - dźwięki grają raz
       await Future.wait([

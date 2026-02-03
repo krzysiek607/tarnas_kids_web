@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../theme/app_theme.dart';
 import '../../services/sound_effects_controller.dart';
@@ -29,10 +30,11 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
   late Animation<double> _successScale;
 
   // Audio player dla sylab
-  final AudioPlayer _syllablePlayer = AudioPlayer();
+  late final AudioPlayer _syllablePlayer;
 
-  // 20 slow z poprawna polska sylabifikacja
+  // 50 slow z poprawna polska sylabifikacja
   final List<_WordData> wordData = [
+    // Podstawowe (2 sylaby)
     _WordData('MAMA', ['MA', 'MA'], '👩'),
     _WordData('TATA', ['TA', 'TA'], '👨'),
     _WordData('KURA', ['KU', 'RA'], '🐔'),
@@ -48,16 +50,57 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
     _WordData('MAPA', ['MA', 'PA'], '🗺️'),
     _WordData('KINO', ['KI', 'NO'], '🎬'),
     _WordData('AUTO', ['AU', 'TO'], '🚗'),
-    _WordData('KOLO', ['KO', 'LO'], '⭕'),
+    _WordData('KOŁO', ['KO', 'ŁO'], '⭕'),
+    // Trudniejsze (2-3 sylaby)
     _WordData('TORBA', ['TOR', 'BA'], '👜'),
     _WordData('LAMPA', ['LAM', 'PA'], '💡'),
     _WordData('MLEKO', ['MLE', 'KO'], '🥛'),
     _WordData('MOTYL', ['MO', 'TYL'], '🦋'),
+    // Nowe słowa - zwierzęta
+    _WordData('PTAK', ['PTAK'], '🐦'),
+    _WordData('SOWA', ['SO', 'WA'], '🦉'),
+    _WordData('ŻABA', ['ŻA', 'BA'], '🐸'),
+    _WordData('KRAB', ['KRAB'], '🦀'),
+    _WordData('SŁOŃ', ['SŁOŃ'], '🐘'),
+    _WordData('ŻYRAFA', ['ŻY', 'RA', 'FA'], '🦒'),
+    _WordData('PANDA', ['PAN', 'DA'], '🐼'),
+    _WordData('TYGRYS', ['TY', 'GRYS'], '🐅'),
+    _WordData('ZEBRA', ['ZE', 'BRA'], '🦓'),
+    _WordData('KOALA', ['KO', 'A', 'LA'], '🐨'),
+    // Nowe słowa - jedzenie
+    _WordData('PIZZA', ['PIZ', 'ZA'], '🍕'),
+    _WordData('BANAN', ['BA', 'NAN'], '🍌'),
+    _WordData('JABŁKO', ['JAB', 'ŁKO'], '🍎'),
+    _WordData('ARBUZ', ['AR', 'BUZ'], '🍉'),
+    _WordData('CHLEB', ['CHLEB'], '🍞'),
+    _WordData('MASŁO', ['MAS', 'ŁO'], '🧈'),
+    _WordData('SERNIK', ['SER', 'NIK'], '🍰'),
+    _WordData('LIZAK', ['LI', 'ZAK'], '🍭'),
+    // Nowe słowa - przedmioty
+    _WordData('PIŁKA', ['PIŁ', 'KA'], '⚽'),
+    _WordData('LALKA', ['LAL', 'KA'], '🎎'),
+    _WordData('ROBOT', ['RO', 'BOT'], '🤖'),
+    _WordData('BALON', ['BA', 'LON'], '🎈'),
+    _WordData('KSIĄŻKA', ['KSIĄŻ', 'KA'], '📚'),
+    _WordData('OŁÓWEK', ['O', 'ŁÓ', 'WEK'], '✏️'),
+    _WordData('KREDKA', ['KRED', 'KA'], '🖍️'),
+    // Nowe słowa - natura
+    _WordData('SŁOŃCE', ['SŁOŃ', 'CE'], '☀️'),
+    _WordData('CHMURA', ['CHMU', 'RA'], '☁️'),
+    _WordData('DESZCZ', ['DESZCZ'], '🌧️'),
+    _WordData('DRZEWO', ['DRZE', 'WO'], '🌳'),
+    _WordData('KWIAT', ['KWIAT'], '🌸'),
+    _WordData('TRAWA', ['TRA', 'WA'], '🌿'),
   ];
 
   @override
   void initState() {
     super.initState();
+
+    // Inicjalizuj player sylab z AudioContext który NIE zabiera audio focus
+    _syllablePlayer = AudioPlayer();
+    _initSyllablePlayer();
+
     _successController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -68,6 +111,29 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
     _generateRound();
   }
 
+  /// Konfiguruje player sylab żeby nie zabierał audio focus od muzyki
+  Future<void> _initSyllablePlayer() async {
+    try {
+      await _syllablePlayer.setAudioContext(AudioContext(
+        android: AudioContextAndroid(
+          isSpeakerphoneOn: false,
+          stayAwake: false,
+          contentType: AndroidContentType.sonification,
+          usageType: AndroidUsageType.game,
+          audioFocus: AndroidAudioFocus.none, // NIE zabieraj fokusu!
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: {AVAudioSessionOptions.mixWithOthers},
+        ),
+      ));
+      await _syllablePlayer.setReleaseMode(ReleaseMode.stop);
+    } catch (e) {
+      // Ignoruj błędy na platformach które nie obsługują AudioContext
+      debugPrint('[SYLLABLE] AudioContext error: $e');
+    }
+  }
+
   @override
   void dispose() {
     _successController.dispose();
@@ -75,15 +141,87 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
     super.dispose();
   }
 
-  /// Odtwarza dźwięk sylaby (jeśli plik istnieje)
+  /// Mapowanie polskich znaków na nazwy plików audio
+  static const Map<String, String> _syllableFileMap = {
+    // Sylaby z polskimi znakami
+    'ŻA': 'Za2',
+    'ŻY': 'Zy',
+    'ŁKO': 'Lko',
+    'ŁO': 'Lo2',
+    'ŁÓ': 'Lou',
+    'PIŁ': 'Pil',
+    'SŁOŃ': 'Slon',
+    'KSIĄŻ': 'Ksiaz',
+  };
+
+  /// Konwertuje sylabę na nazwę pliku (Capitalize + usunięcie polskich znaków)
+  String _syllableToFileName(String syllable) {
+    // Najpierw sprawdź specjalne mapowanie
+    if (_syllableFileMap.containsKey(syllable)) {
+      return _syllableFileMap[syllable]!;
+    }
+
+    // Standardowa konwersja: SYLABA → Sylaba
+    final lower = syllable.toLowerCase();
+
+    // Zamień pozostałe polskie znaki
+    final normalized = lower
+        .replaceAll('ą', 'a')
+        .replaceAll('ć', 'c')
+        .replaceAll('ę', 'e')
+        .replaceAll('ł', 'l')
+        .replaceAll('ń', 'n')
+        .replaceAll('ó', 'o')
+        .replaceAll('ś', 's')
+        .replaceAll('ź', 'z')
+        .replaceAll('ż', 'z');
+
+    // Capitalize: pierwsza duża, reszta mała
+    if (normalized.isEmpty) return normalized;
+    return normalized[0].toUpperCase() + normalized.substring(1);
+  }
+
+  /// Odtwarza dźwięk sylaby przy kliknięciu (bez ducking - sylaba jest krótka)
   Future<void> _playSyllableSound(String syllable) async {
+    final fileName = _syllableToFileName(syllable);
     try {
-      // Normalizacja nazwy pliku: lowercase
-      final fileName = syllable.toLowerCase();
+      await _syllablePlayer.stop();
       await _syllablePlayer.play(AssetSource('sounds/syllables/$fileName.mp3'));
     } catch (e) {
-      // Brak pliku audio - ignoruj, gra działa dalej
-      debugPrint('[SYLLABLE AUDIO] Brak pliku dla: $syllable');
+      debugPrint('[SYLLABLE AUDIO] Brak pliku dla: $syllable -> $fileName');
+    }
+  }
+
+  /// Odtwarza wszystkie sylaby słowa po kolei (przy poprawnej odpowiedzi)
+  /// Hybrydowe podejście: czeka na koniec dźwięku LUB max 550ms
+  Future<void> _playAllSyllables() async {
+    for (final syllable in currentWord.syllables) {
+      if (!mounted) return;
+
+      final fileName = _syllableToFileName(syllable);
+      try {
+        final completer = Completer<void>();
+
+        // Listener na zakończenie dźwięku
+        StreamSubscription? subscription;
+        subscription = _syllablePlayer.onPlayerComplete.listen((_) {
+          if (!completer.isCompleted) completer.complete();
+          subscription?.cancel();
+        });
+
+        // Odtwórz sylabę
+        await _syllablePlayer.play(AssetSource('sounds/syllables/$fileName.mp3'));
+
+        // Czekaj na koniec LUB max 550ms (co pierwsze)
+        await Future.any([
+          completer.future,
+          Future.delayed(const Duration(milliseconds: 550)),
+        ]);
+
+        subscription?.cancel();
+      } catch (e) {
+        debugPrint('[SYLLABLE AUDIO] Brak pliku: $syllable -> $fileName');
+      }
     }
   }
 
@@ -127,7 +265,7 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
     });
   }
 
-  void _checkAnswer() {
+  Future<void> _checkAnswer() async {
     bool isCorrect = true;
     for (int i = 0; i < currentWord.syllables.length; i++) {
       if (placedSyllables[i] != currentWord.syllables[i]) {
@@ -142,7 +280,12 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
         showSuccess = true;
       });
       _successController.forward(from: 0);
-      SoundEffectsController().playSuccess();
+
+      // Odtwórz sylaby po kolei (bez ducking - muzyka gra dalej)
+      await _playAllSyllables();
+
+      // Dźwięk sukcesu (bez ducking)
+      SoundEffectsController().playSuccessRaw();
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {

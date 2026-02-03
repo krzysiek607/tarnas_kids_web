@@ -39,6 +39,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
   final GlobalKey<TracingCanvasState> _canvasKey = GlobalKey();
   final Random _random = Random();
   int _completedCount = 0; // Licznik ukończonych wzorów
+  bool _rewardGrantedForCurrentPattern = false; // Flaga czy nagroda już przyznana
 
   @override
   void initState() {
@@ -69,8 +70,20 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
 
     setState(() {
       _currentIndex = _getNextRandomIndex();
+      _rewardGrantedForCurrentPattern = false; // Reset flagi przy zmianie wzoru
     });
     debugPrint('✏️ TRACING: Pominięto - nowy wzór: $_currentIndex');
+  }
+
+  /// Wywoływane przez TracingCanvas gdy wszystkie waypointy zaliczone
+  /// Przyznaje nagrodę NATYCHMIAST (razem z dźwiękiem sukcesu)
+  void _onPatternCompleted() {
+    if (!widget.enableRewards) return;
+    if (_rewardGrantedForCurrentPattern) return; // Już przyznano
+
+    debugPrint('✏️ TRACING: onComplete - przyznawanie nagrody natychmiast!');
+    _rewardGrantedForCurrentPattern = true;
+    _grantReward();
   }
 
   /// INFINITE RANDOM LOOP: Zawsze losuje nowy wzór
@@ -91,15 +104,13 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     debugPrint('✏️ TRACING: ═══════════════════════════════════');
     debugPrint('✏️ TRACING: Wzór: ${_currentPattern.name}');
     debugPrint('✏️ TRACING: $score');
-    debugPrint('✏️ TRACING: Nagroda? ${score.isGoodEnough ? "TAK ✅" : "NIE ❌"}');
+    debugPrint('✏️ TRACING: Nagroda już przyznana? ${_rewardGrantedForCurrentPattern ? "TAK" : "NIE"}');
     debugPrint('✏️ TRACING: ═══════════════════════════════════');
 
-    // Sprawdz czy wynik jest wystarczajaco dobry
-    if (widget.enableRewards && score.isGoodEnough) {
-      debugPrint('✏️ TRACING: Przyznawanie nagrody...');
-      await _grantReward();
-    } else if (widget.enableRewards) {
-      // Nie przyznaj nagrody, ale pozwól przejść dalej
+    // Nagroda jest przyznawana przez onComplete (gdy success.mp3 się odtwarza)
+    // Tutaj tylko sprawdzamy czy wynik był wystarczający
+    if (!_rewardGrantedForCurrentPattern && widget.enableRewards && !score.isGoodEnough) {
+      // Za słaby wynik - pokaż komunikat
       debugPrint('✏️ TRACING: Za słaby wynik - brak nagrody');
       _showTryAgainMessage(
         'Spróbuj dokładniej! 🎯\n'
@@ -114,6 +125,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     setState(() {
       _currentIndex = _getNextRandomIndex();
       _completedCount++;
+      _rewardGrantedForCurrentPattern = false; // Reset flagi dla nowego wzoru
     });
     canvasState.clear();
 
@@ -291,6 +303,7 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
                     drawColor: widget.drawColor,
                     drawWidth: 14.0,
                     traceWidth: 10.0,
+                    onComplete: _onPatternCompleted, // Nagroda natychmiast!
                   ),
                 ),
               ),

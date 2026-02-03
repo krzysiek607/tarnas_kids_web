@@ -24,7 +24,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
   late AnimationController _successController;
   late Animation<double> _successScale;
 
-  // Sekwencje z poprawna logika
+  // 10 sekwencji z poprawna logika
   final List<_SequenceData> sequences = [
     _SequenceData(
       title: 'Poranek',
@@ -84,6 +84,47 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
         _SequenceStep(1, '🐣', 'Wykluwanie'),
         _SequenceStep(2, '🐥', 'Pisklak'),
         _SequenceStep(3, '🐔', 'Kura'),
+      ],
+    ),
+    // Nowe sekwencje
+    _SequenceData(
+      title: 'Pory roku',
+      icon: '🍂',
+      steps: [
+        _SequenceStep(0, '🌸', 'Wiosna'),
+        _SequenceStep(1, '☀️', 'Lato'),
+        _SequenceStep(2, '🍂', 'Jesień'),
+        _SequenceStep(3, '❄️', 'Zima'),
+      ],
+    ),
+    _SequenceData(
+      title: 'Bałwan',
+      icon: '⛄',
+      steps: [
+        _SequenceStep(0, '❄️', 'Śnieg'),
+        _SequenceStep(1, '⚪', 'Kula'),
+        _SequenceStep(2, '⛄', 'Bałwan'),
+        _SequenceStep(3, '🥕', 'Nos'),
+      ],
+    ),
+    _SequenceData(
+      title: 'Książka',
+      icon: '📖',
+      steps: [
+        _SequenceStep(0, '✏️', 'Pisanie'),
+        _SequenceStep(1, '📄', 'Strony'),
+        _SequenceStep(2, '📚', 'Okładka'),
+        _SequenceStep(3, '📖', 'Czytanie'),
+      ],
+    ),
+    _SequenceData(
+      title: 'Żaba',
+      icon: '🐸',
+      steps: [
+        _SequenceStep(0, '💧', 'Woda'),
+        _SequenceStep(1, '🥚', 'Skrzek'),
+        _SequenceStep(2, '🐟', 'Kijanka'),
+        _SequenceStep(3, '🐸', 'Żaba'),
       ],
     ),
   ];

@@ -1,12 +1,13 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/background_music_provider.dart';
 import '../providers/pet_provider.dart';
 import '../services/sound_effects_controller.dart';
+import '../services/sound_effects_service.dart';
 
-/// Ekran ustawień - minimalistyczny, bezpieczny dla dzieci
+/// Ekran ustawień - przyjazny dla dzieci, bezpieczny dla rodziców
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -14,8 +15,35 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   bool _sfxEnabled = true;
+  bool _parentUnlocked = false;
+
+  // Animacja parental gate (4 sekundy)
+  late AnimationController _gateController;
+  bool _isHolding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _gateController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    );
+    _gateController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() => _parentUnlocked = true);
+        SoundEffectsService.instance.playSuccess();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _gateController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,41 +52,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Ustawienia'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('⚙️ ', style: TextStyle(fontSize: 24)),
+            const Text('Ustawienia'),
+          ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            SoundEffectsService.instance.playClick();
+            context.pop();
+          },
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // === SEKCJA DZIECIĘCA ===
-              _buildChildSection(musicState),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          // === SEKCJA DZIECIĘCA ===
+          _buildChildSection(musicState),
 
-              const SizedBox(height: 40),
+          const SizedBox(height: 24),
 
-              // === SEKCJA RODZICIELSKA ===
-              _buildParentSection(),
+          // === SEKCJA RODZICIELSKA ===
+          _buildParentSection(),
 
-              const Spacer(),
+          const SizedBox(height: 32),
 
-              // Wersja aplikacji
-              Center(
-                child: Text(
-                  'Tarnas Kids v1.0',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textLightColor.withValues(alpha: 0.5),
-                  ),
+          // Wersja aplikacji
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '🌟 Tarnas Kids v1.0',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.primaryColor,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -71,118 +113,149 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Muzyka
-          _SettingRow(
-            icon: Icons.music_note_rounded,
-            iconColor: AppTheme.primaryColor,
-            label: 'Muzyka',
-            child: _buildMusicSlider(musicState),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.yellowColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text('🎵', style: TextStyle(fontSize: 20)),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Dźwięki',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textColor,
+                ),
+              ),
+            ],
           ),
-
           const SizedBox(height: 20),
 
-          // Dźwięki
-          _SettingRow(
-            icon: Icons.volume_up_rounded,
-            iconColor: AppTheme.accentColor,
-            label: 'Dźwięki',
-            child: _buildSfxToggle(),
+          // Muzyka
+          _buildSettingTile(
+            emoji: '🎶',
+            title: 'Muzyka',
+            subtitle: 'Melodia w tle',
+            trailing: SizedBox(
+              width: 140,
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: AppTheme.primaryColor,
+                  inactiveTrackColor: AppTheme.primaryColor.withOpacity(0.2),
+                  thumbColor: AppTheme.primaryColor,
+                  overlayColor: AppTheme.primaryColor.withOpacity(0.1),
+                  trackHeight: 8,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                ),
+                child: Slider(
+                  value: musicState.userMuted ? 0 : musicState.volume,
+                  onChanged: (value) {
+                    if (value == 0) {
+                      ref.read(backgroundMusicProvider.notifier).pause();
+                    } else {
+                      if (musicState.userMuted || !musicState.isPlaying) {
+                        ref.read(backgroundMusicProvider.notifier).play();
+                      }
+                      ref.read(backgroundMusicProvider.notifier).setVolume(value);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1),
+          ),
+
+          // Efekty dźwiękowe
+          _buildSettingTile(
+            emoji: '🔔',
+            title: 'Dźwięki',
+            subtitle: 'Efekty w grach',
+            trailing: Transform.scale(
+              scale: 1.1,
+              child: Switch(
+                value: _sfxEnabled,
+                activeColor: AppTheme.greenColor,
+                activeTrackColor: AppTheme.greenColor.withOpacity(0.3),
+                inactiveThumbColor: Colors.grey.shade400,
+                inactiveTrackColor: Colors.grey.shade300,
+                onChanged: (value) {
+                  setState(() => _sfxEnabled = value);
+                  SoundEffectsController().setMuted(!value);
+                  SoundEffectsService.instance.setMuted(!value);
+                  if (value) {
+                    SoundEffectsService.instance.playSuccess();
+                  }
+                },
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMusicSlider(BackgroundMusicState musicState) {
+  Widget _buildSettingTile({
+    required String emoji,
+    required String title,
+    required String subtitle,
+    required Widget trailing,
+  }) {
     return Row(
       children: [
-        Icon(
-          Icons.volume_mute_rounded,
-          size: 20,
-          color: AppTheme.textLightColor,
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Center(
+            child: Text(emoji, style: const TextStyle(fontSize: 24)),
+          ),
         ),
+        const SizedBox(width: 14),
         Expanded(
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppTheme.primaryColor,
-              inactiveTrackColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-              thumbColor: AppTheme.primaryColor,
-              overlayColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-              trackHeight: 8,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
-            ),
-            child: Slider(
-              value: musicState.userMuted ? 0 : musicState.volume,
-              onChanged: (value) {
-                if (value == 0) {
-                  ref.read(backgroundMusicProvider.notifier).pause();
-                } else {
-                  if (musicState.userMuted || !musicState.isPlaying) {
-                    ref.read(backgroundMusicProvider.notifier).play();
-                  }
-                  ref.read(backgroundMusicProvider.notifier).setVolume(value);
-                }
-              },
-            ),
-          ),
-        ),
-        Icon(
-          Icons.volume_up_rounded,
-          size: 20,
-          color: AppTheme.textLightColor,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSfxToggle() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _sfxEnabled = !_sfxEnabled;
-        });
-        SoundEffectsController().setMuted(!_sfxEnabled);
-        // Zagraj dźwięk testowy jeśli włączone
-        if (_sfxEnabled) {
-          SoundEffectsController().playSuccess();
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 80,
-        height: 44,
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: _sfxEnabled ? AppTheme.greenColor : Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: AnimatedAlign(
-          duration: const Duration(milliseconds: 200),
-          alignment: _sfxEnabled ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                _sfxEnabled ? '🔔' : '🔕',
-                style: const TextStyle(fontSize: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textColor,
+                ),
               ),
-            ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppTheme.textLightColor,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
+        trailing,
+      ],
     );
   }
 
@@ -193,14 +266,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.purpleColor.withValues(alpha: 0.3),
+          color: AppTheme.purpleColor.withOpacity(0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: AppTheme.purpleColor.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -208,274 +281,92 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.lock_rounded,
-                color: AppTheme.purpleColor,
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Dla rodziców',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textColor,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.purpleColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  _parentUnlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                  color: AppTheme.purpleColor,
+                  size: 24,
                 ),
               ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Strefa rodzica',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textColor,
+                      ),
+                    ),
+                    Text(
+                      _parentUnlocked ? 'Odblokowano' : 'Chronione hasłem',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: _parentUnlocked
+                            ? AppTheme.greenColor
+                            : AppTheme.textLightColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_parentUnlocked)
+                TextButton(
+                  onPressed: () => setState(() => _parentUnlocked = false),
+                  child: Text(
+                    'Zablokuj',
+                    style: TextStyle(color: AppTheme.purpleColor),
+                  ),
+                ),
             ],
           ),
-          const SizedBox(height: 16),
-          _ParentalGateButton(
-            onUnlocked: () => _openParentSettings(),
-          ),
+          const SizedBox(height: 20),
+          if (!_parentUnlocked)
+            _buildParentalGate()
+          else
+            _buildParentOptions(),
         ],
       ),
     );
   }
 
-  void _openParentSettings() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _ParentSettingsSheet(
-        onResetPet: _confirmResetPet,
-        onDeleteData: _confirmDeleteData,
-      ),
-    );
-  }
-
-  void _confirmResetPet() {
-    Navigator.pop(context); // Zamknij bottom sheet
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Text('🥚 '),
-            Text('Reset zwierzaka'),
-          ],
-        ),
-        content: const Text(
-          'Czy na pewno chcesz zacząć od nowa?\n\nZwierzak wróci do jajka, ale zebrane smakołyki pozostaną.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Anuluj',
-              style: TextStyle(color: AppTheme.textLightColor),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              ref.read(petProvider.notifier).reset();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Text('🥚', style: TextStyle(fontSize: 20)),
-                      SizedBox(width: 8),
-                      Text('Nowe jajko czeka na opiekę!'),
-                    ],
-                  ),
-                  backgroundColor: AppTheme.greenColor,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
-            ),
-            child: const Text('Resetuj'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _confirmDeleteData() {
-    Navigator.pop(context); // Zamknij bottom sheet
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(Icons.warning_rounded, color: Colors.red.shade400),
-            const SizedBox(width: 8),
-            const Text('Usuń wszystko'),
-          ],
-        ),
-        content: const Text(
-          'Czy na pewno chcesz usunąć WSZYSTKIE dane?\n\n'
-          '• Zwierzak\n'
-          '• Smakołyki\n'
-          '• Postęp w grach\n\n'
-          'Tej operacji nie można cofnąć!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Anuluj',
-              style: TextStyle(color: AppTheme.textLightColor),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              // Reset pet
-              ref.read(petProvider.notifier).reset();
-              // TODO: Clear inventory from Supabase
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Text('🗑️', style: TextStyle(fontSize: 20)),
-                      SizedBox(width: 8),
-                      Text('Dane zostały usunięte'),
-                    ],
-                  ),
-                  backgroundColor: Colors.red.shade400,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade400,
-            ),
-            child: const Text('Usuń'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Wiersz ustawienia
-class _SettingRow extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final Widget child;
-
-  const _SettingRow({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, color: iconColor, size: 26),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textColor,
-          ),
-        ),
-        const Spacer(),
-        child,
-      ],
-    );
-  }
-}
-
-/// Przycisk Parental Gate - wymaga przytrzymania 4 sekundy
-class _ParentalGateButton extends StatefulWidget {
-  final VoidCallback onUnlocked;
-
-  const _ParentalGateButton({required this.onUnlocked});
-
-  @override
-  State<_ParentalGateButton> createState() => _ParentalGateButtonState();
-}
-
-class _ParentalGateButtonState extends State<_ParentalGateButton>
-    with SingleTickerProviderStateMixin {
-  static const int _holdDurationSeconds = 4;
-
-  late AnimationController _progressController;
-  bool _isHolding = false;
-  Timer? _unlockTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _progressController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: _holdDurationSeconds),
-    );
-
-    _progressController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _onUnlocked();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _progressController.dispose();
-    _unlockTimer?.cancel();
-    super.dispose();
-  }
-
-  void _onPressStart() {
-    setState(() => _isHolding = true);
-    _progressController.forward(from: 0);
-  }
-
-  void _onPressEnd() {
-    setState(() => _isHolding = false);
-    _progressController.reset();
-  }
-
-  void _onUnlocked() {
-    setState(() => _isHolding = false);
-    _progressController.reset();
-    widget.onUnlocked();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildParentalGate() {
     return GestureDetector(
-      onTapDown: (_) => _onPressStart(),
-      onTapUp: (_) => _onPressEnd(),
-      onTapCancel: _onPressEnd,
+      onTapDown: (_) {
+        setState(() => _isHolding = true);
+        _gateController.forward(from: 0);
+      },
+      onTapUp: (_) {
+        setState(() => _isHolding = false);
+        _gateController.reset();
+      },
+      onTapCancel: () {
+        setState(() => _isHolding = false);
+        _gateController.reset();
+      },
       child: AnimatedBuilder(
-        animation: _progressController,
+        animation: _gateController,
         builder: (context, child) {
+          final progress = _gateController.value;
+          final remaining = (4 - (progress * 4)).ceil();
+
           return Container(
             width: double.infinity,
-            height: 56,
+            height: 60,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.purpleColor.withValues(alpha: 0.5),
+                color: _isHolding
+                    ? AppTheme.purpleColor
+                    : AppTheme.purpleColor.withOpacity(0.4),
                 width: 2,
               ),
             ),
@@ -483,33 +374,40 @@ class _ParentalGateButtonState extends State<_ParentalGateButton>
               borderRadius: BorderRadius.circular(14),
               child: Stack(
                 children: [
-                  // Tło z progress
-                  Positioned.fill(
-                    child: FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: _progressController.value,
-                      child: Container(
-                        color: AppTheme.purpleColor.withValues(alpha: 0.3),
+                  // Progress bar
+                  FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.purpleColor.withOpacity(0.3),
+                            AppTheme.purpleColor.withOpacity(0.5),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  // Tekst
+                  // Text
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          _isHolding ? Icons.lock_open_rounded : Icons.touch_app_rounded,
+                          _isHolding
+                              ? Icons.hourglass_top_rounded
+                              : Icons.touch_app_rounded,
                           color: AppTheme.purpleColor,
-                          size: 24,
+                          size: 22,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Text(
                           _isHolding
-                              ? 'Trzymaj... ${(_holdDurationSeconds - (_progressController.value * _holdDurationSeconds)).ceil()}s'
-                              : 'Przytrzymaj ${_holdDurationSeconds}s aby wejść',
+                              ? 'Trzymaj... ${remaining}s'
+                              : 'Przytrzymaj 4 sekundy',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppTheme.purpleColor,
                           ),
@@ -525,166 +423,72 @@ class _ParentalGateButtonState extends State<_ParentalGateButton>
       ),
     );
   }
-}
 
-/// Bottom sheet z opcjami dla rodziców
-class _ParentSettingsSheet extends StatelessWidget {
-  final VoidCallback onResetPet;
-  final VoidCallback onDeleteData;
-
-  const _ParentSettingsSheet({
-    required this.onResetPet,
-    required this.onDeleteData,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Icon(Icons.admin_panel_settings_rounded,
-                    color: AppTheme.purpleColor, size: 28),
-                const SizedBox(width: 12),
-                Text(
-                  'Panel rodzica',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Opcje
-          _ParentOptionTile(
-            icon: Icons.egg_rounded,
-            iconColor: AppTheme.primaryColor,
-            title: 'Reset zwierzaka',
-            subtitle: 'Zacznij od nowego jajka',
-            onTap: onResetPet,
-          ),
-
-          const Divider(height: 1, indent: 72),
-
-          _ParentOptionTile(
-            icon: Icons.bar_chart_rounded,
-            iconColor: AppTheme.accentColor,
-            title: 'Statystyki',
-            subtitle: 'Zobacz postępy dziecka',
-            onTap: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Statystyki - wkrótce!'),
-                  backgroundColor: AppTheme.accentColor,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
-            },
-          ),
-
-          const Divider(height: 1, indent: 72),
-
-          _ParentOptionTile(
-            icon: Icons.delete_outline_rounded,
-            iconColor: Colors.red.shade400,
-            title: 'Usuń wszystkie dane',
-            subtitle: 'Wyczyść całą aplikację',
-            onTap: onDeleteData,
-            isDestructive: true,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Przycisk zamknięcia
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  'Zamknij',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppTheme.textLightColor,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
+  Widget _buildParentOptions() {
+    return Column(
+      children: [
+        _buildParentOption(
+          emoji: '🥚',
+          title: 'Reset zwierzaka',
+          subtitle: 'Zacznij przygodę od nowa',
+          onTap: _confirmResetPet,
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Divider(height: 1),
+        ),
+        _buildParentOption(
+          emoji: '📊',
+          title: 'Statystyki',
+          subtitle: 'Zobacz postępy dziecka',
+          onTap: () => context.push('/parent-panel'),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Divider(height: 1),
+        ),
+        _buildParentOption(
+          emoji: '🗑️',
+          title: 'Usuń wszystkie dane',
+          subtitle: 'Wyczyść całą aplikację',
+          onTap: _confirmDeleteData,
+          isDestructive: true,
+        ),
+      ],
     );
   }
-}
 
-/// Kafelek opcji w panelu rodzica
-class _ParentOptionTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final bool isDestructive;
-
-  const _ParentOptionTile({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildParentOption({
+    required String emoji,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        SoundEffectsService.instance.playClick();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(14),
+                color: isDestructive
+                    ? Colors.red.shade50
+                    : AppTheme.backgroundColor,
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: iconColor, size: 24),
+              child: Center(
+                child: Text(emoji, style: const TextStyle(fontSize: 22)),
+              ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,15 +496,15 @@ class _ParentOptionTile extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: isDestructive ? Colors.red.shade400 : AppTheme.textColor,
+                      color: isDestructive ? Colors.red.shade600 : AppTheme.textColor,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: AppTheme.textLightColor,
                     ),
                   ),
@@ -709,10 +513,129 @@ class _ParentOptionTile extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textLightColor,
+              color: isDestructive ? Colors.red.shade300 : AppTheme.textLightColor,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmResetPet() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Text('🥚 ', style: TextStyle(fontSize: 28)),
+            Text('Nowa przygoda?'),
+          ],
+        ),
+        content: const Text(
+          'Czy na pewno chcesz zacząć od nowa?\n\n'
+          'Twój zwierzak wróci do jajka, ale zebrane smakołyki pozostaną! 🍪',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Nie, zostaję',
+              style: TextStyle(color: AppTheme.textLightColor, fontSize: 15),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(petProvider.notifier).reset();
+              Navigator.pop(ctx);
+              SoundEffectsService.instance.playSuccess();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Text('🥚 ', style: TextStyle(fontSize: 20)),
+                      Text('Nowe jajko czeka na opiekę!'),
+                    ],
+                  ),
+                  backgroundColor: AppTheme.greenColor,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Tak, resetuj! 🚀', style: TextStyle(fontSize: 15)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteData() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_rounded, color: Colors.red.shade400, size: 28),
+            const SizedBox(width: 10),
+            const Text('Na pewno?'),
+          ],
+        ),
+        content: const Text(
+          'Czy na pewno chcesz usunąć WSZYSTKIE dane?\n\n'
+          '• 🥚 Zwierzak\n'
+          '• 🍪 Smakołyki\n'
+          '• 🎮 Postępy w grach\n\n'
+          'Tej operacji nie można cofnąć!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Anuluj',
+              style: TextStyle(color: AppTheme.textLightColor, fontSize: 15),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(petProvider.notifier).reset();
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Text('🗑️ ', style: TextStyle(fontSize: 20)),
+                      Text('Wszystko usunięte'),
+                    ],
+                  ),
+                  backgroundColor: Colors.red.shade400,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade400,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Usuń wszystko', style: TextStyle(fontSize: 15)),
+          ),
+        ],
       ),
     );
   }

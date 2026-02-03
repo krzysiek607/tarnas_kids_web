@@ -96,9 +96,8 @@ class _EvolutionOverlayState extends State<EvolutionOverlay>
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    _confettiController.addListener(() {
-      _updateConfetti();
-    });
+    // Uwaga: NIE używamy addListener z setState - to powodowało problemy z wydajnością
+    // Zamiast tego używamy AnimatedBuilder w build() który sam reaguje na zmiany
   }
 
   Future<void> _startEvolutionSequence() async {
@@ -175,16 +174,14 @@ class _EvolutionOverlayState extends State<EvolutionOverlay>
     }
   }
 
-  void _updateConfetti() {
-    if (!mounted) return;
-    setState(() {
-      for (var particle in _confettiParticles) {
-        particle.y += particle.velocityY * 0.02;
-        particle.x += particle.velocityX * 0.02;
-        particle.rotation += particle.rotationSpeed * 0.02;
-        particle.velocityY += 0.01; // Grawitacja
-      }
-    });
+  /// Aktualizuje pozycje cząsteczek konfetti (bez setState - wywoływane przez AnimatedBuilder)
+  void _updateConfettiPositions() {
+    for (var particle in _confettiParticles) {
+      particle.y += particle.velocityY * 0.02;
+      particle.x += particle.velocityX * 0.02;
+      particle.rotation += particle.rotationSpeed * 0.02;
+      particle.velocityY += 0.01; // Grawitacja
+    }
   }
 
   String _getOldEggAsset() {
@@ -249,11 +246,19 @@ class _EvolutionOverlayState extends State<EvolutionOverlay>
             ),
           ),
 
-          // Konfetti (za jajkiem)
+          // Konfetti (za jajkiem) - użycie RepaintBoundary + AnimatedBuilder dla wydajności
           if (_showConfetti)
             Positioned.fill(
-              child: CustomPaint(
-                painter: _ConfettiPainter(_confettiParticles),
+              child: RepaintBoundary(
+                child: AnimatedBuilder(
+                  animation: _confettiController,
+                  builder: (context, child) {
+                    _updateConfettiPositions();
+                    return CustomPaint(
+                      painter: _ConfettiPainter(_confettiParticles),
+                    );
+                  },
+                ),
               ),
             ),
 

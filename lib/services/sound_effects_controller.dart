@@ -41,22 +41,30 @@ class SoundEffectsController {
     try {
       _sfxPlayer = AudioPlayer();
 
-      // Konfiguracja dla efektów dźwiękowych (krótkich)
-      await _sfxPlayer!.setAudioContext(AudioContext(
-        android: AudioContextAndroid(
-          isSpeakerphoneOn: false,
-          stayAwake: false,
-          contentType: AndroidContentType.sonification,
-          usageType: AndroidUsageType.game,
-          audioFocus: AndroidAudioFocus.gainTransientMayDuck,
-        ),
-        iOS: AudioContextIOS(
-          category: AVAudioSessionCategory.ambient,
-          options: {
-            AVAudioSessionOptions.mixWithOthers,
-          },
-        ),
-      ));
+      // Konfiguracja AudioContext tylko dla mobile (iOS/Android)
+      // Na Windows/Linux/Web pomijamy - domyślna konfiguracja działa
+      if (!kIsWeb) {
+        try {
+          await _sfxPlayer!.setAudioContext(AudioContext(
+            android: AudioContextAndroid(
+              isSpeakerphoneOn: false,
+              stayAwake: false,
+              contentType: AndroidContentType.sonification,
+              usageType: AndroidUsageType.game,
+              audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+            ),
+            iOS: AudioContextIOS(
+              // playback + mixWithOthers = gra dźwięki bez przerywania muzyki
+              category: AVAudioSessionCategory.playback,
+              options: {
+                AVAudioSessionOptions.mixWithOthers,
+              },
+            ),
+          ));
+        } catch (e) {
+          // Windows/Linux nie obsługują AudioContext - ignoruj
+        }
+      }
 
       // Nie zapętlaj - efekty grają raz
       await _sfxPlayer!.setReleaseMode(ReleaseMode.stop);
@@ -75,11 +83,62 @@ class SoundEffectsController {
     await _playSfxWithDucking('sounds/success.mp3', durationMs: 1500);
   }
 
+  /// Odtwarza efekt sukcesu BEZ audio ducking (gdy ducking jest już aktywny)
+  Future<void> playSuccessRaw() async {
+    if (_isMuted) return;
+    await _ensureInitialized();
+    if (_sfxPlayer == null) return;
+
+    try {
+      await _sfxPlayer!.stop();
+      if (kIsWeb) {
+        await _sfxPlayer!.play(UrlSource('sounds/success.mp3'));
+      } else {
+        await _sfxPlayer!.play(AssetSource('sounds/success.mp3'));
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('[SFX ERROR] playSuccessRaw error: $e');
+    }
+  }
+
   /// Odtwarza efekt dźwiękowy ewolucji (dłuższy, z audio ducking)
   Future<void> playEvolution() async {
     // Używamy success.mp3 jako placeholder dla ewolucji
     // Można dodać dedykowany dźwięk evolution.mp3
     await _playSfxWithDucking('sounds/success.mp3', durationMs: 3000);
+  }
+
+  /// Odtwarza krótki dźwięk (np. sylaba) z lekkim ducking
+  /// Używane przez zewnętrzne AudioPlayery (np. syllable player)
+  Future<void> duckMusicDuring(Future<void> Function() playAction, {int durationMs = 800}) async {
+    if (_isMuted) {
+      await playAction();
+      return;
+    }
+
+    try {
+      // AUDIO DUCKING: Wycisz muzykę w tle
+      if (_onDuckingStart != null) {
+        await _onDuckingStart!(_duckedVolume);
+      }
+
+      // Wykonaj akcję odtwarzania
+      await playAction();
+
+      // Poczekaj na zakończenie dźwięku
+      await Future.delayed(Duration(milliseconds: durationMs));
+
+      // AUDIO DUCKING: Przywróć głośność
+      if (_onDuckingEnd != null) {
+        await _onDuckingEnd!(_originalBgVolume);
+      }
+    } catch (e) {
+      // W przypadku błędu przywróć głośność
+      if (_onDuckingEnd != null) {
+        await _onDuckingEnd!(_originalBgVolume);
+      }
+    }
   }
 
   /// Odtwarza efekt z audio ducking (wycisza muzykę w tle)

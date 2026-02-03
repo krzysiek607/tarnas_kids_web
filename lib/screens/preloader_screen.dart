@@ -38,8 +38,8 @@ class _PreloaderScreenState extends ConsumerState<PreloaderScreen> {
   }
 
   Future<void> _preloadFonts() async {
-    // Daj chwile na renderowanie ukrytych emoji
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Daj chwile na renderowanie ukrytych emoji (skrócone z 800ms)
+    await Future.delayed(const Duration(milliseconds: 300));
 
     if (mounted) {
       setState(() => _fontsLoaded = true);
@@ -164,13 +164,13 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
   }
 
   Future<void> _onVideoComplete() async {
-    // Zatrzymaj na ostatniej klatce przez 2 sekundy
+    // Zatrzymaj na ostatniej klatce przez 0.5 sekundy (skrócone z 2s)
     try {
       await _controller?.pause();
     } catch (e) {
       debugPrint('[VIDEO] Błąd pauzy: $e');
     }
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     _navigateToHome();
   }
@@ -212,23 +212,63 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: _isInitialized && _controller != null
-            ? SizedBox.expand(
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: _controller!.value.size.width,
-                    height: _controller!.value.size.height,
-                    child: VideoPlayer(_controller!),
+      body: GestureDetector(
+        // Tap to skip intro
+        onTap: () {
+          if (_isInitialized && !_videoEnded) {
+            _videoEnded = true; // Zapobiegaj wielokrotnym wywołaniom
+            _navigateToHome();
+          }
+        },
+        child: Stack(
+          children: [
+            Center(
+              child: _isInitialized && _controller != null
+                  ? SizedBox.expand(
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: _controller!.value.size.width,
+                          height: _controller!.value.size.height,
+                          child: VideoPlayer(_controller!),
+                        ),
+                      ),
+                    )
+                  : CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.primaryColor,
+                      ),
+                    ),
+            ),
+            // "Tap to skip" hint - pokazuj po 2 sekundach
+            if (_isInitialized)
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: AnimatedOpacity(
+                    opacity: 0.6,
+                    duration: const Duration(milliseconds: 500),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Dotknij aby pominąć',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              )
-            : CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppTheme.primaryColor,
-                ),
               ),
+          ],
+        ),
       ),
     );
   }

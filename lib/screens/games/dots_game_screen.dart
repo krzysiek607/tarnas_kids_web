@@ -159,8 +159,8 @@ class _DotsGameScreenState extends State<DotsGameScreen>
       pulseControllers[index].reset();
       dotTimer?.cancel();
 
-      // Dźwięk sukcesu przy trafieniu
-      SoundEffectsService.instance.playSuccess();
+      // Dźwięk kliknięcia przy trafieniu (lżejszy feedback)
+      SoundEffectsService.instance.playClick();
 
       // Generuj nowe losowe pozycje po kazdym trafieniu
       if (gameAreaSize != null) {

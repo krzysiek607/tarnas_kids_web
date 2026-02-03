@@ -12,7 +12,8 @@ class MazeGameScreen extends StatefulWidget {
   State<MazeGameScreen> createState() => _MazeGameScreenState();
 }
 
-class _MazeGameScreenState extends State<MazeGameScreen> {
+class _MazeGameScreenState extends State<MazeGameScreen>
+    with SingleTickerProviderStateMixin {
   static const int maxLevel = 10;
   late int gridSize;
   late List<List<int>> maze;
@@ -256,36 +257,67 @@ class _MazeGameScreenState extends State<MazeGameScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: gridSize,
-                        ),
-                        itemCount: gridSize * gridSize,
-                        itemBuilder: (context, index) {
-                          int x = index % gridSize;
-                          int y = index ~/ gridSize;
-                          bool isWall = maze[y][x] == 1;
-                          bool isPlayer = playerPosition.dx == x && playerPosition.dy == y;
-                          bool isGoal = goalPosition.dx == x && goalPosition.dy == y;
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cellSize = constraints.maxWidth / gridSize;
+                          final emojiSize = cellSize * 0.85; // 85% rozmiaru komórki
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: isWall
-                                  ? AppTheme.purpleColor
-                                  : Colors.white,
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 0.5,
+                          return Stack(
+                            children: [
+                              // Tło labiryntu (ściany)
+                              GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: gridSize,
+                                ),
+                                itemCount: gridSize * gridSize,
+                                itemBuilder: (context, index) {
+                                  int x = index % gridSize;
+                                  int y = index ~/ gridSize;
+                                  bool isWall = maze[y][x] == 1;
+
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: isWall
+                                          ? AppTheme.purpleColor
+                                          : Colors.white,
+                                      border: Border.all(
+                                        color: Colors.grey.shade200,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                            child: Center(
-                              child: isPlayer
-                                  ? const Text('🧒', style: TextStyle(fontSize: 28))
-                                  : isGoal
-                                      ? const Text('🍬', style: TextStyle(fontSize: 28))
-                                      : null,
-                            ),
+                              // Cukierek (cel) - statyczny
+                              Positioned(
+                                left: goalPosition.dx * cellSize,
+                                top: goalPosition.dy * cellSize,
+                                width: cellSize,
+                                height: cellSize,
+                                child: Center(
+                                  child: Text(
+                                    '🍬',
+                                    style: TextStyle(fontSize: emojiSize),
+                                  ),
+                                ),
+                              ),
+                              // Postać gracza - animowana
+                              AnimatedPositioned(
+                                duration: const Duration(milliseconds: 150),
+                                curve: Curves.easeOut,
+                                left: playerPosition.dx * cellSize,
+                                top: playerPosition.dy * cellSize,
+                                width: cellSize,
+                                height: cellSize,
+                                child: Center(
+                                  child: Text(
+                                    '🧒',
+                                    style: TextStyle(fontSize: emojiSize),
+                                  ),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),

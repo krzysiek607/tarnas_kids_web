@@ -630,8 +630,8 @@ class TracingCanvasState extends State<TracingCanvas>
     final nextWaypoint = waypoints[_reachedWaypointIndex];
     final waypointOffset = nextWaypoint.toOffset(_canvasSize);
 
-    // Promień trafienia (35px - spójne z TracingPath.hitRadiusPx)
-    const hitRadius = 35.0;
+    // Promień trafienia (22px - zmniejszona tolerancja dla większej precyzji)
+    const hitRadius = 22.0;
 
     final distance = (position - waypointOffset).distance;
 
@@ -646,6 +646,8 @@ class TracingCanvasState extends State<TracingCanvas>
       } else {
         // WSZYSTKIE WAYPOINTY ZALICZONE - dźwięk sukcesu!
         SoundEffectsController().playSuccess();
+        // Wywołaj callback ukończenia (przyznaje nagrodę natychmiast)
+        widget.onComplete?.call();
       }
     }
   }

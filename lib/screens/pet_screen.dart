@@ -199,7 +199,18 @@ class _PetScreenState extends ConsumerState<PetScreen> {
           SnackBar(
             content: Row(
               children: [
-                Text(_getRewardEmoji(rewardId), style: const TextStyle(fontSize: 24)),
+                Image.asset(
+                  reward.iconPath,
+                  width: 28,
+                  height: 28,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Text(
+                      _getRewardEmoji(rewardId),
+                      style: const TextStyle(fontSize: 24),
+                    );
+                  },
+                ),
                 const SizedBox(width: 8),
                 Text('Mniam! ${reward.name}!'),
               ],
@@ -838,6 +849,7 @@ class _InventoryPanel extends StatelessWidget {
                 key: ValueKey('food_${reward.id}_$count'),
                 rewardId: reward.id,
                 name: reward.name,
+                iconPath: reward.iconPath,
                 count: count,
                 enabled: canFeed,
                 onTap: canFeed ? () => onFeed(reward.id) : null,
@@ -854,6 +866,7 @@ class _InventoryPanel extends StatelessWidget {
 class _FoodItem extends StatelessWidget {
   final String rewardId;
   final String name;
+  final String iconPath;
   final int count;
   final bool enabled;
   final VoidCallback? onTap;
@@ -862,6 +875,7 @@ class _FoodItem extends StatelessWidget {
     super.key,
     required this.rewardId,
     required this.name,
+    required this.iconPath,
     required this.count,
     required this.enabled,
     this.onTap,
@@ -885,7 +899,7 @@ class _FoodItem extends StatelessWidget {
                   height: 56,
                   decoration: BoxDecoration(
                     color: enabled
-                        ? _getRewardColor(rewardId).withOpacity(0.2)
+                        ? _getRewardColor(rewardId).withValues(alpha: 0.2)
                         : Colors.grey.shade200,
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -895,10 +909,21 @@ class _FoodItem extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: Center(
-                    child: Text(
-                      _getRewardEmoji(rewardId),
-                      style: const TextStyle(fontSize: 28),
+                  child: ClipOval(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        iconPath,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text(
+                            _getRewardEmoji(rewardId),
+                            style: const TextStyle(fontSize: 28),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../providers/drawing_provider.dart';
 import '../services/analytics_service.dart';
+import '../services/sound_effects_service.dart';
+import '../widgets/bubble_tooltip.dart';
 
 /// Ekran zabawy dla dzieci - menu wyboru gier
 /// Uklad lukowy z tlem
@@ -151,7 +153,7 @@ class _BackButton extends StatelessWidget {
   }
 }
 
-/// Przycisk menu w ksztalcie luku - ikona z obrazka z Tooltip na tap
+/// Przycisk menu w ksztalcie luku - ikona z obrazka z BubbleTooltip na tap
 class _ArchMenuButton extends StatefulWidget {
   final String iconPath;
   final String tooltip;
@@ -173,7 +175,7 @@ class _ArchMenuButtonState extends State<_ArchMenuButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  final GlobalKey _tooltipKey = GlobalKey();
+  final GlobalKey<BubbleTooltipState> _tooltipKey = GlobalKey<BubbleTooltipState>();
   bool _isNavigating = false;
 
   @override
@@ -198,12 +200,14 @@ class _ArchMenuButtonState extends State<_ArchMenuButton>
     if (_isNavigating) return;
     _isNavigating = true;
 
-    // Pokaz tooltip
-    final dynamic tooltip = _tooltipKey.currentState;
-    tooltip?.ensureTooltipVisible();
+    // Dźwięk kliknięcia
+    SoundEffectsService.instance.playClick();
 
-    // Po 500ms wykonaj nawigację
-    Future.delayed(const Duration(milliseconds: 500), () {
+    // Pokaz bubble tooltip
+    _tooltipKey.currentState?.showTooltip();
+
+    // Po 600ms wykonaj nawigację (dajemy czas na animację)
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) {
         _isNavigating = false;
         widget.onTap();
@@ -213,12 +217,10 @@ class _ArchMenuButtonState extends State<_ArchMenuButton>
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
+    return BubbleTooltip(
       key: _tooltipKey,
       message: widget.tooltip,
-      preferBelow: true,
-      triggerMode: TooltipTriggerMode.manual,
-      showDuration: const Duration(milliseconds: 500),
+      color: widget.color,
       child: GestureDetector(
         onTapDown: (_) => _controller.forward(),
         onTapUp: (_) {

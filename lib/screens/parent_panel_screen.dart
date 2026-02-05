@@ -1,94 +1,24 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../providers/pet_provider.dart';
+import '../providers/parent_panel_provider.dart';
 import '../services/sound_effects_service.dart';
+import '../widgets/parent_panel/activity_chart_card.dart';
+import '../widgets/parent_panel/favorite_games_card.dart';
+import '../widgets/parent_panel/stats_summary_cards.dart';
+import '../widgets/parent_panel/export_stats_button.dart';
+import '../widgets/parent_panel/stats_loading_skeleton.dart';
 
 /// Panel Rodzica - statystyki dziecka
-class ParentPanelScreen extends ConsumerStatefulWidget {
+class ParentPanelScreen extends ConsumerWidget {
   const ParentPanelScreen({super.key});
 
   @override
-  ConsumerState<ParentPanelScreen> createState() => _ParentPanelScreenState();
-}
-
-class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
-  bool _isLoading = true;
-  Map<String, int> _gameStats = {};
-  int _totalRewards = 0;
-  int _totalGamesPlayed = 0;
-  String _favoriteGame = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStatistics();
-  }
-
-  Future<void> _loadStatistics() async {
-    try {
-      final supabase = Supabase.instance.client;
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      // Pobierz statystyki gier z analytics_events
-      final gameStartEvents = await supabase
-          .from('analytics_events')
-          .select('parameters')
-          .eq('user_id', userId)
-          .eq('event_name', 'game_start');
-
-      final rewardEvents = await supabase
-          .from('analytics_events')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('event_name', 'reward_earned');
-
-      // Przetwórz statystyki gier
-      final Map<String, int> gameCount = {};
-      for (final event in gameStartEvents) {
-        final params = event['parameters'] as Map<String, dynamic>?;
-        if (params != null && params['game_name'] != null) {
-          final gameName = params['game_name'] as String;
-          gameCount[gameName] = (gameCount[gameName] ?? 0) + 1;
-        }
-      }
-
-      // Znajdź ulubioną grę
-      String favorite = '';
-      int maxPlays = 0;
-      gameCount.forEach((game, count) {
-        if (count > maxPlays) {
-          maxPlays = count;
-          favorite = game;
-        }
-      });
-
-      setState(() {
-        _gameStats = gameCount;
-        _totalGamesPlayed = gameCount.values.fold(0, (a, b) => a + b);
-        _totalRewards = rewardEvents.length;
-        _favoriteGame = favorite;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[PARENT_PANEL] Błąd ładowania statystyk: $e');
-      }
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final petState = ref.watch(petProvider);
+    final stats = ref.watch(parentPanelProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -96,7 +26,7 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
         title: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('📊 ', style: TextStyle(fontSize: 24)),
+            Text('\u{1F4CA} ', style: TextStyle(fontSize: 24)),
             Text('Panel Rodzica'),
           ],
         ),
@@ -108,41 +38,57 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
           },
         ),
       ),
-      body: _isLoading
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: AppTheme.primaryColor),
-                  SizedBox(height: 16),
-                  Text('Ładowanie statystyk...'),
-                ],
-              ),
+      body: stats.isLoading
+          ? const Padding(
+              padding: EdgeInsets.all(20),
+              child: StatsLoadingSkeleton(),
             )
           : RefreshIndicator(
-              onRefresh: _loadStatistics,
+              onRefresh: () =>
+                  ref.read(parentPanelProvider.notifier).loadStatistics(),
               color: AppTheme.primaryColor,
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  // Nagłówek
-                  _buildInfoBanner(),
+                  // Naglowek
+                  const _InfoBanner(),
                   const SizedBox(height: 20),
 
-                  // Statystyki Zwierzaka
-                  _buildPetStatsCard(petState),
+                  // Statystyki Zwierzaka (zachowana istniejaca funkcjonalnosc)
+                  _PetStatsCard(petState: petState),
                   const SizedBox(height: 16),
 
-                  // Statystyki Gier
-                  _buildGameStatsCard(),
+                  // Podsumowanie statystyk (nowe karty)
+                  StatsSummaryCards(
+                    totalGamesPlayed: stats.totalGamesPlayed,
+                    totalRewards: stats.totalRewards,
+                    currentStreak: stats.currentStreak,
+                    dailySessions: stats.dailySessions,
+                  ),
                   const SizedBox(height: 16),
+
+                  // Wykres aktywnosci (ostatnie 7 dni)
+                  ActivityChartCard(dailySessions: stats.dailySessions),
+                  const SizedBox(height: 16),
+
+                  // Ulubione gry z progress barami
+                  if (stats.gameStats.isNotEmpty)
+                    FavoriteGamesCard(gameStats: stats.gameStats),
+                  if (stats.gameStats.isNotEmpty) const SizedBox(height: 16),
 
                   // Nagrody
-                  _buildRewardsCard(),
-                  const SizedBox(height: 16),
+                  _RewardsCard(totalRewards: stats.totalRewards),
+                  const SizedBox(height: 20),
 
-                  // Top Gry
-                  if (_gameStats.isNotEmpty) _buildTopGamesCard(),
+                  // Przycisk eksportu
+                  ExportStatsButton(
+                    totalGamesPlayed: stats.totalGamesPlayed,
+                    totalRewards: stats.totalRewards,
+                    currentStreak: stats.currentStreak,
+                    favoriteGame: stats.favoriteGame,
+                    gameStats: stats.gameStats,
+                    petState: petState,
+                  ),
 
                   const SizedBox(height: 32),
                 ],
@@ -150,8 +96,18 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
             ),
     );
   }
+}
 
-  Widget _buildInfoBanner() {
+// ============================================================
+// EXTRACTED STATELESS WIDGETS
+// ============================================================
+
+/// Info banner at the top of the parent panel
+class _InfoBanner extends StatelessWidget {
+  const _InfoBanner();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -174,12 +130,12 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text('💡', style: TextStyle(fontSize: 24)),
+            child: const Text('\u{1F4A1}', style: TextStyle(fontSize: 24)),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
-              'Tu możesz sprawdzić postępy swojego dziecka w nauce i zabawie.',
+              'Tu mozesz sprawdzic postepy swojego dziecka w nauce i zabawie.',
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.textColor,
@@ -191,18 +147,56 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
       ),
     );
   }
+}
 
-  Widget _buildPetStatsCard(PetState petState) {
+/// Pet statistics card showing evolution progress and health bars
+class _PetStatsCard extends StatelessWidget {
+  final PetState petState;
+
+  const _PetStatsCard({required this.petState});
+
+  @override
+  Widget build(BuildContext context) {
     final evolutionPercent = _getEvolutionPercent(petState);
     final stageName = _getStageName(petState.evolutionStage);
     final nextStageName = _getNextStageName(petState.evolutionStage);
 
-    return _buildCard(
-      emoji: '🥚',
-      title: 'Zwierzak',
-      color: AppTheme.yellowColor,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.yellowColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text('\u{1F95A}', style: TextStyle(fontSize: 20)),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Zwierzak',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
           // Etap ewolucji
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,7 +213,7 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
                   ),
                   if (nextStageName.isNotEmpty)
                     Text(
-                      'Następny: $nextStageName',
+                      'Nastepny: $nextStageName',
                       style: TextStyle(
                         fontSize: 13,
                         color: AppTheme.textLightColor,
@@ -228,7 +222,8 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppTheme.yellowColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -247,40 +242,35 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
 
           const SizedBox(height: 16),
 
-          // Pasek postępu
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Pasek postepu
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Postęp do następnego etapu',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textLightColor,
-                    ),
-                  ),
-                  Text(
-                    '${(evolutionPercent * 100).round()}%',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              Text(
+                'Postep do nastepnego etapu',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppTheme.textLightColor,
+                ),
               ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: evolutionPercent,
-                  minHeight: 12,
-                  backgroundColor: AppTheme.yellowColor.withOpacity(0.2),
-                  valueColor: AlwaysStoppedAnimation(AppTheme.yellowColor),
+              Text(
+                '${(evolutionPercent * 100).round()}%',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: evolutionPercent,
+              minHeight: 12,
+              backgroundColor: AppTheme.yellowColor.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation(AppTheme.yellowColor),
+            ),
           ),
 
           const SizedBox(height: 20),
@@ -288,10 +278,10 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
           // Statystyki zdrowia
           Row(
             children: [
-              _buildMiniStat('🍎', 'Głód', petState.hunger),
-              _buildMiniStat('😊', 'Humor', petState.happiness),
-              _buildMiniStat('⚡', 'Energia', petState.energy),
-              _buildMiniStat('🛁', 'Higiena', petState.hygiene),
+              _buildMiniStat('\u{1F34E}', 'Glod', petState.hunger),
+              _buildMiniStat('\u{1F60A}', 'Humor', petState.happiness),
+              _buildMiniStat('\u{26A1}', 'Energia', petState.energy),
+              _buildMiniStat('\u{1F6C1}', 'Higiena', petState.hygiene),
             ],
           ),
         ],
@@ -331,251 +321,60 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
     );
   }
 
-  Widget _buildGameStatsCard() {
-    return _buildCard(
-      emoji: '🎮',
-      title: 'Aktywność',
-      color: AppTheme.primaryColor,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatBox(
-                  value: _totalGamesPlayed.toString(),
-                  label: 'Gier zagrano',
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatBox(
-                  value: _totalRewards.toString(),
-                  label: 'Nagród zdobyto',
-                  color: AppTheme.accentColor,
-                ),
-              ),
-            ],
-          ),
-          if (_favoriteGame.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppTheme.purpleColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Text('⭐', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Ulubiona gra',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textLightColor,
-                          ),
-                        ),
-                        Text(
-                          _translateGameName(_favoriteGame),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.purpleColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${_gameStats[_favoriteGame] ?? 0}x',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.purpleColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
+  double _getEvolutionPercent(PetState petState) {
+    final points = petState.evolutionPoints;
+    switch (petState.evolutionStage) {
+      case EvolutionStage.egg:
+        return (points / 150).clamp(0.0, 1.0);
+      case EvolutionStage.firstCrack:
+        return ((points - 150) / 200).clamp(0.0, 1.0);
+      case EvolutionStage.secondCrack:
+        return ((points - 350) / 250).clamp(0.0, 1.0);
+      case EvolutionStage.hatched:
+        return 1.0;
+    }
   }
 
-  Widget _buildStatBox({
-    required String value,
-    required String label,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: AppTheme.textLightColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+  String _getStageName(EvolutionStage stage) {
+    switch (stage) {
+      case EvolutionStage.egg:
+        return 'Jajko';
+      case EvolutionStage.firstCrack:
+        return 'Pekniecie';
+      case EvolutionStage.secondCrack:
+        return 'Prawie gotowe!';
+      case EvolutionStage.hatched:
+        return 'Wykluty! \u{1F423}';
+    }
   }
 
-  Widget _buildRewardsCard() {
-    return _buildCard(
-      emoji: '🏆',
-      title: 'Nagrody',
-      color: AppTheme.accentColor,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.yellowColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Text('🍪', style: TextStyle(fontSize: 36)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$_totalRewards smakołyków',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _totalRewards == 0
-                      ? 'Jeszcze nic nie zebrano'
-                      : _totalRewards < 5
-                          ? 'Dobry początek!'
-                          : _totalRewards < 20
-                              ? 'Świetnie idzie!'
-                              : 'Wspaniały kolekcjoner!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textLightColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  String _getNextStageName(EvolutionStage stage) {
+    switch (stage) {
+      case EvolutionStage.egg:
+        return 'Pierwsze pekniecie (151 pkt)';
+      case EvolutionStage.firstCrack:
+        return 'Drugie pekniecie (351 pkt)';
+      case EvolutionStage.secondCrack:
+        return 'Wyklucie (601 pkt)';
+      case EvolutionStage.hatched:
+        return '';
+    }
   }
+}
 
-  Widget _buildTopGamesCard() {
-    // Sortuj gry według popularności
-    final sortedGames = _gameStats.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final topGames = sortedGames.take(5).toList();
+/// Rewards summary card
+class _RewardsCard extends StatelessWidget {
+  final int totalRewards;
 
-    return _buildCard(
-      emoji: '📈',
-      title: 'Ranking Gier',
-      color: AppTheme.purpleColor,
-      child: Column(
-        children: topGames.asMap().entries.map((entry) {
-          final index = entry.key;
-          final game = entry.value;
-          final medal = index == 0
-              ? '🥇'
-              : index == 1
-                  ? '🥈'
-                  : index == 2
-                      ? '🥉'
-                      : '▫️';
+  const _RewardsCard({required this.totalRewards});
 
-          return Padding(
-            padding: EdgeInsets.only(bottom: index < topGames.length - 1 ? 12 : 0),
-            child: Row(
-              children: [
-                Text(medal, style: const TextStyle(fontSize: 20)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _translateGameName(game.key),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.backgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '${game.value}x',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildCard({
-    required String emoji,
-    required String title,
-    required Color color,
-    required Widget child,
-  }) {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -592,87 +391,63 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: AppTheme.accentColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                child: const Text('\u{1F3C6}', style: TextStyle(fontSize: 20)),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              const Text(
+                'Nagrody',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          child,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.yellowColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text('\u{1F36A}', style: TextStyle(fontSize: 36)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$totalRewards smakolykow',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _rewardMessage(totalRewards),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.textLightColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  // === Helpers ===
-
-  double _getEvolutionPercent(PetState petState) {
-    final points = petState.evolutionPoints;
-    switch (petState.evolutionStage) {
-      case EvolutionStage.egg:
-        return (points / 150).clamp(0.0, 1.0);
-      case EvolutionStage.firstCrack:
-        return ((points - 150) / 200).clamp(0.0, 1.0); // 150-350
-      case EvolutionStage.secondCrack:
-        return ((points - 350) / 250).clamp(0.0, 1.0); // 350-600
-      case EvolutionStage.hatched:
-        return 1.0;
-    }
-  }
-
-  String _getStageName(EvolutionStage stage) {
-    switch (stage) {
-      case EvolutionStage.egg:
-        return 'Jajko';
-      case EvolutionStage.firstCrack:
-        return 'Pęknięcie';
-      case EvolutionStage.secondCrack:
-        return 'Prawie gotowe!';
-      case EvolutionStage.hatched:
-        return 'Wykluty! 🐣';
-    }
-  }
-
-  String _getNextStageName(EvolutionStage stage) {
-    switch (stage) {
-      case EvolutionStage.egg:
-        return 'Pierwsze pęknięcie (151 pkt)';
-      case EvolutionStage.firstCrack:
-        return 'Drugie pęknięcie (351 pkt)';
-      case EvolutionStage.secondCrack:
-        return 'Wyklucie (601 pkt)';
-      case EvolutionStage.hatched:
-        return '';
-    }
-  }
-
-  String _translateGameName(String name) {
-    final translations = {
-      'maze': 'Labirynt',
-      'matching': 'Memory',
-      'dots': 'Połącz kropki',
-      'tracing': 'Rysowanie',
-      'coloring': 'Kolorowanie',
-      'letters': 'Literki',
-      'numbers': 'Cyferki',
-      'colors': 'Kolory',
-      'animals': 'Zwierzątka',
-      'shapes': 'Kształty',
-      'syllables': 'Sylaby',
-      'piano': 'Pianinko',
-      'drums': 'Perkusja',
-      'balloon_pop': 'Baloniki',
-    };
-    return translations[name] ?? name;
+  String _rewardMessage(int count) {
+    if (count == 0) return 'Jeszcze nic nie zebrano';
+    if (count < 5) return 'Dobry poczatek!';
+    if (count < 20) return 'Swietnie idzie!';
+    return 'Wspanialy kolekcjoner!';
   }
 }

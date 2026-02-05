@@ -34,6 +34,9 @@ dependencies:
   firebase_analytics: ^12.1.1
   posthog_flutter: ^5.11.1
 
+  # Charts
+  fl_chart: ^0.69.0
+
   # Sharing & Gallery
   share_plus: ^10.1.4
   path_provider: ^2.1.5

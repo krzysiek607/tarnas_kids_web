@@ -31,8 +31,8 @@
         "flutter analyze passes without errors"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Zaimplementowano w lib/providers/sound_effects_provider.dart"
     },
     {
       "id": "US-003",
@@ -46,8 +46,8 @@
         "flutter analyze passes without errors"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": "Uwaga: Pliki dźwiękowe mogą wymagać ręcznego dodania przez użytkownika"
+      "passes": true,
+      "notes": "Pliki click.mp3, success.mp3, error.mp3 istnieją w assets/sounds/"
     },
     {
       "id": "US-004",
@@ -60,8 +60,8 @@
         "flutter analyze passes without errors"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "playClick() na 4 przyciskach menu, przycisku muzyki i ustawień w home_screen.dart"
     },
     {
       "id": "US-005",
@@ -74,8 +74,8 @@
         "flutter analyze passes without errors"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "MazeGameScreen: playSuccess(), DotsGameScreen: playClick(), MatchingGameScreen: playSuccess()"
     },
     {
       "id": "US-006",
@@ -91,8 +91,8 @@
         "flutter analyze passes without errors"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Wszystkie 6 ekranów nauki mają playSuccess() - TracingCanvas, FindLetter, Counting, ConnectSyllables, Sequence"
     },
     {
       "id": "US-007",
@@ -102,12 +102,13 @@
         "Dodać dźwięk błędu w FindLetterScreen (zła odpowiedź)",
         "Dodać dźwięk błędu w MatchingGameScreen (złe dopasowanie)",
         "Dodać dźwięk błędu w ConnectSyllablesScreen (zła kolejność)",
+        "Dodać dźwięk błędu w SequenceGameScreen (zła kolejność)",
         "Dźwięk delikatny, nie straszący dzieci",
         "flutter analyze passes without errors"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "playError() w FindLetter, Matching, ConnectSyllables i SequenceGame (dodano 2026-02-04)"
     }
   ]
 }

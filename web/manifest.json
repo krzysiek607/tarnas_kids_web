@@ -1,11 +1,11 @@
 {
-    "name": "tarnas_kids",
-    "short_name": "tarnas_kids",
+    "name": "Tarnas Kids",
+    "short_name": "Tarnas Kids",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FF8FAB",
+    "theme_color": "#FF8FAB",
+    "description": "Edukacyjna gra dla dzieci 3-7 lat z wirtualnym zwierzakiem",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

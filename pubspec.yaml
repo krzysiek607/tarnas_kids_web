@@ -42,11 +42,17 @@ dependencies:
   # Video
   video_player: ^2.9.2
 
+  # Production
+  package_info_plus: ^8.0.0
+  in_app_review: ^2.0.9
+  firebase_crashlytics: ^5.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.0
 
 flutter_launcher_icons:
   android: true
@@ -55,6 +61,15 @@ flutter_launcher_icons:
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/Tarnas_kids_icon.png"
   remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FF8FAB"
+  image: "assets/images/Tarnas_kids_icon.png"
+  android_12:
+    color: "#FF8FAB"
+    image: "assets/images/Tarnas_kids_icon.png"
+  ios: true
+  web: true
 
 flutter:
   uses-material-design: true

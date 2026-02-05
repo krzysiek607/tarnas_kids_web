@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../theme/app_theme.dart';
@@ -130,7 +131,9 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
       await _syllablePlayer.setReleaseMode(ReleaseMode.stop);
     } catch (e) {
       // Ignoruj błędy na platformach które nie obsługują AudioContext
-      debugPrint('[SYLLABLE] AudioContext error: $e');
+      if (kDebugMode) {
+        debugPrint('[SYLLABLE] AudioContext error: $e');
+      }
     }
   }
 
@@ -188,7 +191,9 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
       await _syllablePlayer.stop();
       await _syllablePlayer.play(AssetSource('sounds/syllables/$fileName.mp3'));
     } catch (e) {
-      debugPrint('[SYLLABLE AUDIO] Brak pliku dla: $syllable -> $fileName');
+      if (kDebugMode) {
+        debugPrint('[SYLLABLE AUDIO] Brak pliku dla: $syllable -> $fileName');
+      }
     }
   }
 
@@ -220,7 +225,9 @@ class _ConnectSyllablesScreenState extends State<ConnectSyllablesScreen>
 
         subscription?.cancel();
       } catch (e) {
-        debugPrint('[SYLLABLE AUDIO] Brak pliku: $syllable -> $fileName');
+        if (kDebugMode) {
+          debugPrint('[SYLLABLE AUDIO] Brak pliku: $syllable -> $fileName');
+        }
       }
     }
   }

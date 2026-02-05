@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -133,7 +134,9 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
       }
     } on UnimplementedError catch (e) {
       // BULLETPROOF: Windows/Linux może nie obsługiwać wideo
-      debugPrint('[VIDEO] Platform nie obsługuje wideo: $e');
+      if (kDebugMode) {
+        debugPrint('[VIDEO] Platform nie obsługuje wideo: $e');
+      }
       if (mounted) {
         setState(() => _videoUnavailable = true);
       }
@@ -141,7 +144,9 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
       _navigateToHome();
     } catch (e) {
       // Jesli wideo nie zaladuje sie - przejdz do ekranu glownego po 2s
-      debugPrint('[VIDEO] Blad ladowania wideo: $e');
+      if (kDebugMode) {
+        debugPrint('[VIDEO] Blad ladowania wideo: $e');
+      }
       if (mounted) {
         setState(() => _videoUnavailable = true);
       }
@@ -168,7 +173,9 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
     try {
       await _controller?.pause();
     } catch (e) {
-      debugPrint('[VIDEO] Błąd pauzy: $e');
+      if (kDebugMode) {
+        debugPrint('[VIDEO] Błąd pauzy: $e');
+      }
     }
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -189,7 +196,9 @@ class _VideoIntroContentState extends State<_VideoIntroContent> {
       _controller?.removeListener(_onVideoUpdate);
       _controller?.dispose();
     } catch (e) {
-      debugPrint('[VIDEO] Błąd dispose: $e');
+      if (kDebugMode) {
+        debugPrint('[VIDEO] Błąd dispose: $e');
+      }
     }
     super.dispose();
   }

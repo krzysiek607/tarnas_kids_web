@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/sound_effects_service.dart';
@@ -50,7 +51,9 @@ class SoundEffectsNotifier extends StateNotifier<SoundEffectsState> {
       _service.setMuted(!isEnabled);
       await _service.setVolume(volume);
     } catch (e) {
-      // Ignoruj błędy - użyj domyślnych wartości
+      if (kDebugMode) {
+        debugPrint('[SFX] Błąd ładowania preferencji: $e');
+      }
     }
   }
 
@@ -65,7 +68,9 @@ class SoundEffectsNotifier extends StateNotifier<SoundEffectsState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_enabledKey, newEnabled);
     } catch (e) {
-      // Ignoruj błędy zapisu
+      if (kDebugMode) {
+        debugPrint('[SFX] Błąd zapisu toggleSound: $e');
+      }
     }
   }
 
@@ -80,7 +85,9 @@ class SoundEffectsNotifier extends StateNotifier<SoundEffectsState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(_volumeKey, clampedVolume);
     } catch (e) {
-      // Ignoruj błędy zapisu
+      if (kDebugMode) {
+        debugPrint('[SFX] Błąd zapisu volume: $e');
+      }
     }
   }
 

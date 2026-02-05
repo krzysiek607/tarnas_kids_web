@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/database_service.dart';
@@ -162,7 +162,9 @@ class PetNotifier extends StateNotifier<PetState> {
 
     // KROK 1: Wczytaj evolutionPoints z CACHE (SharedPreferences) - natychmiastowy UI
     int evolutionPoints = prefs.getInt('pet_evolutionPoints') ?? 0;
-    debugPrint('[PET] Cache: evolutionPoints = $evolutionPoints');
+    if (kDebugMode) {
+      debugPrint('[PET] Cache: evolutionPoints = $evolutionPoints');
+    }
 
     // KROK 2: Pobierz dane z Supabase (source of truth) - może nadpisać cache
     if (DatabaseService.isInitialized) {
@@ -173,25 +175,35 @@ class PetNotifier extends StateNotifier<PetState> {
           isSleeping = true;
           final minutesSlept = DateTime.now().difference(sleepStartTime).inMinutes;
           loadedEnergy = (loadedEnergy + minutesSlept).clamp(0.0, 100.0);
-          debugPrint('[PET] Zwierzak śpi od $minutesSlept minut, energia: $loadedEnergy');
+          if (kDebugMode) {
+            debugPrint('[PET] Zwierzak śpi od $minutesSlept minut, energia: $loadedEnergy');
+          }
         }
 
         // Pobierz punkty ewolucji z Supabase (source of truth)
         final supabasePoints = await DatabaseService.instance.getEvolutionPoints();
-        debugPrint('[PET] Supabase: evolutionPoints = $supabasePoints');
+        if (kDebugMode) {
+          debugPrint('[PET] Supabase: evolutionPoints = $supabasePoints');
+        }
 
         // Użyj większej wartości (zabezpieczenie przed utratą danych)
         if (supabasePoints > evolutionPoints) {
           evolutionPoints = supabasePoints;
           // Zaktualizuj cache z danymi z Supabase
           await prefs.setInt('pet_evolutionPoints', evolutionPoints);
-          debugPrint('[PET] Zaktualizowano cache z Supabase: $evolutionPoints');
+          if (kDebugMode) {
+            debugPrint('[PET] Zaktualizowano cache z Supabase: $evolutionPoints');
+          }
         } else if (evolutionPoints > supabasePoints && evolutionPoints > 0) {
           // Cache ma więcej punktów niż Supabase - może być problem z sync
-          debugPrint('[PET] ⚠️ Cache ($evolutionPoints) > Supabase ($supabasePoints) - używam cache');
+          if (kDebugMode) {
+            debugPrint('[PET] Cache ($evolutionPoints) > Supabase ($supabasePoints) - używam cache');
+          }
         }
       } catch (e) {
-        debugPrint('[PET] Błąd ładowania z Supabase: $e - używam cache: $evolutionPoints');
+        if (kDebugMode) {
+          debugPrint('[PET] Błąd ładowania z Supabase: $e - używam cache: $evolutionPoints');
+        }
       }
     }
 
@@ -204,8 +216,10 @@ class PetNotifier extends StateNotifier<PetState> {
       // Jeśli minęło więcej niż 72h (3 dni), zwierzak uciekł
       if (hoursPassed >= runAwayThresholdHours && evolutionPoints > 0) {
         final ranAwayTime = lastUpdate.add(Duration(hours: runAwayThresholdHours));
-        debugPrint('[PET] 🏃 UCIECZKA! Zwierzak uciekł po ${runAwayThresholdHours}h nieobecności!');
-        debugPrint('[PET] Ostatnia wizyta: $lastUpdate, uciekł: $ranAwayTime');
+        if (kDebugMode) {
+          debugPrint('[PET] UCIECZKA! Zwierzak uciekł po ${runAwayThresholdHours}h nieobecności!');
+          debugPrint('[PET] Ostatnia wizyta: $lastUpdate, uciekł: $ranAwayTime');
+        }
 
         state = PetState(
           lastUpdateTime: now,
@@ -232,7 +246,9 @@ class PetNotifier extends StateNotifier<PetState> {
         evolutionPoints: evolutionPoints,
       );
 
-      debugPrint('[PET] Stan załadowany: evolutionPoints=$evolutionPoints (stage: ${state.evolutionStage})');
+      if (kDebugMode) {
+        debugPrint('[PET] Stan załadowany: evolutionPoints=$evolutionPoints (stage: ${state.evolutionStage})');
+      }
       _updateMood();
     } else {
       // Nowy użytkownik - sprawdź czy śpi
@@ -258,7 +274,9 @@ class PetNotifier extends StateNotifier<PetState> {
     await prefs.setString('pet_lastUpdate', DateTime.now().toIso8601String());
     // CACHE: evolutionPoints zapisywane lokalnie jako backup
     await prefs.setInt('pet_evolutionPoints', state.evolutionPoints);
-    debugPrint('[PET] _saveState: evolutionPoints cache = ${state.evolutionPoints}');
+    if (kDebugMode) {
+      debugPrint('[PET] _saveState: evolutionPoints cache = ${state.evolutionPoints}');
+    }
   }
 
   /// Startuje timer tiku
@@ -329,7 +347,9 @@ class PetNotifier extends StateNotifier<PetState> {
       evolutionPoints: newPoints,
     );
 
-    debugPrint('[PET] Feed: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    if (kDebugMode) {
+      debugPrint('[PET] Feed: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    }
 
     // Wroc do normalnego nastroju po chwili
     Future.delayed(const Duration(seconds: 2), () {
@@ -358,7 +378,9 @@ class PetNotifier extends StateNotifier<PetState> {
       evolutionPoints: newPoints,
     );
 
-    debugPrint('[PET] Play: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    if (kDebugMode) {
+      debugPrint('[PET] Play: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    }
 
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) _updateMood();
@@ -389,7 +411,9 @@ class PetNotifier extends StateNotifier<PetState> {
     // lub energia regeneruje się przez czas (1 min = 1 punkt)
 
     _saveState();
-    debugPrint('[PET] Zwierzak zasnął o ${now.toIso8601String()}');
+    if (kDebugMode) {
+      debugPrint('[PET] Zwierzak zasnął o ${now.toIso8601String()}');
+    }
   }
 
   /// Obudz zwierzaka (time-based - oblicza energię na podstawie czasu snu)
@@ -420,7 +444,9 @@ class PetNotifier extends StateNotifier<PetState> {
     _updateMood();
     _saveState();
 
-    debugPrint('[PET] Zwierzak obudzony! Spał $minutesSlept min, +$energyGained energii, teraz: $newEnergy');
+    if (kDebugMode) {
+      debugPrint('[PET] Zwierzak obudzony! Spał $minutesSlept min, +$energyGained energii, teraz: $newEnergy');
+    }
   }
 
   /// Umyj zwierzaka (+2 evolution points)
@@ -440,7 +466,9 @@ class PetNotifier extends StateNotifier<PetState> {
       evolutionPoints: newPoints,
     );
 
-    debugPrint('[PET] Wash: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    if (kDebugMode) {
+      debugPrint('[PET] Wash: evolutionPoints = $newPoints (stage: ${state.evolutionStage})');
+    }
 
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) _updateMood();
@@ -453,7 +481,9 @@ class PetNotifier extends StateNotifier<PetState> {
   Future<void> acknowledgeRunaway() async {
     if (!state.hasRunAway) return;
 
-    debugPrint('[PET] 🥚 Użytkownik zaakceptował ucieczkę. Nowe jajko!');
+    if (kDebugMode) {
+      debugPrint('[PET] Użytkownik zaakceptował ucieczkę. Nowe jajko!');
+    }
 
     // Resetuj punkty ewolucji w Supabase
     if (DatabaseService.isInitialized) {
@@ -496,7 +526,9 @@ class PetNotifier extends StateNotifier<PetState> {
       lastUpdateTime: DateTime.now(),
       evolutionPoints: 0,
     );
-    debugPrint('[PET] Reset: evolutionPoints = 0');
+    if (kDebugMode) {
+      debugPrint('[PET] Reset: evolutionPoints = 0');
+    }
     _saveState();
   }
 

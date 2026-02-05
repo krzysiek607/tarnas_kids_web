@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../services/sound_effects_controller.dart';
+import '../../services/sound_effects_service.dart';
 
 class SequenceGameScreen extends StatefulWidget {
   const SequenceGameScreen({super.key});
@@ -205,6 +206,7 @@ class _SequenceGameScreenState extends State<SequenceGameScreen>
         }
       });
     } else {
+      SoundEffectsService.instance.playError();
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           setState(() {

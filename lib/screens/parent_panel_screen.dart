@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -78,7 +79,9 @@ class _ParentPanelScreenState extends ConsumerState<ParentPanelScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('[PARENT_PANEL] Błąd ładowania statystyk: $e');
+      if (kDebugMode) {
+        debugPrint('[PARENT_PANEL] Błąd ładowania statystyk: $e');
+      }
       setState(() => _isLoading = false);
     }
   }

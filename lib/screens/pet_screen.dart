@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
@@ -45,7 +46,9 @@ class _PetScreenState extends ConsumerState<PetScreen> {
 
     // Ewolucja do wyższej fazy
     if (newIndex > oldIndex && !_showEvolutionOverlay) {
-      debugPrint('🌟 EVOLUTION DETECTED! ${_lastKnownStage} -> ${petState.evolutionStage}');
+      if (kDebugMode) {
+        debugPrint('[PET] EVOLUTION DETECTED! $_lastKnownStage -> ${petState.evolutionStage}');
+      }
       setState(() {
         _evolutionFromStage = _lastKnownStage;
         _evolutionToStage = petState.evolutionStage;
@@ -552,7 +555,9 @@ class _PetDisplayState extends State<_PetDisplay> {
 
   /// Uruchamia animację przejścia między fazami
   void _startEvolutionAnimation() {
-    debugPrint('🌟 EVOLUTION! Rozpoczynam animację przejścia do fazy: ${widget.evolutionStage}');
+    if (kDebugMode) {
+      debugPrint('[PET] EVOLUTION! Rozpoczynam animację przejścia do fazy: ${widget.evolutionStage}');
+    }
 
     setState(() {
       _isEvolving = true;
@@ -564,7 +569,9 @@ class _PetDisplayState extends State<_PetDisplay> {
       Duration(seconds: _evolutionAnimationDuration),
       () {
         if (mounted) {
-          debugPrint('🌟 EVOLUTION! Animacja zakończona - przechodzę do IDLE');
+          if (kDebugMode) {
+            debugPrint('[PET] EVOLUTION! Animacja zakończona - przechodzę do IDLE');
+          }
           setState(() {
             _isEvolving = false;
           });
@@ -620,7 +627,9 @@ class _PetDisplayState extends State<_PetDisplay> {
 
     // PRIORYTET 1: Animacja przejścia (ewolucja w toku)
     if (_isEvolving) {
-      debugPrint('🌟 EVOLVING: Wyświetlam animację przejścia dla fazy ${widget.evolutionStage}');
+      if (kDebugMode) {
+        debugPrint('[PET] EVOLVING: Wyświetlam animację przejścia dla fazy ${widget.evolutionStage}');
+      }
       // Animacja przejścia do Fazy 2
       if (widget.evolutionStage == EvolutionStage.firstCrack) {
         return 'assets/images/Creature/first_crack.webp';
@@ -631,7 +640,9 @@ class _PetDisplayState extends State<_PetDisplay> {
 
     // Faza 4 - Wyklucie (>100 pkt)
     if (widget.evolutionStage == EvolutionStage.hatched) {
-      debugPrint('🐣 HATCHING! evolutionPoints: ${widget.evolutionPoints}');
+      if (kDebugMode) {
+        debugPrint('[PET] HATCHING! evolutionPoints: ${widget.evolutionPoints}');
+      }
       // Placeholder - używamy assetów Fazy 2 do czasu stworzenia dedykowanych
       if (moodCategory == 'HAPPY') return 'assets/images/Creature/first_crack_happy.webp';
       if (moodCategory == 'SAD') return 'assets/images/Creature/first_crack_sad.webp';
@@ -794,7 +805,9 @@ class _InventoryPanel extends StatelessWidget {
             ? DatabaseService.calculateCounts(snapshot.data!)
             : <String, int>{};
 
-        debugPrint('[INVENTORY UI] Stream update: $counts');
+        if (kDebugMode) {
+          debugPrint('[INVENTORY UI] Stream update: $counts');
+        }
 
         return _buildPanel(context, counts);
       },

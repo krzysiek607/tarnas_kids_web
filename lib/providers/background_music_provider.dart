@@ -1,22 +1,17 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Funkcja do logowania - tylko bledy i wazne zdarzenia
-// Ustaw na true tylko do debugowania
-const bool _enableAudioLogs = true;
-
 void _log(String message) {
-  if (_enableAudioLogs) {
-    // ignore: avoid_print
-    print('[AUDIO] $message');
+  if (kDebugMode) {
+    debugPrint('[AUDIO] $message');
   }
 }
 
-// Zawsze loguj bledy
 void _logError(String message) {
-  // ignore: avoid_print
-  print('[AUDIO ERROR] $message');
+  if (kDebugMode) {
+    debugPrint('[AUDIO ERROR] $message');
+  }
 }
 
 /// Stan muzyki w tle
@@ -94,10 +89,6 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
       _audioPlayer!.onPlayerComplete.listen((_) {
         _log('AudioPlayer completed - looping');
       });
-
-      // Listenery na pozycje i czas trwania - WYLACZONE (zasmiecaly konsole)
-      // _audioPlayer!.onDurationChanged.listen((duration) { ... });
-      // _audioPlayer!.onPositionChanged.listen((position) { ... });
 
       _isInitialized = true;
       _log('AudioPlayer initialized successfully');

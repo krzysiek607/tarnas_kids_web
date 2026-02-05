@@ -316,7 +316,9 @@ class _CollectableButtonState extends State<_CollectableButton>
     if (widget.collected && !oldWidget.collected) {
       // Najpierw bounce, potem lot
       _bounceController.forward().then((_) {
-        _flyController.forward();
+        if (mounted) {
+          _flyController.forward();
+        }
       });
     }
   }

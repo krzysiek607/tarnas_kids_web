@@ -112,10 +112,6 @@ class _BigButtonState extends State<BigButton>
   /// Obsługa kliknięcia
   void _handleTap() {
     if (!widget.isDisabled) {
-      // TODO: Tutaj można dodać odtwarzanie dźwięku kliknięcia
-      // AudioPlayer.play('tap_sound.mp3');
-
-      // Wywołanie callbacku
       widget.onTap();
     }
   }

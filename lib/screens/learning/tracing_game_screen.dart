@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_theme.dart';
@@ -46,7 +46,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     super.initState();
     // LOSOWANIE POZIOMÓW: Zacznij od losowego wzoru
     _currentIndex = _random.nextInt(widget.patterns.length);
-    debugPrint('✏️ TRACING: Losowy start od wzoru $_currentIndex/${widget.patterns.length}');
+    if (kDebugMode) {
+      debugPrint('[TRACING] Losowy start od wzoru $_currentIndex/${widget.patterns.length}');
+    }
   }
 
   TracingPattern get _currentPattern => widget.patterns[_currentIndex];
@@ -72,7 +74,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
       _currentIndex = _getNextRandomIndex();
       _rewardGrantedForCurrentPattern = false; // Reset flagi przy zmianie wzoru
     });
-    debugPrint('✏️ TRACING: Pominięto - nowy wzór: $_currentIndex');
+    if (kDebugMode) {
+      debugPrint('[TRACING] Pominięto - nowy wzór: $_currentIndex');
+    }
   }
 
   /// Wywoływane przez TracingCanvas gdy wszystkie waypointy zaliczone
@@ -81,7 +85,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     if (!widget.enableRewards) return;
     if (_rewardGrantedForCurrentPattern) return; // Już przyznano
 
-    debugPrint('✏️ TRACING: onComplete - przyznawanie nagrody natychmiast!');
+    if (kDebugMode) {
+      debugPrint('[TRACING] onComplete - przyznawanie nagrody natychmiast!');
+    }
     _rewardGrantedForCurrentPattern = true;
     _grantReward();
   }
@@ -92,7 +98,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
 
     // Sprawdz czy uzytkownik narysował cokolwiek
     if (canvasState == null || !canvasState.hasDrawing) {
-      debugPrint('✏️ TRACING: Brak rysunku!');
+      if (kDebugMode) {
+        debugPrint('[TRACING] Brak rysunku!');
+      }
       _showTryAgainMessage('Najpierw narysuj wzór!');
       return;
     }
@@ -101,17 +109,17 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     final score = canvasState.calculateScore();
 
     // DEBUG: Pokaż szczegóły wyniku w konsoli
-    debugPrint('✏️ TRACING: ═══════════════════════════════════');
-    debugPrint('✏️ TRACING: Wzór: ${_currentPattern.name}');
-    debugPrint('✏️ TRACING: $score');
-    debugPrint('✏️ TRACING: Nagroda już przyznana? ${_rewardGrantedForCurrentPattern ? "TAK" : "NIE"}');
-    debugPrint('✏️ TRACING: ═══════════════════════════════════');
+    if (kDebugMode) {
+      debugPrint('[TRACING] Wzór: ${_currentPattern.name} | $score | Nagroda: ${_rewardGrantedForCurrentPattern ? "TAK" : "NIE"}');
+    }
 
     // Nagroda jest przyznawana przez onComplete (gdy success.mp3 się odtwarza)
     // Tutaj tylko sprawdzamy czy wynik był wystarczający
     if (!_rewardGrantedForCurrentPattern && widget.enableRewards && !score.isGoodEnough) {
       // Za słaby wynik - pokaż komunikat
-      debugPrint('✏️ TRACING: Za słaby wynik - brak nagrody');
+      if (kDebugMode) {
+        debugPrint('[TRACING] Za słaby wynik - brak nagrody');
+      }
       _showTryAgainMessage(
         'Spróbuj dokładniej! 🎯\n'
         'Dokładność: ${score.accuracy.toInt()}%, Pokrycie: ${score.coverage.toInt()}%',
@@ -129,7 +137,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
     });
     canvasState.clear();
 
-    debugPrint('✏️ TRACING: Następny losowy wzór: $_currentIndex (ukończono: $_completedCount)');
+    if (kDebugMode) {
+      debugPrint('[TRACING] Następny losowy wzór: $_currentIndex (ukończono: $_completedCount)');
+    }
   }
 
   /// Pokazuje komunikat zachęcający do ponownej próby
@@ -180,7 +190,9 @@ class _TracingGameScreenState extends State<TracingGameScreen> {
         await RewardDialog.show(context, reward);
       }
     } catch (e) {
-      debugPrint('Błąd przyznawania nagrody: $e');
+      if (kDebugMode) {
+        debugPrint('[TRACING] Błąd przyznawania nagrody: $e');
+      }
     }
   }
 

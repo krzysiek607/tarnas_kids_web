@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
@@ -29,20 +32,42 @@ void main() async {
   // Inicjalizacja Supabase (jeśli skonfigurowany)
   await _initializeSupabase();
 
-  runApp(
-    const ProviderScope(
-      child: TarnasKidsApp(),
-    ),
+  // Przechwytywanie WSZYSTKICH błędów async (niezłapanych przez try-catch)
+  runZonedGuarded(
+    () {
+      runApp(
+        const ProviderScope(
+          child: TarnasKidsApp(),
+        ),
+      );
+    },
+    (error, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(error, stackTrace, fatal: false);
+    },
   );
 }
 
-/// Inicjalizuje Firebase
+/// Inicjalizuje Firebase + Crashlytics
 Future<void> _initializeFirebase() async {
   try {
     await Firebase.initializeApp();
-    debugPrint('[FIREBASE] Zainicjalizowany');
+
+    // Crashlytics - przechwytuj błędy Flutter framework
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Przechwytuj błędy async z PlatformDispatcher (np. failed Future w izolatkach)
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+
+    if (kDebugMode) {
+      debugPrint('[FIREBASE] Zainicjalizowany z Crashlytics');
+    }
   } catch (e) {
-    debugPrint('[FIREBASE] Błąd inicjalizacji: $e');
+    if (kDebugMode) {
+      debugPrint('[FIREBASE] Błąd inicjalizacji: $e');
+    }
   }
 }
 
@@ -51,17 +76,23 @@ Future<void> _initializePostHog() async {
   try {
     final config = PostHogConfig('phc_BL81wy8lEm6vrX1OVV2Y7oINDk99N1wubbhsLEVA3pg');
     config.host = 'https://eu.posthog.com';
-    config.flushAt = 1; // DIAGNOSTYKA: Wysyłaj natychmiast każde zdarzenie
+    config.flushAt = 20;
     config.captureApplicationLifecycleEvents = true;
+    config.debug = false;
+
+    // Session Replay - nagrywanie sesji (bezpieczna konfiguracja)
     config.sessionReplay = true;
-    config.sessionReplayConfig.maskAllTexts = false;
+    config.sessionReplayConfig.maskAllTexts = true;
     config.sessionReplayConfig.maskAllImages = false;
-    config.debug = true; // DIAGNOSTYKA: Włącz logi PostHog
 
     await Posthog().setup(config);
-    debugPrint('[POSTHOG] Zainicjalizowany z session recording');
+    if (kDebugMode) {
+      debugPrint('[POSTHOG] Zainicjalizowany (events + session replay, texts masked)');
+    }
   } catch (e) {
-    debugPrint('[POSTHOG] Błąd inicjalizacji: $e');
+    if (kDebugMode) {
+      debugPrint('[POSTHOG] Błąd inicjalizacji: $e');
+    }
   }
 }
 
@@ -69,7 +100,9 @@ Future<void> _initializePostHog() async {
 Future<void> _initializeSupabase() async {
   // Sprawdź czy konfiguracja jest ustawiona
   if (SupabaseConfig.url.isEmpty || SupabaseConfig.anonKey.isEmpty) {
-    debugPrint('Supabase nie skonfigurowany - nagrody działają lokalnie');
+    if (kDebugMode) {
+      debugPrint('Supabase nie skonfigurowany - nagrody działają lokalnie');
+    }
     return;
   }
 
@@ -95,10 +128,13 @@ Future<void> _initializeSupabase() async {
       await AnalyticsService.instance.identifyUser(userId);
     }
 
-    debugPrint('Supabase zainicjalizowany pomyślnie');
-    debugPrint('Analityka gotowa. Dane płyną do Firebase i PostHog');
+    if (kDebugMode) {
+      debugPrint('Supabase zainicjalizowany pomyślnie');
+    }
   } catch (e) {
-    debugPrint('Błąd inicjalizacji Supabase: $e');
+    if (kDebugMode) {
+      debugPrint('Błąd inicjalizacji Supabase: $e');
+    }
     // Aplikacja działa bez bazy - nagrody tylko lokalnie
   }
 }
@@ -106,28 +142,44 @@ Future<void> _initializeSupabase() async {
 /// Zapewnia anonimowe uwierzytelnienie użytkownika
 /// Zwraca User ID lub null w przypadku błędu
 Future<String?> _ensureAnonymousAuth() async {
-  final supabase = Supabase.instance.client;
+  try {
+    final supabase = Supabase.instance.client;
 
-  // Sprawdź czy użytkownik jest już zalogowany
-  final currentSession = supabase.auth.currentSession;
+    // Sprawdź czy użytkownik jest już zalogowany
+    final currentSession = supabase.auth.currentSession;
 
-  if (currentSession == null) {
-    // Brak sesji - zaloguj anonimowo
-    debugPrint('Brak sesji - logowanie anonimowe...');
+    if (currentSession == null) {
+      // Brak sesji - zaloguj anonimowo
+      if (kDebugMode) {
+        debugPrint('Brak sesji - logowanie anonimowe...');
+      }
 
-    final response = await supabase.auth.signInAnonymously();
+      final response = await supabase.auth.signInAnonymously();
 
-    if (response.user != null) {
-      debugPrint('Zalogowano anonimowo. User ID: ${response.user!.id}');
-      return response.user!.id;
+      if (response.user != null) {
+        if (kDebugMode) {
+          debugPrint('Zalogowano anonimowo. User ID: ${response.user!.id}');
+        }
+        return response.user!.id;
+      } else {
+        if (kDebugMode) {
+          debugPrint('Błąd logowania anonimowego');
+        }
+        return null;
+      }
     } else {
-      debugPrint('Błąd logowania anonimowego');
-      return null;
+      // Sesja istnieje
+      if (kDebugMode) {
+        debugPrint('Sesja aktywna. User ID: ${currentSession.user.id}');
+      }
+      return currentSession.user.id;
     }
-  } else {
-    // Sesja istnieje
-    debugPrint('Sesja aktywna. User ID: ${currentSession.user.id}');
-    return currentSession.user.id;
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Błąd uwierzytelniania: $e');
+    }
+    FirebaseCrashlytics.instance.recordError(e, StackTrace.current);
+    return null;
   }
 }
 

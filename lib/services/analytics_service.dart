@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'review_service.dart';
 
 /// Serwis analityki - wysyła zdarzenia do Firebase, PostHog i Supabase
 /// BULLETPROOF MODE: Wszystkie błędy są łapane i logowane, nie crashują aplikacji
@@ -39,9 +40,13 @@ class AnalyticsService {
       _supabaseClient = supabaseClient;
 
       _isInitialized = true;
-      debugPrint('[ANALYTICS] Zainicjalizowano Firebase Analytics i PostHog');
+      if (kDebugMode) {
+        debugPrint('[ANALYTICS] Zainicjalizowano Firebase Analytics i PostHog');
+      }
     } catch (e) {
-      debugPrint('[ANALYTICS] Błąd inicjalizacji: $e');
+      if (kDebugMode) {
+        debugPrint('[ANALYTICS] Błąd inicjalizacji: $e');
+      }
     }
   }
 
@@ -54,20 +59,30 @@ class AnalyticsService {
       try {
         await _firebaseAnalytics!.setUserId(id: userId);
       } catch (e) {
-        debugPrint('[ANALYTICS] Firebase identifyUser error: $e');
+        if (kDebugMode) {
+          debugPrint('[ANALYTICS] Firebase identifyUser error: $e');
+        }
       }
     }
 
     // PostHog
     try {
-      debugPrint('➡️ [POSTHOG] Próba identyfikacji użytkownika: $userId');
+      if (kDebugMode) {
+        debugPrint('[POSTHOG] Próba identyfikacji użytkownika: $userId');
+      }
       await Posthog().identify(userId: userId);
-      debugPrint('✅ [POSTHOG] Użytkownik zidentyfikowany: $userId');
+      if (kDebugMode) {
+        debugPrint('[POSTHOG] Użytkownik zidentyfikowany: $userId');
+      }
     } catch (e) {
-      debugPrint('❌ [POSTHOG] Błąd identyfikacji: $e');
+      if (kDebugMode) {
+        debugPrint('[POSTHOG] Błąd identyfikacji: $e');
+      }
     }
 
-    debugPrint('[ANALYTICS] User ID ustawiony: $userId');
+    if (kDebugMode) {
+      debugPrint('[ANALYTICS] User ID ustawiony: $userId');
+    }
   }
 
   /// Resetuje użytkownika (np. przy wylogowaniu)
@@ -79,7 +94,9 @@ class AnalyticsService {
       try {
         await _firebaseAnalytics!.setUserId(id: null);
       } catch (e) {
-        debugPrint('[ANALYTICS] Firebase reset error: $e');
+        if (kDebugMode) {
+          debugPrint('[ANALYTICS] Firebase reset error: $e');
+        }
       }
     }
 
@@ -87,7 +104,9 @@ class AnalyticsService {
     try {
       await Posthog().reset();
     } catch (e) {
-      debugPrint('[ANALYTICS] PostHog reset error: $e');
+      if (kDebugMode) {
+        debugPrint('[ANALYTICS] PostHog reset error: $e');
+      }
     }
   }
 
@@ -104,7 +123,9 @@ class AnalyticsService {
       try {
         await _firebaseAnalytics!.logScreenView(screenName: screenName);
       } catch (e) {
-        debugPrint('[ANALYTICS] Firebase screen view error: $e');
+        if (kDebugMode) {
+          debugPrint('[ANALYTICS] Firebase screen view error: $e');
+        }
       }
     }
   }
@@ -118,13 +139,16 @@ class AnalyticsService {
     await _logEvent('game_start', {'game_name': gameName});
   }
 
-  /// Loguje ukończenie gry
+  /// Loguje ukończenie gry + sprawdza czy pokazać prośbę o ocenę
   Future<void> logGameComplete(String gameName, {int? score, int? level}) async {
     await _logEvent('game_complete', {
       'game_name': gameName,
       if (score != null) 'score': score,
       if (level != null) 'level': level,
     });
+
+    // Sprawdź czy pokazać prośbę o ocenę w Store
+    ReviewService.instance.onGameCompleted();
   }
 
   // ============================================
@@ -199,7 +223,9 @@ class AnalyticsService {
           parameters: firebaseParams,
         );
       } catch (e) {
-        debugPrint('[ANALYTICS] Firebase error: $e');
+        if (kDebugMode) {
+          debugPrint('[ANALYTICS] Firebase error: $e');
+        }
       }
     }
 
@@ -214,18 +240,18 @@ class AnalyticsService {
         }
       }
 
-      // DIAGNOSTYKA: Wyraźny log przed wysłaniem
-      debugPrint('➡️ [POSTHOG] Próba wysłania: $eventName | params: $posthogParams');
+      if (kDebugMode) {
+        debugPrint('[POSTHOG] Wysyłanie: $eventName | params: $posthogParams');
+      }
 
       await Posthog().capture(
         eventName: eventName,
         properties: posthogParams,
       );
-
-      // DIAGNOSTYKA: Potwierdzenie wysłania
-      debugPrint('✅ [POSTHOG] Wysłano: $eventName');
     } catch (e) {
-      debugPrint('❌ [POSTHOG] Błąd wysyłania $eventName: $e');
+      if (kDebugMode) {
+        debugPrint('[POSTHOG] Błąd wysyłania $eventName: $e');
+      }
     }
 
     // Supabase (opcjonalnie - do własnej analizy)

@@ -8,6 +8,8 @@ import '../screens/fun_screen.dart';
 import '../screens/pet_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/parent_panel_screen.dart';
+import '../screens/terms_screen.dart';
+import '../screens/privacy_policy_screen.dart';
 import '../screens/games/maze_game_screen.dart';
 import '../screens/games/matching_game_screen.dart';
 import '../screens/games/dots_game_screen.dart';
@@ -94,6 +96,24 @@ final appRouter = GoRouter(
         context: context,
         state: state,
         child: const ParentPanelScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/terms',
+      name: 'terms',
+      pageBuilder: (context, state) => _buildFadeTransition(
+        context: context,
+        state: state,
+        child: const TermsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/privacy-policy',
+      name: 'privacy-policy',
+      pageBuilder: (context, state) => _buildFadeTransition(
+        context: context,
+        state: state,
+        child: const PrivacyPolicyScreen(),
       ),
     ),
     GoRoute(

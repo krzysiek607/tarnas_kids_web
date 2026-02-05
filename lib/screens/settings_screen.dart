@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import '../theme/app_theme.dart';
 import '../providers/background_music_provider.dart';
 import '../providers/pet_provider.dart';
@@ -19,6 +21,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with SingleTickerProviderStateMixin {
   bool _sfxEnabled = true;
   bool _parentUnlocked = false;
+  String _appVersion = '';
 
   // Animacja parental gate (4 sekundy)
   late AnimationController _gateController;
@@ -37,6 +40,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         SoundEffectsService.instance.playSuccess();
       }
     });
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() => _appVersion = 'v${info.version}');
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _appVersion = 'v1.0.0');
+      }
+    }
   }
 
   @override
@@ -89,7 +106,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '🌟 Tarnas Kids v1.0',
+                'Tarnas Kids $_appVersion',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -448,6 +465,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           child: Divider(height: 1),
         ),
         _buildParentOption(
+          emoji: '💌',
+          title: 'Poleć znajomemu',
+          subtitle: 'Udostępnij aplikację',
+          onTap: _shareApp,
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Divider(height: 1),
+        ),
+        _buildParentOption(
+          emoji: '📋',
+          title: 'Regulamin',
+          subtitle: 'Warunki korzystania z aplikacji',
+          onTap: () => context.push('/terms'),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Divider(height: 1),
+        ),
+        _buildParentOption(
+          emoji: '🔒',
+          title: 'Polityka prywatnosci',
+          subtitle: 'Jak chronimy dane dziecka',
+          onTap: () => context.push('/privacy-policy'),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Divider(height: 1),
+        ),
+        _buildParentOption(
           emoji: '🗑️',
           title: 'Usuń wszystkie dane',
           subtitle: 'Wyczyść całą aplikację',
@@ -518,6 +565,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           ],
         ),
       ),
+    );
+  }
+
+  void _shareApp() {
+    Share.share(
+      'Moje dziecko uwielbia Tarnas Kids! '
+      'Edukacyjna aplikacja z grami, rysowaniem i wirtualnym zwierzakiem. '
+      'Sprawdź sam!',
     );
   }
 

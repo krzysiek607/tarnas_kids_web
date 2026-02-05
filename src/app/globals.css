@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #FFF9F5;
+  --color-foreground: #2D3748;
+  --color-surface: #FFFFFF;
+
+  --color-pink-50: #FFF0F5;
+  --color-pink-100: #FFE0EB;
+  --color-pink-400: #FFA8C5;
+  --color-pink-500: #FF6B9D;
+  --color-pink-600: #FF5287;
+
+  --color-teal-50: #E0F2F1;
+  --color-teal-100: #B2DFDB;
+  --color-teal-400: #7FE5DD;
+  --color-teal-500: #4ECDC4;
+  --color-teal-600: #38B2AC;
+
+  --color-purple-50: #EDE9FE;
+  --color-purple-100: #DDD6FE;
+  --color-purple-400: #C4B5FD;
+  --color-purple-500: #A78BFA;
+  --color-purple-600: #8B5CF6;
+
+  --color-yellow-50: #FFF9C4;
+  --color-yellow-100: #FFF3A0;
+  --color-yellow-400: #FFE67D;
+  --color-yellow-500: #FFD93D;
+  --color-yellow-600: #F59E0B;
+
+  --color-green-50: #D1FAE5;
+  --color-green-100: #A7F3D0;
+  --color-green-400: #6EE7B7;
+  --color-green-500: #34D399;
+  --color-green-600: #10B981;
+
+  --color-orange-50: #FFF5F5;
+  --color-orange-100: #FED7D7;
+  --color-orange-400: #FCA5A5;
+  --color-orange-500: #F87171;
+  --color-orange-600: #EF4444;
+
+  --color-text: #2D3748;
+  --color-text-light: #4A5568;
+  --color-text-muted: #718096;
+
+  --font-display: var(--font-fredoka);
+  --font-body: var(--font-nunito);
+  --font-accent: var(--font-baloo);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #FF6B9D;
+  color: white;
+}
+
+/* Smooth scroll offset for fixed navbar */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF9F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF6B9D, #A78BFA);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF5287, #8B5CF6);
+}

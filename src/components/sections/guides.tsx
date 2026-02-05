@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Sparkles, Lightbulb } from "lucide-react"
+import Image from "next/image"
 
 const guides = [
   {
@@ -9,24 +9,20 @@ const guides = [
     role: "Wesoła Odkrywczyni",
     description:
       "Lumi uwielbia eksplorować i odkrywać nowe rzeczy. Pomaga dzieciom poznawać świat liter i liczb z uśmiechem na twarzy.",
-    color: "pink",
-    icon: Sparkles,
+    image: "/images/Lumi.png",
     borderColor: "border-pink-400",
     bgGradient: "from-pink-100 to-pink-50",
     textColor: "text-pink-600",
-    iconBg: "bg-pink-500",
   },
   {
     name: "Taro",
     role: "Pomysłowy Wynalazca",
     description:
       "Taro jest pełen pomysłów i kreatywności. Inspiruje dzieci do tworzenia, rysowania i rozwiązywania zagadek logicznych.",
-    color: "teal",
-    icon: Lightbulb,
+    image: "/images/Taro.png",
     borderColor: "border-teal-400",
     bgGradient: "from-teal-100 to-teal-50",
     textColor: "text-teal-600",
-    iconBg: "bg-teal-500",
   },
 ]
 
@@ -70,15 +66,18 @@ export function Guides() {
               className={`group relative overflow-hidden rounded-3xl border-2 ${guide.borderColor} bg-gradient-to-br ${guide.bgGradient} p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl`}
             >
               <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-start gap-6">
-                {/* Avatar placeholder */}
                 <motion.div
-                  className={`shrink-0 flex h-28 w-28 items-center justify-center rounded-full border-4 ${guide.borderColor} bg-white shadow-xl`}
+                  className={`shrink-0 h-28 w-28 overflow-hidden rounded-full border-4 ${guide.borderColor} bg-white shadow-xl`}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <div className={`flex h-16 w-16 items-center justify-center rounded-full ${guide.iconBg}`}>
-                    <guide.icon className="h-8 w-8 text-white" />
-                  </div>
+                  <Image
+                    src={guide.image}
+                    alt={guide.name}
+                    width={112}
+                    height={112}
+                    className="h-full w-full object-cover"
+                  />
                 </motion.div>
 
                 <div>

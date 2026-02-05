@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
+import { href } from "@/lib/utils"
 
 const guides = [
   {
@@ -71,8 +71,8 @@ export function Guides() {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <Image
-                    src={guide.image}
+                  <img
+                    src={href(guide.image)}
                     alt={guide.name}
                     width={112}
                     height={112}

@@ -63,3 +63,6 @@ secrets/
 
 # Supabase config (contains API keys)
 lib/config/supabase_config.dart
+
+# PostHog config (contains API key)
+lib/config/posthog_config.dart

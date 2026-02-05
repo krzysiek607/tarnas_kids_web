@@ -357,34 +357,50 @@ class DatabaseService {
     }
   }
 
-  /// Dodaje punkty ewolucji i zwraca nową wartość
+  /// Dodaje punkty ewolucji atomowo (RPC) i zwraca nową wartość.
+  /// Używa server-side RPC zamiast read-modify-write (brak race condition).
   Future<int> addEvolutionPoints(int points) async {
     final userId = currentUserId;
     if (userId == null) return 0;
 
     try {
-      // Pobierz aktualny stan
-      final state = await getPetState();
-      final currentPoints = (state?['evolution_points'] as int?) ?? 0;
-      final newPoints = currentPoints + points;
+      final result = await _client.rpc(
+        'add_evolution_points',
+        params: {'points_to_add': points},
+      );
 
-      // Zapisz nową wartość
-      await _client.from('pet_states').upsert({
-        'user_id': userId,
-        'evolution_points': newPoints,
-        'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'user_id');
-
+      final newPoints = (result as int?) ?? 0;
       if (kDebugMode) {
-        debugPrint('[PET] Evolution points: $currentPoints + $points = $newPoints');
+        debugPrint('[PET] Evolution points += $points → $newPoints (RPC)');
       }
       return newPoints;
     } catch (e) {
+      // Fallback na client-side jeśli RPC nie istnieje jeszcze na serwerze
       if (kDebugMode) {
-        debugPrint('[PET] Błąd aktualizacji evolution_points: $e');
+        debugPrint('[PET] RPC fallback - $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, StackTrace.current);
-      return 0;
+      try {
+        final state = await getPetState();
+        final currentPoints = (state?['evolution_points'] as int?) ?? 0;
+        final newPoints = currentPoints + points;
+
+        await _client.from('pet_states').upsert({
+          'user_id': userId,
+          'evolution_points': newPoints,
+          'updated_at': DateTime.now().toIso8601String(),
+        }, onConflict: 'user_id');
+
+        if (kDebugMode) {
+          debugPrint('[PET] Evolution points: $currentPoints + $points = $newPoints (fallback)');
+        }
+        return newPoints;
+      } catch (fallbackError) {
+        if (kDebugMode) {
+          debugPrint('[PET] Błąd aktualizacji evolution_points: $fallbackError');
+        }
+        FirebaseCrashlytics.instance.recordError(fallbackError, StackTrace.current);
+        return 0;
+      }
     }
   }
 

@@ -14,6 +14,7 @@ import 'services/database_service.dart';
 import 'services/analytics_service.dart';
 import 'services/sound_effects_controller.dart';
 import 'config/supabase_config.dart';
+import 'config/posthog_config.dart' as ph_config;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,8 +75,8 @@ Future<void> _initializeFirebase() async {
 /// Inicjalizuje PostHog z session recording
 Future<void> _initializePostHog() async {
   try {
-    final config = PostHogConfig('phc_BL81wy8lEm6vrX1OVV2Y7oINDk99N1wubbhsLEVA3pg');
-    config.host = 'https://eu.posthog.com';
+    final config = PostHogConfig(ph_config.PostHogConfig.apiKey);
+    config.host = ph_config.PostHogConfig.host;
     config.flushAt = 20;
     config.captureApplicationLifecycleEvents = true;
     config.debug = false;

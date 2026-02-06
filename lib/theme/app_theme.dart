@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Theme aplikacji Tarnas Kids
+/// Theme aplikacji TaLu Kids
 class AppTheme {
   AppTheme._();
 

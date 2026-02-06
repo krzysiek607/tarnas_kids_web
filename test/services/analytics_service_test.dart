@@ -3,7 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tarnas_kids/services/analytics_service.dart';
+import 'package:talu_kids/services/analytics_service.dart';
 
 // =============================================================================
 // MOCKS

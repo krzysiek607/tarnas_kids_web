@@ -1,4 +1,4 @@
-# 📚 Dokumentacja Projektu Tarnas Kids
+# 📚 Dokumentacja Projektu TaLu Kids
 
 Witaj! Wszystkie informacje o projekcie są tutaj.
 

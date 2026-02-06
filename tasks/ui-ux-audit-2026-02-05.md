@@ -1,4 +1,4 @@
-# UI/UX Audit - Tarnas Kids (2026-02-05)
+# UI/UX Audit - TaLu Kids (2026-02-05)
 
 ## Problemy KRYTYCZNE (widoczne od razu)
 
@@ -60,7 +60,7 @@
 ## Problemy SREDNIE (jakosc)
 
 ### 9. Ekran glowny - brak brandingu
-- Nie ma logo ani nazwy "Tarnas Kids" - tylko tlo i przyciski
+- Nie ma logo ani nazwy "TaLu Kids" - tylko tlo i przyciski
 - **Fix:** Dodac animowane logo/maskotke u gory ekranu
 
 ### 10. Zwierzak wyglada blado

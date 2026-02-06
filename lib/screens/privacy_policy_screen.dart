@@ -30,7 +30,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _buildSectionTitle('1. Administrator danych'),
               _buildBody(
                 'Administratorem danych osobowych jest tworca aplikacji '
-                'Tarnas Kids.\n\n'
+                'TaLu Kids.\n\n'
                 'Kontakt: [UZUPELNIJ_EMAIL]',
               ),
             ],

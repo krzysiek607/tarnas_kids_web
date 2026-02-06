@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tarnas_kids/providers/background_music_provider.dart';
+import 'package:talu_kids/providers/background_music_provider.dart';
 
 void main() {
   group('BackgroundMusicState', () {

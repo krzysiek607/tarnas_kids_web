@@ -1,4 +1,4 @@
-package com.example.tarnas_kids
+package com.talukids.app
 
 import io.flutter.embedding.android.FlutterActivity
 

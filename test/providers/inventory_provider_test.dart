@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tarnas_kids/providers/inventory_provider.dart';
-import 'package:tarnas_kids/services/database_service.dart';
+import 'package:talu_kids/providers/inventory_provider.dart';
+import 'package:talu_kids/services/database_service.dart';
 
 void main() {
   group('InventoryState', () {

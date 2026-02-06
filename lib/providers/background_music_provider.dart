@@ -119,13 +119,13 @@ class BackgroundMusicNotifier extends StateNotifier<BackgroundMusicState> {
 
       if (kIsWeb) {
         // Na web uzyj UrlSource
-        await _audioPlayer!.play(UrlSource('audio/Tarnas_kids_theme.mp3'));
+        await _audioPlayer!.play(UrlSource('audio/talu_kids_theme.mp3'));
         _log('Web: Playing from UrlSource');
       } else {
         // Na Android/iOS
         // Plik jest w assets/audio/, audioplayers dodaje prefix "assets/"
         // wiec sciezka to "audio/nazwa.mp3"
-        const assetPath = 'audio/Tarnas_kids_theme.mp3';
+        const assetPath = 'audio/talu_kids_theme.mp3';
         _log('Mobile: Playing from AssetSource: $assetPath');
 
         await _audioPlayer!.play(AssetSource(assetPath));

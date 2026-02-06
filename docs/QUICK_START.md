@@ -14,7 +14,7 @@ Wybierz jedną z opcji poniżej:
 ```dart
 // Otwórz: test/widget_test.dart
 // Znajdź linię 16
-// Zmień: MyApp → TarnasKidsApp
+// Zmień: MyApp → TaLuKidsApp
 ```
 
 ### 2. Zaktualizuj pubspec.yaml
@@ -25,7 +25,7 @@ Wybierz jedną z opcji poniżej:
 
 ### 3. Zainstaluj zależności
 ```bash
-cd C:\Users\krzys\tarnas_kids
+cd C:\Users\krzys\talu_kids
 flutter pub get
 ```
 
@@ -93,7 +93,7 @@ npm install -g @anthropic/mcp-sequential-thinking
 **Zapisz dokumentację do Git:**
 
 ```bash
-cd C:\Users\krzys\tarnas_kids
+cd C:\Users\krzys\talu_kids
 git add docs/
 git commit -m "docs: dodaj dokumentację projektu
 
@@ -199,7 +199,7 @@ lub
 ## ⚡ TL;DR - Absolutne minimum
 
 ```bash
-# 1. Napraw test (otwórz test/widget_test.dart, zmień MyApp na TarnasKidsApp)
+# 1. Napraw test (otwórz test/widget_test.dart, zmień MyApp na TaLuKidsApp)
 # 2. Commit dokumentacji
 git add docs/
 git commit -m "docs: dodaj dokumentację projektu"

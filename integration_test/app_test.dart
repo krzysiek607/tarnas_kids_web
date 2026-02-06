@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:tarnas_kids/screens/home_screen.dart';
-import 'package:tarnas_kids/screens/learning_screen.dart';
-import 'package:tarnas_kids/screens/fun_screen.dart';
-import 'package:tarnas_kids/screens/pet_screen.dart';
-import 'package:tarnas_kids/screens/settings_screen.dart';
-import 'package:tarnas_kids/screens/learning/letter_tracing_screen.dart';
+import 'package:talu_kids/screens/home_screen.dart';
+import 'package:talu_kids/screens/learning_screen.dart';
+import 'package:talu_kids/screens/fun_screen.dart';
+import 'package:talu_kids/screens/pet_screen.dart';
+import 'package:talu_kids/screens/settings_screen.dart';
+import 'package:talu_kids/screens/learning/letter_tracing_screen.dart';
 
 import 'helpers/test_app.dart';
 
@@ -479,15 +479,15 @@ void main() {
     );
 
     testWidgets(
-      'App version text contains "Tarnas Kids"',
+      'App version text contains "TaLu Kids"',
       (WidgetTester tester) async {
         await tester.pumpWidget(
           createTestAppWithMockedProviders(initialRoute: '/settings'),
         );
         await tester.pumpAndSettle();
 
-        // Version text is "Tarnas Kids v1.0.0" (fallback in test env)
-        expect(find.textContaining('Tarnas Kids'), findsOneWidget);
+        // Version text is "TaLu Kids v1.0.0" (fallback in test env)
+        expect(find.textContaining('TaLu Kids'), findsOneWidget);
       },
     );
 

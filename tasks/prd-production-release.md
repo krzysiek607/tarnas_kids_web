@@ -1,16 +1,16 @@
-# PRD: Produkcyjny Release Tarnas Kids
+# PRD: Produkcyjny Release TaLu Kids
 
 ## Introduction
 
-Tarnas Kids to edukacyjna aplikacja Flutter dla dzieci 3-8 lat zawierajaca gry edukacyjne (literki, sylaby, liczenie, szlaczki, sekwencje), gry rozrywkowe (labirynt, memory, laczenie kropek), wirtualnego zwierzaka (tamagotchi z ewolucja) i system nagrod. Aplikacja jest gotowa funkcjonalnie - ten PRD opisuje wszystko co potrzebne do profesjonalnego release na Google Play i App Store.
+TaLu Kids to edukacyjna aplikacja Flutter dla dzieci 3-8 lat zawierajaca gry edukacyjne (literki, sylaby, liczenie, szlaczki, sekwencje), gry rozrywkowe (labirynt, memory, laczenie kropek), wirtualnego zwierzaka (tamagotchi z ewolucja) i system nagrod. Aplikacja jest gotowa funkcjonalnie - ten PRD opisuje wszystko co potrzebne do profesjonalnego release na Google Play i App Store.
 
-**Lokalizacja projektu:** `C:\tarnas_kids`
+**Lokalizacja projektu:** `C:\talu_kids`
 **Dokumentacja:** `C:\AI`
 **Wersja:** 1.0.0+1
 
 ## Goals
 
-- Wypuscic Tarnas Kids na Google Play i App Store jako profesjonalna aplikacja
+- Wypuscic TaLu Kids na Google Play i App Store jako profesjonalna aplikacja
 - Spelnic wymagania prawne (COPPA/GDPR) dla aplikacji dzieciecych
 - Zapewnic stabilnosc i brak crashy w produkcji
 - Przygotowac wszystkie materialy marketingowe (ikona, screenshoty, opisy)
@@ -43,7 +43,7 @@ Screenshoty, opisy, ikona, konta deweloperskie, submission.
 **Opis:** Jako deweloper, musze zmienic Application ID z domyslnego na unikalne ID firmy, bo Google Play odrzuci apke z `com.example`.
 
 **Acceptance Criteria:**
-- [ ] Zmienic `applicationId` w `android/app/build.gradle.kts` na docelowe (np. `com.tarnas.kids`)
+- [ ] Zmienic `applicationId` w `android/app/build.gradle.kts` na docelowe (np. `com.talukids.app`)
 - [ ] Zaktualizowac package name w `AndroidManifest.xml`
 - [ ] Zaktualizowac `namespace` w `build.gradle.kts`
 - [ ] Zaktualizowac Kotlin package w `MainActivity.kt`
@@ -357,7 +357,7 @@ Screenshoty, opisy, ikona, konta deweloperskie, submission.
 
 ## Open Questions
 
-1. **Application ID** - jaki docelowy? Propozycja: `com.tarnas.kids` lub `pl.tarnas.kids`
+1. **Application ID** - jaki docelowy? Propozycja: `com.talukids.app` lub `com.talukids.app`
 2. **Privacy Policy URL** - gdzie bedzie hostowana? (GitHub Pages? Supabase?)
 3. **Email kontaktowy** - jaki adres do PRIVACY_POLICY.md?
 4. **Onboarding** - jaki dokladnie flow? (do ustalenia w osobnej sesji)

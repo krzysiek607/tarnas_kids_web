@@ -25,12 +25,12 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          appBar: AppBar(title: const Text('Tarnas Kids')),
+          appBar: AppBar(title: const Text('TaLu Kids')),
           body: const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Witaj w Tarnas Kids!'),
+                Text('Witaj w TaLu Kids!'),
                 SizedBox(height: 20),
                 Icon(Icons.pets, size: 64),
               ],
@@ -40,8 +40,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Tarnas Kids'), findsOneWidget);
-    expect(find.text('Witaj w Tarnas Kids!'), findsOneWidget);
+    expect(find.text('TaLu Kids'), findsOneWidget);
+    expect(find.text('Witaj w TaLu Kids!'), findsOneWidget);
     expect(find.byIcon(Icons.pets), findsOneWidget);
   });
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Dodanie dźwięków interfejsu użytkownika do aplikacji Tarnas Kids. Dźwięki będą odtwarzane przy interakcjach użytkownika (kliknięcia przycisków, sukces w grze, błąd). Poprawi to immersję i feedback dla dzieci.
+Dodanie dźwięków interfejsu użytkownika do aplikacji TaLu Kids. Dźwięki będą odtwarzane przy interakcjach użytkownika (kliknięcia przycisków, sukces w grze, błąd). Poprawi to immersję i feedback dla dzieci.
 
 ## Goals
 

@@ -106,7 +106,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Tarnas Kids $_appVersion',
+                'TaLu Kids $_appVersion',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -570,7 +570,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
   void _shareApp() {
     Share.share(
-      'Moje dziecko uwielbia Tarnas Kids! '
+      'Moje dziecko uwielbia TaLu Kids! '
       'Edukacyjna aplikacja z grami, rysowaniem i wirtualnym zwierzakiem. '
       'Sprawdź sam!',
     );

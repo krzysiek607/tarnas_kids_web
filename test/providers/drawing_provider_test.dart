@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tarnas_kids/models/drawing_point.dart';
-import 'package:tarnas_kids/providers/drawing_provider.dart';
+import 'package:talu_kids/models/drawing_point.dart';
+import 'package:talu_kids/providers/drawing_provider.dart';
 
 void main() {
   group('DrawingState', () {

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Tooltip w stylu White Card - spójny z motywem Tarnas Kids
+/// Tooltip w stylu White Card - spójny z motywem TaLu Kids
 /// Białe tło, kolorowa obwódka, gwiazdki, bounce animation
 class BubbleTooltip extends StatefulWidget {
   final Widget child;

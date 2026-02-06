@@ -30,7 +30,7 @@ class TermsScreen extends StatelessWidget {
               _buildSectionTitle('1. Postanowienia ogolne'),
               _buildBody(
                 'Niniejszy Regulamin okresla zasady korzystania z aplikacji '
-                'mobilnej Tarnas Kids ("Aplikacja").\n\n'
+                'mobilnej TaLu Kids ("Aplikacja").\n\n'
                 'Aplikacja jest edukacyjna gra mobilna przeznaczona dla dzieci '
                 'w wieku 5-8 lat, oferujaca gry edukacyjne, gry rozrywkowe, '
                 'wirtualnego zwierzaka oraz system nagrod.\n\n'
@@ -70,8 +70,8 @@ class TermsScreen extends StatelessWidget {
                 'rozliczeniowego, chyba ze zostanie anulowana przed uplywem '
                 'biezacego okresu.\n\n'
                 'Anulowanie subskrypcji:\n'
-                '  \u2022 Android: Google Play > Subskrypcje > Tarnas Kids > Anuluj\n'
-                '  \u2022 iOS: Ustawienia > Apple ID > Subskrypcje > Tarnas Kids > Anuluj\n\n'
+                '  \u2022 Android: Google Play > Subskrypcje > TaLu Kids > Anuluj\n'
+                '  \u2022 iOS: Ustawienia > Apple ID > Subskrypcje > TaLu Kids > Anuluj\n\n'
                 'Po anulowaniu subskrypcji dostep do platnych funkcji pozostaje '
                 'aktywny do konca oplaconego okresu.\n\n'
                 'Zwroty sa obslugiwane zgodnie z politykami Google Play i App Store.',
@@ -84,7 +84,7 @@ class TermsScreen extends StatelessWidget {
               _buildSectionTitle('4. Wlasnosc intelektualna'),
               _buildBody(
                 'Wszelkie prawa autorskie, znaki towarowe i inne prawa wlasnosci '
-                'intelektualnej zwiazane z Aplikacja naleza do tworcow Tarnas Kids.\n\n'
+                'intelektualnej zwiazane z Aplikacja naleza do tworcow TaLu Kids.\n\n'
                 'Uzytkownik otrzymuje ograniczona, niewylaczna, nieprzenoszalna '
                 'licencje na korzystanie z Aplikacji na urzadzeniu mobilnym.\n\n'
                 'Rysunki i prace stworzone przez dziecko w Aplikacji sa wlasnoscia '

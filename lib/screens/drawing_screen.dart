@@ -337,7 +337,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
 
       await Share.shareXFiles(
         [XFile(file.path)],
-        text: 'Moj rysunek z Tarnas Kids!',
+        text: 'Moj rysunek z TaLu Kids!',
       );
     } catch (e) {
       _showErrorSnackBar('Blad podczas udostepniania');
@@ -382,7 +382,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
 
       // Zapisz do pliku tymczasowego
       final tempDir = await getTemporaryDirectory();
-      final filePath = '${tempDir.path}/tarnas_kids_rysunek_${DateTime.now().millisecondsSinceEpoch}.png';
+      final filePath = '${tempDir.path}/talu_kids_rysunek_${DateTime.now().millisecondsSinceEpoch}.png';
       final file = File(filePath);
       await file.writeAsBytes(bytes);
 
@@ -390,7 +390,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       if (!mounted) return;
 
       // Zapisz do galerii
-      await Gal.putImage(filePath, album: 'Tarnas Kids');
+      await Gal.putImage(filePath, album: 'TaLu Kids');
 
       _showSuccessSnackBar('Rysunek zapisany w galerii!');
     } catch (e) {

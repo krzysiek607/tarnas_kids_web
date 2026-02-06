@@ -1,14 +1,14 @@
-# Polityka Prywatnosci - Tarnas Kids
+# Polityka Prywatnosci - TaLu Kids
 
 **Data ostatniej aktualizacji:** 4 lutego 2026
 
-Tarnas Kids ("Aplikacja") to edukacyjna gra mobilna przeznaczona dla dzieci w wieku 3-7 lat. Bezpieczenstwo danych dzieci jest dla nas priorytetem. Niniejsza Polityka Prywatnosci opisuje, jakie dane zbieramy, jak je wykorzystujemy i jakie prawa przysluguja uzytkownikowi.
+TaLu Kids ("Aplikacja") to edukacyjna gra mobilna przeznaczona dla dzieci w wieku 3-7 lat. Bezpieczenstwo danych dzieci jest dla nas priorytetem. Niniejsza Polityka Prywatnosci opisuje, jakie dane zbieramy, jak je wykorzystujemy i jakie prawa przysluguja uzytkownikowi.
 
 ---
 
 ## 1. Administrator danych
 
-Administratorem danych osobowych jest tworca aplikacji Tarnas Kids. Kontakt: [UZUPELNIJ_EMAIL]
+Administratorem danych osobowych jest tworca aplikacji TaLu Kids. Kontakt: [UZUPELNIJ_EMAIL]
 
 ## 2. Jakie dane zbieramy
 
@@ -123,15 +123,15 @@ Jesli masz pytania dotyczace Polityki Prywatnosci lub chcesz skorzystac z przysl
 
 ---
 
-# Privacy Policy - Tarnas Kids (English)
+# Privacy Policy - TaLu Kids (English)
 
 **Last updated:** February 4, 2026
 
-Tarnas Kids ("App") is an educational mobile game designed for children aged 3-7. The safety of children's data is our top priority. This Privacy Policy describes what data we collect, how we use it, and what rights you have.
+TaLu Kids ("App") is an educational mobile game designed for children aged 3-7. The safety of children's data is our top priority. This Privacy Policy describes what data we collect, how we use it, and what rights you have.
 
 ## 1. Data Controller
 
-The data controller is the creator of the Tarnas Kids application. Contact: [FILL_IN_EMAIL]
+The data controller is the creator of the TaLu Kids application. Contact: [FILL_IN_EMAIL]
 
 ## 2. What Data We Collect
 

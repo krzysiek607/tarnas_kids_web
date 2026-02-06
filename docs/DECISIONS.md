@@ -1,6 +1,6 @@
 # DECISIONS - Architecture Decision Records (ADR)
 
-Ten dokument zawiera wszystkie istotne decyzje architektoniczne podjęte w projekcie Tarnas Kids.
+Ten dokument zawiera wszystkie istotne decyzje architektoniczne podjęte w projekcie TaLu Kids.
 
 ---
 
@@ -11,7 +11,7 @@ Ten dokument zawiera wszystkie istotne decyzje architektoniczne podjęte w proje
 **Decydent:** Team / Claude Code
 
 ### Kontekst
-Projekt Tarnas Kids jest na wczesnym etapie rozwoju. Obecna struktura (wszystko w main.dart) nie skaluje się dobrze. Potrzebujemy architektury, która:
+Projekt TaLu Kids jest na wczesnym etapie rozwoju. Obecna struktura (wszystko w main.dart) nie skaluje się dobrze. Potrzebujemy architektury, która:
 - Oddziela różne części aplikacji
 - Ułatwia współpracę wielu developerów
 - Umożliwia łatwe testowanie

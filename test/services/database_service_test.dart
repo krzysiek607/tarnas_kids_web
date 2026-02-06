@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tarnas_kids/services/database_service.dart';
+import 'package:talu_kids/services/database_service.dart';
 
 // =============================================================================
 // MOCKS

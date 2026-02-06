@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tarnas_kids/services/sound_effects_service.dart';
+import 'package:talu_kids/services/sound_effects_service.dart';
 
 void main() {
   group('SoundEffectsService', () {

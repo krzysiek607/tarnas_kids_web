@@ -1,6 +1,6 @@
 # Supabase Row Level Security (RLS) Audit Report
 
-**Application:** Tarnas Kids (Children's Educational App)
+**Application:** TaLu Kids (Children's Educational App)
 **Audit Date:** 2026-02-05
 **Auditor:** Security Reviewer Agent (Claude Opus 4.6)
 **Compliance Scope:** COPPA, GDPR (children's data)
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This audit examines the Supabase Row Level Security configuration for the Tarnas Kids
+This audit examines the Supabase Row Level Security configuration for the TaLu Kids
 application -- a children's educational app that stores gameplay data, pet state, and
 analytics events in Supabase. The application uses **anonymous authentication** (no email
 or password), meaning each device installation receives a unique anonymous user ID via
@@ -466,17 +466,17 @@ $$;
 
 | # | Action | File/Location | Details |
 |---|--------|---------------|---------|
-| 6 | **Create SQL migration files for ALL tables** | `C:\tarnas_kids\supabase\` | Store schema + RLS for `inventory`, `analytics_events`, `pet_states`, and future tables in version control |
-| 7 | **Move PostHog API key to config** | `C:\tarnas_kids\lib\main.dart:77` | Move `phc_BL81wy8lEm6vrX1OVV2Y7oINDk99N1wubbhsLEVA3pg` to a config file that is gitignored, or use `--dart-define` |
-| 8 | **Fix `inventory` example schema** | `C:\tarnas_kids\lib\config\supabase_config.dart.example` | Add `user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE` column to the documented schema |
+| 6 | **Create SQL migration files for ALL tables** | `C:\talu_kids\supabase\` | Store schema + RLS for `inventory`, `analytics_events`, `pet_states`, and future tables in version control |
+| 7 | **Move PostHog API key to config** | `C:\talu_kids\lib\main.dart:77` | Move `phc_BL81wy8lEm6vrX1OVV2Y7oINDk99N1wubbhsLEVA3pg` to a config file that is gitignored, or use `--dart-define` |
+| 8 | **Fix `inventory` example schema** | `C:\talu_kids\lib\config\supabase_config.dart.example` | Add `user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE` column to the documented schema |
 | 9 | **Test cross-user data isolation** | Manual test | Create two anonymous sessions, verify user A cannot see user B's data via direct API calls |
 
 ### MEDIUM (Fix When Possible)
 
 | # | Action | File/Location | Details |
 |---|--------|---------------|---------|
-| 10 | **Replace `addEvolutionPoints` with RPC** | `C:\tarnas_kids\lib\services\database_service.dart:361-389` | Use atomic `add_evolution_points` RPC function (Section 4.5) to prevent race condition |
-| 11 | **Evaluate PostHog session replay compliance** | `C:\tarnas_kids\lib\main.dart:84` | Assess whether session replay of children's interactions requires parental consent under COPPA/GDPR. Consider disabling for children under 13 or adding a consent gate. |
+| 10 | **Replace `addEvolutionPoints` with RPC** | `C:\talu_kids\lib\services\database_service.dart:361-389` | Use atomic `add_evolution_points` RPC function (Section 4.5) to prevent race condition |
+| 11 | **Evaluate PostHog session replay compliance** | `C:\talu_kids\lib\main.dart:84` | Assess whether session replay of children's interactions requires parental consent under COPPA/GDPR. Consider disabling for children under 13 or adding a consent gate. |
 | 12 | **Add `analytics_events` immutability** | Supabase Dashboard | No UPDATE or DELETE policies for analytics (events should be append-only) |
 | 13 | **Restrict `analytics_events` SELECT to parent panel** | Consider architecture | Analytics reads currently happen from client code in `parent_panel_screen.dart`. Consider a Supabase Edge Function or RPC to aggregate stats server-side, reducing exposed data surface. |
 
@@ -485,7 +485,7 @@ $$;
 | # | Action | File/Location | Details |
 |---|--------|---------------|---------|
 | 14 | **Implement `daily_logins` with RLS from day one** | When US for daily logins is picked up | Use SQL from Section 4.4 |
-| 15 | **Add Supabase project ref to gitignore note** | `C:\tarnas_kids\.gitignore` | The project ref `efnxsjneewsqhxcglelz` is exposed in the example file; while low risk, consider removing it |
+| 15 | **Add Supabase project ref to gitignore note** | `C:\talu_kids\.gitignore` | The project ref `efnxsjneewsqhxcglelz` is exposed in the example file; while low risk, consider removing it |
 
 ---
 

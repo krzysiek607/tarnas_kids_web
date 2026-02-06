@@ -7,7 +7,7 @@ import '../providers/pet_provider.dart';
 import '../services/sound_effects_service.dart';
 import '../widgets/bubble_tooltip.dart';
 
-/// Ekran glowny aplikacji Tarnas Kids
+/// Ekran glowny aplikacji TaLu Kids
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 

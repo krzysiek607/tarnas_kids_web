@@ -3,19 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:tarnas_kids/screens/home_screen.dart';
-import 'package:tarnas_kids/screens/learning_screen.dart';
-import 'package:tarnas_kids/screens/fun_screen.dart';
-import 'package:tarnas_kids/screens/pet_screen.dart';
-import 'package:tarnas_kids/screens/settings_screen.dart';
-import 'package:tarnas_kids/screens/parent_panel_screen.dart';
-import 'package:tarnas_kids/screens/drawing_screen.dart';
-import 'package:tarnas_kids/screens/games/maze_game_screen.dart';
-import 'package:tarnas_kids/screens/games/matching_game_screen.dart';
-import 'package:tarnas_kids/screens/games/dots_game_screen.dart';
-import 'package:tarnas_kids/theme/app_theme.dart';
-import 'package:tarnas_kids/providers/pet_provider.dart';
-import 'package:tarnas_kids/providers/background_music_provider.dart';
+import 'package:talu_kids/screens/home_screen.dart';
+import 'package:talu_kids/screens/learning_screen.dart';
+import 'package:talu_kids/screens/fun_screen.dart';
+import 'package:talu_kids/screens/pet_screen.dart';
+import 'package:talu_kids/screens/settings_screen.dart';
+import 'package:talu_kids/screens/parent_panel_screen.dart';
+import 'package:talu_kids/screens/drawing_screen.dart';
+import 'package:talu_kids/screens/games/maze_game_screen.dart';
+import 'package:talu_kids/screens/games/matching_game_screen.dart';
+import 'package:talu_kids/screens/games/dots_game_screen.dart';
+import 'package:talu_kids/theme/app_theme.dart';
+import 'package:talu_kids/providers/pet_provider.dart';
+import 'package:talu_kids/providers/background_music_provider.dart';
 
 /// Sets up SharedPreferences mock for testing.
 ///
@@ -123,7 +123,7 @@ Widget createTestApp({
     overrides: overrides,
     child: MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Tarnas Kids Test',
+      title: 'Talu Kids Test',
       theme: AppTheme.theme,
       routerConfig: router,
     ),

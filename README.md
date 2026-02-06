@@ -1,4 +1,4 @@
-# tarnas_kids
+# talu_kids
 
 A new Flutter project.
 

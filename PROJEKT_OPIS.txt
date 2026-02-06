@@ -1,5 +1,5 @@
 ================================================================================
-                         TARNAS KIDS - DOKUMENTACJA PROJEKTU
+                         TALU KIDS - DOKUMENTACJA PROJEKTU
 ================================================================================
 
 Data utworzenia: 2026-01-25
@@ -9,7 +9,7 @@ Wersja: 1.0
                               1. OPIS OGOLNY
 ================================================================================
 
-NAZWA: Tarnas Kids
+NAZWA: TaLu Kids
 TYP: Edukacyjna aplikacja mobilna dla dzieci
 TECHNOLOGIA: Flutter (Dart)
 PLATFORMY: Android, iOS, Web
@@ -332,7 +332,7 @@ Debouncing: Zapobiega wielokrotnym klikniecm
 Stan: BackgroundMusicState
 - isPlaying, volume, userMuted, error
 
-Plik: Tarnas_kids_theme.mp3 (loop)
+Plik: talu_kids_theme.mp3 (loop)
 Lifecycle: Pause na APP_PAUSED, resume na APP_RESUMED
 
 7.4 DRAWING PROVIDER (drawing_provider.dart)
@@ -395,7 +395,7 @@ Tabele: inventory, pet_sleep
 
 9.2 FIREBASE
 ------------
-Projekt: Tarnas Kids
+Projekt: TaLu Kids
 Analytics: Wlaczone
 Crashlytics: Do dodania
 
@@ -436,7 +436,7 @@ Nagrody (assets/images/rewards/):
 10.2 AUDIO
 ----------
 Muzyka:
-- assets/audio/Tarnas_kids_theme.mp3
+- assets/audio/talu_kids_theme.mp3
 
 Dzwieki zwierzat (assets/sounds/):
 - dog.mp3, cat.mp3, cow.mp3, pig.mp3, duck.mp3
@@ -498,7 +498,7 @@ PRZEJSCIA: FadeTransition (600ms)
                           14. KONTAKT
 ================================================================================
 
-Projekt: Tarnas Kids
+Projekt: TaLu Kids
 Repozytorium: (do uzupelnienia)
 Autor: (do uzupelnienia)
 

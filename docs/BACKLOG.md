@@ -1,4 +1,4 @@
-# BACKLOG - Tarnas Kids
+# BACKLOG - TaLu Kids
 
 **Ostatnia aktualizacja:** 2026-01-09
 

@@ -67,7 +67,7 @@ class ExportStatsButton extends StatelessWidget {
         : 'brak';
 
     final buffer = StringBuffer();
-    buffer.writeln('Tarnas Kids - Statystyki');
+    buffer.writeln('TaLu Kids - Statystyki');
     buffer.writeln('========================');
     buffer.writeln('');
     buffer.writeln('Gier zagrano: $totalGamesPlayed');

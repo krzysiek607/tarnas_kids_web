@@ -1,10 +1,10 @@
-# Regulamin - Tarnas Kids
+# Regulamin - TaLu Kids
 
 **Data ostatniej aktualizacji:** 4 lutego 2026
 
 ## 1. Postanowienia ogolne
 
-1.1. Niniejszy Regulamin okresla zasady korzystania z aplikacji mobilnej Tarnas Kids ("Aplikacja").
+1.1. Niniejszy Regulamin okresla zasady korzystania z aplikacji mobilnej TaLu Kids ("Aplikacja").
 
 1.2. Aplikacja jest edukacyjna gra mobilna przeznaczona dla dzieci w wieku 5-8 lat, oferujaca gry edukacyjne, gry rozrywkowe, wirtualnego zwierzaka oraz system nagrod.
 
@@ -14,7 +14,7 @@
 
 ## 2. Definicje
 
-- **Aplikacja** - aplikacja mobilna Tarnas Kids dostepna w sklepach Google Play i App Store
+- **Aplikacja** - aplikacja mobilna TaLu Kids dostepna w sklepach Google Play i App Store
 - **Uzytkownik** - osoba korzystajaca z Aplikacji (dziecko pod nadzorem rodzica/opiekuna)
 - **Rodzic** - rodzic lub opiekun prawny dziecka korzystajacego z Aplikacji
 - **Uslugi** - funkcjonalnosci dostepne w Aplikacji
@@ -44,8 +44,8 @@
 4.4. Subskrypcja odnawia sie automatycznie na koniec kazdego okresu rozliczeniowego, chyba ze zostanie anulowana przed uplywem biezacego okresu.
 
 4.5. Anulowanie subskrypcji:
-- **Android**: Google Play > Subskrypcje > Tarnas Kids > Anuluj
-- **iOS**: Ustawienia > Apple ID > Subskrypcje > Tarnas Kids > Anuluj
+- **Android**: Google Play > Subskrypcje > TaLu Kids > Anuluj
+- **iOS**: Ustawienia > Apple ID > Subskrypcje > TaLu Kids > Anuluj
 
 4.6. Po anulowaniu subskrypcji dostep do platnych funkcji pozostaje aktywny do konca oplaconego okresu.
 
@@ -53,7 +53,7 @@
 
 ## 5. Wlasnosc intelektualna
 
-5.1. Wszelkie prawa autorskie, znaki towarowe i inne prawa wlasnosci intelektualnej zwiazane z Aplikacja naleza do tworcow Tarnas Kids.
+5.1. Wszelkie prawa autorskie, znaki towarowe i inne prawa wlasnosci intelektualnej zwiazane z Aplikacja naleza do tworcow TaLu Kids.
 
 5.2. Uzytkownik otrzymuje ograniczona, niewyłaczna, nieprzenoszalna licencje na korzystanie z Aplikacji na urzadzeniu mobilnym.
 
@@ -110,13 +110,13 @@ Aktualna wersja Regulaminu jest dostepna pod adresem: [UZUPELNIJ_URL]
 
 ---
 
-# Terms of Service - Tarnas Kids (English)
+# Terms of Service - TaLu Kids (English)
 
 **Last updated:** February 4, 2026
 
 ## 1. General Provisions
 
-1.1. These Terms of Service govern the use of the Tarnas Kids mobile application ("App").
+1.1. These Terms of Service govern the use of the TaLu Kids mobile application ("App").
 
 1.2. The App is an educational mobile game designed for children aged 5-8, offering educational games, entertainment games, a virtual pet, and a reward system.
 
@@ -126,7 +126,7 @@ Aktualna wersja Regulaminu jest dostepna pod adresem: [UZUPELNIJ_URL]
 
 ## 2. Definitions
 
-- **App** - the Tarnas Kids mobile application available on Google Play and App Store
+- **App** - the TaLu Kids mobile application available on Google Play and App Store
 - **User** - a person using the App (a child under parental/guardian supervision)
 - **Parent** - the parent or legal guardian of a child using the App
 - **Services** - functionalities available in the App
@@ -156,8 +156,8 @@ Aktualna wersja Regulaminu jest dostepna pod adresem: [UZUPELNIJ_URL]
 4.4. The subscription renews automatically at the end of each billing period unless canceled before the current period expires.
 
 4.5. Cancellation:
-- **Android**: Google Play > Subscriptions > Tarnas Kids > Cancel
-- **iOS**: Settings > Apple ID > Subscriptions > Tarnas Kids > Cancel
+- **Android**: Google Play > Subscriptions > TaLu Kids > Cancel
+- **iOS**: Settings > Apple ID > Subscriptions > TaLu Kids > Cancel
 
 4.6. After cancellation, access to paid features remains active until the end of the paid period.
 
@@ -165,7 +165,7 @@ Aktualna wersja Regulaminu jest dostepna pod adresem: [UZUPELNIJ_URL]
 
 ## 5. Intellectual Property
 
-5.1. All copyrights, trademarks, and other intellectual property rights related to the App belong to the creators of Tarnas Kids.
+5.1. All copyrights, trademarks, and other intellectual property rights related to the App belong to the creators of TaLu Kids.
 
 5.2. The User receives a limited, non-exclusive, non-transferable license to use the App on a mobile device.
 

@@ -10,7 +10,7 @@
 
 ## OPIS PROJEKTU
 
-**Nazwa:** Tarnas Kids
+**Nazwa:** TaLu Kids
 **Typ:** Aplikacja mobilna Flutter dla dzieci 4-8 lat
 **Cel:** Interaktywna aplikacja edukacyjna/rozrywkowa
 
@@ -48,7 +48,7 @@ lib/
 
 ## KLUCZOWE PLIKI
 
-- `lib/main.dart` - Punkt wejscia, TarnasKidsApp widget
+- `lib/main.dart` - Punkt wejscia, TaLuKidsApp widget
 - `lib/screens/home_screen.dart` - Ekran glowny z przyciskami nawigacyjnymi
 - `lib/widgets/big_button.dart` - Reuzywaalny przycisk z animacja
 - `lib/theme/app_theme.dart` - Kolory, gradienty, typografia

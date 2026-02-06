@@ -5,7 +5,7 @@
 ### Zamień obecny pubspec.yaml na:
 
 ```yaml
-name: tarnas_kids
+name: talu_kids
 description: "Interactive educational app for kids"
 publish_to: 'none'
 version: 1.0.0+1
@@ -59,7 +59,7 @@ flutter:
 
 ### Po zapisaniu uruchom:
 ```bash
-cd C:\Users\krzys\tarnas_kids
+cd C:\Users\krzys\talu_kids
 flutter pub get
 ```
 
@@ -70,7 +70,7 @@ flutter pub get
 ### Utwórz foldery (skopiuj i uruchom w terminalu):
 
 ```bash
-cd C:\Users\krzys\tarnas_kids\lib
+cd C:\Users\krzys\talu_kids\lib
 
 # Core
 mkdir core
@@ -105,7 +105,7 @@ mkdir assets\images
 
 **Plik:** `test/widget_test.dart`
 **Linia:** 16
-**Zmień:** `MyApp` → `TarnasKidsApp`
+**Zmień:** `MyApp` → `TaLuKidsApp`
 
 **Weryfikacja:**
 ```bash
@@ -316,19 +316,19 @@ import 'core/theme/app_theme.dart';
 void main() {
   runApp(
     const ProviderScope(
-      child: TarnasKidsApp(),
+      child: TaLuKidsApp(),
     ),
   );
 }
 
-class TarnasKidsApp extends StatelessWidget {
-  const TarnasKidsApp({super.key});
+class TaLuKidsApp extends StatelessWidget {
+  const TaLuKidsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Tarnas Kids',
+      title: 'TaLu Kids',
       theme: AppTheme.lightTheme,
       routerConfig: appRouter,
     );
@@ -387,7 +387,7 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 ### Test failures?
-- Sprawdź czy `TarnasKidsApp` jest poprawnie zaimportowana w test
+- Sprawdź czy `TaLuKidsApp` jest poprawnie zaimportowana w test
 - Uruchom `flutter test -v` dla szczegółów
 
 ---

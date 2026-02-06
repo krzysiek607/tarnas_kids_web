@@ -38,7 +38,7 @@ void main() async {
     () {
       runApp(
         const ProviderScope(
-          child: TarnasKidsApp(),
+          child: TaLuKidsApp(),
         ),
       );
     },
@@ -184,14 +184,14 @@ Future<String?> _ensureAnonymousAuth() async {
   }
 }
 
-class TarnasKidsApp extends ConsumerStatefulWidget {
-  const TarnasKidsApp({super.key});
+class TaLuKidsApp extends ConsumerStatefulWidget {
+  const TaLuKidsApp({super.key});
 
   @override
-  ConsumerState<TarnasKidsApp> createState() => _TarnasKidsAppState();
+  ConsumerState<TaLuKidsApp> createState() => _TaLuKidsAppState();
 }
 
-class _TarnasKidsAppState extends ConsumerState<TarnasKidsApp>
+class _TaLuKidsAppState extends ConsumerState<TaLuKidsApp>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -251,7 +251,7 @@ class _TarnasKidsAppState extends ConsumerState<TarnasKidsApp>
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Tarnas Kids',
+      title: 'TaLu Kids',
       theme: AppTheme.theme,
       routerConfig: appRouter,
     );

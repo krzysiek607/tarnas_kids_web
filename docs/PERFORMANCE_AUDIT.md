@@ -1,4 +1,4 @@
-# Performance Audit - Tarnas Kids
+# Performance Audit - TaLu Kids
 
 **Date:** 2026-02-05
 **Target:** App startup < 3 seconds on 3G
@@ -24,7 +24,7 @@
             DatabaseService.initialize()                  ~10ms
             AnalyticsService.initialize()                 ~50ms
             identifyUser() [network!]                     ~100-300ms
-[~2860ms] runApp(TarnasKidsApp)                         ~50ms
+[~2860ms] runApp(TaLuKidsApp)                         ~50ms
 [~2910ms] PreloaderScreen renders
             300ms artificial delay (emoji preload)        300ms (BLOCKING)
 [~3210ms] _VideoIntroContent initializes
@@ -364,4 +364,4 @@ During this audit, I observed that `supabase_config.dart` contains hardcoded Sup
 
 ---
 
-*Audit performed on codebase at C:\tarnas_kids. Focus areas: startup time, memory usage, animation smoothness, and network efficiency.*
+*Audit performed on codebase at C:\talu_kids. Focus areas: startup time, memory usage, animation smoothness, and network efficiency.*

@@ -1,0 +1,23 @@
+# Ralph Progress Log
+Started: sob., 31 sty 2026 23:08:02
+Feature: UI Sound Effects
+
+## Codebase Patterns
+- Serwisy używają singleton pattern (static _instance + factory constructor)
+- Audioplayers wymaga różnej konfiguracji dla Web (UrlSource) i Mobile (AssetSource)
+- AudioContext konfigurowany osobno dla Android i iOS
+- Pliki dźwiękowe w assets/sounds/, ścieżka bez "assets/" dla AssetSource
+
+---
+
+## 2026-01-31 23:20 - US-001
+- Zaimplementowano SoundEffectsService jako singleton
+- Plik: lib/services/sound_effects_service.dart
+- Metody: playClick(), playSuccess(), playError()
+- Preload dźwięków przy inicjalizacji (lazy)
+- Obsługa isMuted i volume
+- **Learnings for future iterations:**
+  - Istnieje już SoundEffectsController w tym samym folderze - używa audio ducking dla muzyki w tle
+  - SoundEffectsService jest prostszą alternatywą bez ducking
+  - Dla każdego typu dźwięku osobny AudioPlayer dla lepszej responsywności
+---

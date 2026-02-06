@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplikacja edukacyjna dla dzieci 4-8 lat - gry, zabawy, bajki i rozwój przez zabawę">
+    <title>TaLu Kids - Partner Twojego Dziecka</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FF6B6B'/%3E%3Ccircle cx='35' cy='40' r='5' fill='%23FFF'/%3E%3Ccircle cx='65' cy='40' r='5' fill='%23FFF'/%3E%3Cpath d='M30 60 Q50 75 70 60' stroke='%23FFF' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & VARIABLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --color-primary: #FF6B9D;
+            --color-primary-dark: #FF5287;
+            --color-secondary: #4ECDC4;
+            --color-tertiary: #FFD93D;
+            --color-purple: #A78BFA;
+            --color-green: #6EE7B7;
+            --color-orange: #FCA5A5;
+            --color-bg: #FFF9F5;
+            --color-text: #2D3748;
+            --color-text-light: #4A5568;
+            --color-text-muted: #718096;
+            --color-surface-shadow: rgba(0, 0, 0, 0.08);
+
+            --font-display: 'Fredoka', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+            --font-accent: 'Baloo 2', sans-serif;
+
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in-up { opacity: 0; transform: translateY(40px); }
+        .fade-in-up.visible { animation: fadeInUp 0.8s var(--transition-smooth) forwards; }
+        
+        .floating { animation: float 6s ease-in-out infinite; }
+        .floating-delayed { animation: float 6s ease-in-out 3s infinite; }
+
+        /* --- LAYOUT UTILS --- */
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        
+        .section-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #6EE7B7 100%);
+            border-radius: 100px;
+            font-family: var(--font-accent);
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-description {
+            font-size: 18px;
+            color: var(--color-text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- BACKGROUND SHAPES --- */
+        .animated-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+            background: linear-gradient(135deg, #FFF9F5 0%, #FFF5EB 50%, #FFF9F5 100%);
+        }
+        .geometric-shape { position: absolute; opacity: 0.15; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.05)); }
+        .shape-1 { top: 10%; left: 5%; animation: float 25s infinite ease-in-out; }
+        .shape-2 { top: 60%; right: 10%; animation: float 30s infinite ease-in-out 5s; }
+        .shape-3 { bottom: 10%; left: 15%; animation: float 35s infinite ease-in-out 10s; }
+        .shape-4 { top: 40%; right: 20%; animation: float 28s infinite ease-in-out 15s; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #FFD93D 100%);
+            border-radius: 100px; color: #fff; font-family: var(--font-accent); font-weight: 700;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+            animation: pulse 2s infinite ease-in-out;
+            margin-bottom: 30px;
+        }
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(48px, 8vw, 84px);
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #A78BFA 50%, #4ECDC4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex; align-items: center; gap: 12px; padding: 18px 40px;
+            font-family: var(--font-accent); font-size: 18px; font-weight: 700;
+            text-decoration: none; border-radius: 50px; border: none; cursor: pointer;
+            transition: all 0.3s var(--transition-bounce);
+        }
+        .btn:hover { transform: translateY(-4px) scale(1.05); }
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B9D 0%, #A78BFA 100%);
+            color: #fff; box-shadow: 0 8px 24px rgba(255, 107, 157, 0.4);
+        }
+        .btn-secondary {
+            background: #fff; border: 3px solid #FF6B9D; color: #FF6B9D;
+            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.2);
+        }
+
+        /* --- EVOLUTION TEASER --- */
+        .evolution-teaser { padding: 80px 0; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,107,157,0.05) 100%); }
+        .evo-steps { display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-top: 50px; }
+        .evo-card {
+            flex: 1; min-width: 250px; max-width: 300px;
+            background: #fff; padding: 40px 30px; border-radius: 30px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s var(--transition-smooth);
+            position: relative; overflow: hidden;
+            border: 2px solid transparent;
+        }
+        .evo-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .evo-icon {
+            font-size: 50px; margin-bottom: 20px;
+            width: 100px; height: 100px; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            background: #FFF5EB; border-radius: 50%;
+            transition: transform 0.4s var(--transition-bounce);
+        }
+        .evo-card:hover .evo-icon { transform: scale(1.2) rotate(10deg); }
+        
+        .evo-card:nth-child(1) { border-color: #FFD93D; }
+        .evo-card:nth-child(1) .evo-icon { background: #FFF9C4; }
+        .evo-card:nth-child(3) { border-color: #4ECDC4; }
+        .evo-card:nth-child(3) .evo-icon { background: #E0F2F1; }
+        .evo-card:nth-child(5) { border-color: #A78BFA; }
+        .evo-card:nth-child(5) .evo-icon { background: #EDE9FE; }
+
+        .evo-arrow { font-size: 30px; color: #CBD5E0; font-weight: bold; }
+
+        /* --- GUIDES SECTION --- */
+        .guides { padding: 80px 0; background: #fff; }
+        .guides-grid { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin-top: 40px; }
+        .guide-item { text-align: center; width: 220px; }
+        .guide-avatar {
+            width: 160px; height: 160px; background: #f0f0f0; border-radius: 50%;
+            margin: 0 auto 20px; border: 6px solid; overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .guide-lumi .guide-avatar { border-color: #FF6B9D; }
+        .guide-taro .guide-avatar { border-color: #4ECDC4; }
+        .guide-img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- FEATURES GRID --- */
+        .features { padding: 100px 0; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .feature-card {
+            background: #fff; padding: 40px 30px; border-radius: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06); transition: all 0.3s var(--transition-smooth);
+            border: 2px solid transparent;
+        }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 16px 32px rgba(0,0,0,0.08); }
+        
+        /* --- GALLERY (NEW) --- */
+        .gallery { padding: 80px 0; background: #FFF9F5; overflow: hidden; }
+        .gallery-scroller {
+            display: flex; gap: 20px; overflow-x: auto; padding: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .gallery-scroller::-webkit-scrollbar { display: none; }
+        .phone-mockup {
+            min-width: 260px; height: 520px; background: #2D3748;
+            border-radius: 40px; border: 8px solid #1A202C;
+            position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
+        .phone-mockup::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 25px; background: #1A202C; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+            z-index: 2;
+        }
+        .phone-screen {
+            width: 100%; height: 100%; background: #4ECDC4;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: bold; font-size: 20px; font-family: var(--font-accent);
+            text-align: center; padding: 20px;
+        }
+        .phone-screen-img {
+            width: 100%; height: 100%; object-fit: cover;
+            display: block;
+        }
+
+        /* --- PARENT ZONE --- */
+        .parent-zone { padding: 100px 0; }
+        .login-card {
+            background: #fff; padding: 50px 40px; border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08); border: 4px solid #FCA5A5;
+            max-width: 450px; width: 100%; margin: 0 auto; text-align: center;
+        }
+        .login-input {
+            width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #E2E8F0;
+            margin-bottom: 16px; font-size: 16px; font-family: var(--font-body);
+            transition: border-color 0.3s;
+        }
+        .login-input:focus { outline: none; border-color: #FF6B9D; }
+
+        /* --- FOOTER --- */
+        .footer { padding: 60px 0 30px; border-top: 1px solid rgba(0,0,0,0.05); background: #fff; }
+        .footer-logo {
+            font-family: var(--font-display); font-size: 32px; font-weight: 700;
+            background: linear-gradient(135deg, #FF6B9D, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <svg class="geometric-shape shape-1" width="200" height="200" viewBox="0 0 200 200"><path d="M100 20 L115 70 L165 75 L125 110 L140 160 L100 130 L60 160 L75 110 L35 75 L85 70 Z" fill="#FFD93D"/></svg>
+        <svg class="geometric-shape shape-2" width="180" height="180" viewBox="0 0 180 180"><path d="M90 140 C90 140 30 100 30 65 C30 45 45 30 65 30 C75 30 85 35 90 45 C95 35 105 30 115 30 C135 30 150 45 150 65 C150 100 90 140 90 140 Z" fill="#FF6B9D"/></svg>
+        <svg class="geometric-shape shape-3" width="220" height="220" viewBox="0 0 220 220"><circle cx="110" cy="110" r="80" fill="#4ECDC4"/></svg>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content" style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <div class="hero-badge">Dla dzieci 4-8 lat</div>
+                <h1 class="hero-title">Twoje Dziecko, Jego Własny Świat</h1>
+                <p class="hero-subtitle" style="font-size: 24px; color: var(--color-text-light); margin-bottom: 24px;">Odkryj magiczne jajko, które rośnie razem z wiedzą Twojego malucha.</p>
+                <p class="hero-description" style="font-size: 18px; color: var(--color-text-muted); line-height: 1.8; margin-bottom: 40px;">
+                    TaLu Kids to bezpieczna przystań, gdzie nauka pisania i liczenia staje się przygodą. Opiekuj się zwierzakiem, zdobywaj nagrody i rozwijaj się bez stresu.
+                </p>
+                <div class="hero-cta">
+                    <a href="#evolution" class="btn btn-primary">
+                        <span>Zacznij Przygodę</span>
+                    </a>
+                    <a href="#parent-zone" class="btn btn-secondary">
+                        <span>Dla Rodziców</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evolution Process Section -->
+    <section id="evolution" class="evolution-teaser">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <span class="section-badge">Mechanika Gry</span>
+                <h2 class="section-title">Od Jajka do Przyjaciela</h2>
+                <p class="section-description">Każda literka i każdy szlaczek przybliża jajko do wyklucia. Zobacz, jak to działa!</p>
+            </div>
+
+            <div class="evo-steps fade-in-up">
+                <!-- Step 1 -->
+                <div class="evo-card">
+                    <div class="evo-icon">🥚</div>
+                    <h3 style="font-family: var(--font-accent); color: #FFD93D; font-size: 24px; margin-bottom: 10px;">1. Opiekuj się</h3>
+                    <p style="color: var(--color-text-light);">Karm, myj i baw się ze swoim jajkiem. Ono potrzebuje miłości, żeby rosnąć!</p>
+                </div>
+
+                <div class="evo-arrow">➜</div>
+
+                <!-- Step 2 -->
+                <div class="evo-card">
+                    <div class="evo-icon">⚡</div>
+                    <h3 style="font-family: var(--font-accent); color: #4ECDC4; font-size: 24px; margin-bottom: 10px;">2. Ucz się</h3>
+                    <p style="color: var(--color-text-light);">Rozwiązuj zadania edukacyjne, aby zdobywać magiczną energię potrzebną do wyklucia.</p>
+                </div>
+
+                <div class="evo-arrow">➜</div>
+
+                <!-- Step 3 -->
+                <div class="evo-card">
+                    <div class="evo-icon">🐣</div>
+                    <h3 style="font-family: var(--font-accent); color: #A78BFA; font-size: 24px; margin-bottom: 10px;">3. Wykluwaj!</h3>
+                    <p style="color: var(--color-text-light);">Zobacz moment pęknięcia skorupki i poznaj swojego unikalnego zwierzaka!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guides Section -->
+    <section class="guides">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2 class="section-title">Poznaj Przewodników</h2>
+                <p class="section-description">Oni zawsze służą pomocą i dobrym słowem.</p>
+            </div>
+            <div class="guides-grid">
+                <div class="guide-item guide-lumi floating fade-in-up">
+                    <div class="guide-avatar">
+                        <img src="talu_kids/Lumi.png" alt="Lumi" class="guide-img">
+                    </div>
+                    <h3 style="font-family: var(--font-display); color: #FF6B9D; font-size: 24px;">Lumi</h3>
+                    <p>Wesoła Odkrywczyni</p>
+                </div>
+                <div class="guide-item guide-taro floating-delayed fade-in-up">
+                    <div class="guide-avatar">
+                        <img src="talu_kids/Taro.png" alt="Taro" class="guide-img">
+                    </div>
+                    <h3 style="font-family: var(--font-display); color: #4ECDC4; font-size: 24px;">Taro</h3>
+                    <p>Pomysłowy Wynalazca</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Gallery / Mockups -->
+    <section class="gallery">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge" style="background: linear-gradient(135deg, #FF6B9D, #FCA5A5);">Podgląd Gry</span>
+                <h2 class="section-title">Zobacz TaLu Kids w akcji</h2>
+            </div>
+            
+            <div class="gallery-scroller fade-in-up">
+                <!-- Ekran Główny -->
+                <div class="phone-mockup">
+                    <img src="images/screenshots/ekran_glowny.jpg" alt="Ekran Główny TaLu Kids" class="phone-screen-img">
+                </div>
+                
+                <!-- Nauka Pisania -->
+                <div class="phone-mockup">
+                    <img src="images/screenshots/literki.jpg" alt="Nauka Pisania Literek" class="phone-screen-img">
+                </div>
+                
+                <!-- Opieka nad Zwierzakiem -->
+                <div class="phone-mockup">
+                    <img src="images/screenshots/zwierzak.jpg" alt="Opieka nad Zwierzakiem" class="phone-screen-img">
+                </div>
+                
+                <!-- Szlaczki -->
+                <div class="phone-mockup">
+                    <img src="images/screenshots/szlaczki.jpg" alt="Rysowanie Szlaczków" class="phone-screen-img">
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: var(--color-text-muted); font-size: 14px;">(Przesuń, aby zobaczyć więcej)</p>
+        </div>
+    </section>
+
+    <!-- Parent Zone -->
+    <section class="parent-zone" id="parent-zone">
+        <div class="container">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 60px;">
+                <div style="flex: 1; min-width: 300px; max-width: 500px;" class="fade-in-up">
+                    <span class="section-badge" style="background: linear-gradient(135deg, #A78BFA, #C4B5FD);">Dla Rodziców</span>
+                    <h2 class="section-title">Pełna kontrola, zero stresu</h2>
+                    <ul style="list-style: none; margin-top: 30px;">
+                        <li style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #E0F2F1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #4ECDC4;">🛡️</div>
+                            <div>
+                                <h4 style="font-weight: 700;">Bezpieczeństwo przede wszystkim</h4>
+                                <p style="font-size: 14px; color: var(--color-text-muted);">Brak reklam, brak ukrytych płatności, pełna zgodność z RODO.</p>
+                            </div>
+                        </li>
+                        <li style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                            <div style="width: 40px; height: 40px; background: #FFF5EB; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #FFD93D;">📊</div>
+                            <div>
+                                <h4 style="font-weight: 700;">Raporty postępów</h4>
+                                <p style="font-size: 14px; color: var(--color-text-muted);">Zobacz, które litery Twoje dziecko już opanowało.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="login-card fade-in-up">
+                    <div style="width: 80px; height: 80px; background: #F7FAFC; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px;">👨‍👩‍👧‍👦</div>
+                    <h3 style="font-family: var(--font-display); font-size: 28px; margin-bottom: 10px;">Panel Rodzica</h3>
+                    <p style="color: var(--color-text-muted); margin-bottom: 30px;">Zaloguj się, aby zsynchronizować postępy.</p>
+                    <input type="email" placeholder="Twój adres e-mail" class="login-input">
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        Zaloguj się
+                    </button>
+                    <p style="margin-top: 15px; font-size: 13px; color: #CBD5E0;">Dostępne wkrótce w wersji beta.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container" style="text-align: center;">
+            <div class="footer-logo">TaLu Kids</div>
+            <div style="display: flex; gap: 30px; justify-content: center; margin: 30px 0;">
+                <a href="mailto:kontakt@talukids.com" style="text-decoration: none; color: var(--color-text); font-weight: 600;">Kontakt</a>
+                <a href="privacy_policy.md" style="text-decoration: none; color: var(--color-text); font-weight: 600;">Polityka Prywatności</a>
+            </div>
+            <p style="color: var(--color-text-muted); font-size: 14px;">&copy; 2026 TaLu Kids. Wszystkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Simple Intersection Observer for Fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>

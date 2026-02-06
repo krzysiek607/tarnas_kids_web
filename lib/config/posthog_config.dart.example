@@ -1,0 +1,9 @@
+/// Konfiguracja PostHog
+///
+/// INSTRUKCJA:
+/// 1. Skopiuj ten plik jako 'posthog_config.dart'
+/// 2. Uzupełnij swój API key z PostHog Dashboard
+class PostHogConfig {
+  static const String apiKey = 'YOUR_POSTHOG_API_KEY';
+  static const String host = 'https://eu.posthog.com';
+}

@@ -6,32 +6,32 @@ import { Smartphone, ChevronLeft, ChevronRight } from "lucide-react"
 
 const screens = [
   {
-    title: "Ekran g\u0142\u00F3wny",
-    description: "4 magiczne \u015Bwiaty do odkrycia",
+    title: "Ekran główny",
+    description: "4 magiczne światy do odkrycia",
     gradient: "from-pink-400 to-purple-500",
     icon: "\uD83C\uDFE0",
   },
   {
     title: "Nauka liter",
-    description: "Polski alfabet A-\u017B z waypoints",
+    description: "Polski alfabet A-Ż z waypoints",
     gradient: "from-teal-400 to-teal-600",
     icon: "\u270F\uFE0F",
   },
   {
     title: "Zwierzak",
-    description: "Opiekuj si\u0119 magicznym jajkiem",
+    description: "Opiekuj się magicznym jajkiem",
     gradient: "from-purple-400 to-pink-500",
     icon: "\uD83E\uDD5A",
   },
   {
     title: "Szlaczki",
-    description: "10 wzor\u00F3w do \u015Bledzenia",
+    description: "10 wzorów do śledzenia",
     gradient: "from-yellow-400 to-orange-500",
     icon: "\u3030\uFE0F",
   },
   {
     title: "Gry",
-    description: "Labirynty, puzzle i wi\u0119cej",
+    description: "Labirynty, puzzle i więcej",
     gradient: "from-green-400 to-teal-500",
     icon: "\uD83C\uDFAE",
   },
@@ -84,7 +84,7 @@ export function Gallery() {
             className="inline-block rounded-full bg-gradient-to-r from-pink-500 to-orange-400 px-5 py-2 text-sm font-bold text-white uppercase tracking-wider shadow-lg shadow-pink-500/20 mb-6"
             style={{ fontFamily: "var(--font-baloo)" }}
           >
-            Podgl\u0105d aplikacji
+            Podgląd aplikacji
           </span>
           <h2
             className="text-4xl font-bold sm:text-5xl bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 bg-clip-text text-transparent mb-4"
@@ -93,7 +93,7 @@ export function Gallery() {
             Zobacz Tarnas Kids w akcji
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-text-muted">
-            Pi\u0119knie zaprojektowane ekrany, kt\u00F3re dzieci uwielbiaj\u0105
+            Pięknie zaprojektowane ekrany, które dzieci uwielbiają
           </p>
         </motion.div>
       </div>
@@ -105,7 +105,7 @@ export function Gallery() {
           <button
             onClick={() => scroll("left")}
             className="absolute left-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-12 w-12 items-center justify-center rounded-full bg-white/90 shadow-lg border border-pink-100 text-pink-500 backdrop-blur-sm transition-all hover:bg-pink-500 hover:text-white hover:shadow-xl"
-            aria-label="Przewi\u0144 w lewo"
+            aria-label="Przewiń w lewo"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
@@ -114,7 +114,7 @@ export function Gallery() {
           <button
             onClick={() => scroll("right")}
             className="absolute right-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-12 w-12 items-center justify-center rounded-full bg-white/90 shadow-lg border border-pink-100 text-pink-500 backdrop-blur-sm transition-all hover:bg-pink-500 hover:text-white hover:shadow-xl"
-            aria-label="Przewi\u0144 w prawo"
+            aria-label="Przewiń w prawo"
           >
             <ChevronRight className="h-6 w-6" />
           </button>
@@ -170,7 +170,7 @@ export function Gallery() {
 
         <div className="mt-6 flex items-center justify-center gap-2 text-sm text-text-muted">
           <Smartphone className="h-4 w-4" />
-          <span>Przesu\u0144 aby zobaczy\u0107 wi\u0119cej</span>
+          <span>Przesuń aby zobaczyć więcej</span>
         </div>
       </div>
 

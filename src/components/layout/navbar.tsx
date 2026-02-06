@@ -73,14 +73,14 @@ export function Navbar() {
               className="rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-pink-500/25 transition-all hover:shadow-xl hover:shadow-pink-500/30 hover:-translate-y-0.5 active:translate-y-0"
               style={{ fontFamily: "var(--font-baloo)" }}
             >
-              Pobierz aplikacj\u0119
+              Pobierz aplikację
             </a>
           </div>
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
             className="flex h-10 w-10 items-center justify-center rounded-xl text-text transition-colors hover:bg-pink-50 lg:hidden"
-            aria-label={isMobileOpen ? "Zamknij menu" : "Otw\u00F3rz menu"}
+            aria-label={isMobileOpen ? "Zamknij menu" : "Otwórz menu"}
           >
             {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -119,7 +119,7 @@ export function Navbar() {
                 className="mt-4 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-8 py-3 text-lg font-bold text-white shadow-lg"
                 style={{ fontFamily: "var(--font-baloo)" }}
               >
-                Pobierz aplikacj\u0119
+                Pobierz aplikację
               </motion.a>
             </nav>
           </motion.div>

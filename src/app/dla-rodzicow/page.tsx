@@ -4,9 +4,9 @@ import { Faq } from "@/components/sections/faq"
 import { Newsletter } from "@/components/sections/newsletter"
 
 export const metadata: Metadata = {
-  title: "Dla rodzic\u00F3w",
+  title: "Dla rodziców",
   description:
-    "Bezpiecze\u0144stwo, kontrola rodzicielska i raporty post\u0119p\u00F3w. Dowiedz si\u0119, jak Tarnas Kids chroni Twoje dziecko.",
+    "Bezpieczeństwo, kontrola rodzicielska i raporty postępów. Dowiedz się, jak Tarnas Kids chroni Twoje dziecko.",
 }
 
 export default function ForParentsPage() {

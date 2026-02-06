@@ -24,7 +24,7 @@ export function Footer() {
             </a>
             <p className="text-sm text-text-muted leading-relaxed max-w-xs">
               {SITE_CONFIG.tagline} w codziennym rozwoju. Bezpieczna edukacja
-              przez zabaw\u0119 dla dzieci {SITE_CONFIG.ageRange}.
+              przez zabawę dla dzieci {SITE_CONFIG.ageRange}.
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export function Footer() {
                   href={href("/polityka-prywatnosci")}
                   className="text-sm text-text-muted hover:text-pink-500 transition-colors"
                 >
-                  Polityka prywatno\u015Bci
+                  Polityka prywatności
                 </a>
               </li>
               <li>

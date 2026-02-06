@@ -33,11 +33,11 @@ export default function TermsPage() {
               className="text-xl font-bold text-text mb-3"
               style={{ fontFamily: "var(--font-fredoka)" }}
             >
-              1. Postanowienia og\u00F3lne
+              1. Postanowienia ogólne
             </h2>
             <p>
-              Niniejszy regulamin okre\u015Bla zasady korzystania z aplikacji Tarnas
-              Kids. Korzystaj\u0105c z aplikacji, akceptujesz poni\u017Csze warunki.
+              Niniejszy regulamin określa zasady korzystania z aplikacji Tarnas
+              Kids. Korzystając z aplikacji, akceptujesz poniższe warunki.
             </p>
           </section>
 
@@ -51,7 +51,7 @@ export default function TermsPage() {
             <p>
               Tarnas Kids jest przeznaczony dla dzieci w wieku 4-8 lat pod
               nadzorem rodzica lub opiekuna. Rodzic/opiekun jest odpowiedzialny
-              za za\u0142o\u017Cenie konta i nadz\u00F3r nad korzystaniem z aplikacji.
+              za założenie konta i nadzór nad korzystaniem z aplikacji.
             </p>
           </section>
 
@@ -60,12 +60,12 @@ export default function TermsPage() {
               className="text-xl font-bold text-text mb-3"
               style={{ fontFamily: "var(--font-fredoka)" }}
             >
-              3. Tre\u015Bci
+              3. Treści
             </h2>
             <p>
-              Wszystkie tre\u015Bci w aplikacji s\u0105 odpowiednie dla dzieci i zosta\u0142y
-              zweryfikowane przez zesp\u00F3\u0142 pedagog\u00F3w. Aplikacja nie zawiera reklam,
-              link\u00F3w zewn\u0119trznych ani tre\u015Bci nieodpowiednich dla grupy wiekowej.
+              Wszystkie treści w aplikacji są odpowiednie dla dzieci i zostały
+              zweryfikowane przez zespół pedagogów. Aplikacja nie zawiera reklam,
+              linków zewnętrznych ani treści nieodpowiednich dla grupy wiekowej.
             </p>
           </section>
 
@@ -74,11 +74,11 @@ export default function TermsPage() {
               className="text-xl font-bold text-text mb-3"
               style={{ fontFamily: "var(--font-fredoka)" }}
             >
-              4. W\u0142asno\u015B\u0107 intelektualna
+              4. Własność intelektualna
             </h2>
             <p>
-              Wszelkie tre\u015Bci, grafiki, d\u017Awi\u0119ki i kod \u017Ar\u00F3d\u0142owy aplikacji Tarnas
-              Kids s\u0105 chronione prawem autorskim i stanowi\u0105 w\u0142asno\u015B\u0107 tw\u00F3rc\u00F3w
+              Wszelkie treści, grafiki, dźwięki i kod źródłowy aplikacji Tarnas
+              Kids są chronione prawem autorskim i stanowią własność twórców
               aplikacji.
             </p>
           </section>
@@ -91,7 +91,7 @@ export default function TermsPage() {
               5. Kontakt
             </h2>
             <p>
-              Pytania dotycz\u0105ce regulaminu prosimy kierowa\u0107 na:{" "}
+              Pytania dotyczące regulaminu prosimy kierować na:{" "}
               <a
                 href="mailto:kontakt@tarnaskids.pl"
                 className="text-pink-500 hover:underline font-semibold"

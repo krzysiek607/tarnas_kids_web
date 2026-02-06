@@ -65,11 +65,11 @@ export function Hero() {
           className="mb-6 text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl"
           style={{ fontFamily: "var(--font-fredoka)" }}
         >
-          <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 bg-clip-text text-transparent">
+          <span className="inline-block bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 bg-clip-text text-transparent">
             Partner Twojego
           </span>
           <br />
-          <span className="bg-gradient-to-r from-teal-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <span className="inline-block bg-gradient-to-r from-teal-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Dziecka
           </span>
         </motion.h1>

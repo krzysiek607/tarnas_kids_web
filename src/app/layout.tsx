@@ -1,12 +1,22 @@
 import type { Metadata } from "next"
-import { Fredoka, Nunito, Baloo_2 } from "next/font/google"
+import localFont from "next/font/local"
+import { Nunito, Baloo_2 } from "next/font/google"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
 import { CookieConsent } from "@/components/ui/cookie-consent"
 import "./globals.css"
 
-const fredoka = Fredoka({
-  subsets: ["latin", "latin-ext"],
+const fredoka = localFont({
+  src: [
+    {
+      path: "../fonts/fredoka-latin-ext.woff2",
+      style: "normal",
+    },
+    {
+      path: "../fonts/fredoka-latin.woff2",
+      style: "normal",
+    },
+  ],
   variable: "--font-fredoka",
   display: "swap",
 })
@@ -26,22 +36,22 @@ const baloo = Baloo_2({
 export const metadata: Metadata = {
   metadataBase: new URL("https://tarnaskids.pl"),
   title: {
-    default: "Tarnas Kids - Partner Twojego Dziecka | Edukacja przez zabaw\u0119",
+    default: "Tarnas Kids - Partner Twojego Dziecka | Edukacja przez zabawę",
     template: "%s | Tarnas Kids",
   },
   description:
-    "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrze\u0144 do rozwoju. Bez reklam, zgodna z RODO.",
+    "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrzeń do rozwoju. Bez reklam, zgodna z RODO.",
   keywords: [
     "edukacja dzieci",
     "gry edukacyjne",
     "nauka pisania",
     "aplikacja dla dzieci",
     "nauka liter",
-    "gry dla przedszkolak\u00F3w",
+    "gry dla przedszkolaków",
     "bezpieczna aplikacja",
     "tarnas kids",
     "wirtualny zwierzak",
-    "nauka przez zabaw\u0119",
+    "nauka przez zabawę",
   ],
   authors: [{ name: "Tarnas Kids" }],
   creator: "Tarnas Kids",
@@ -52,13 +62,13 @@ export const metadata: Metadata = {
     siteName: "Tarnas Kids",
     title: "Tarnas Kids - Partner Twojego Dziecka",
     description:
-      "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrze\u0144 do rozwoju.",
+      "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrzeń do rozwoju.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Tarnas Kids - Edukacja przez zabaw\u0119",
+        alt: "Tarnas Kids - Edukacja przez zabawę",
       },
     ],
   },
@@ -109,7 +119,7 @@ export default function RootLayout({
                 suggestedMaxAge: 8,
               },
               description:
-                "Aplikacja edukacyjna dla dzieci 4-8 lat z grami, nauk\u0105 pisania i wirtualnym zwierzakiem.",
+                "Aplikacja edukacyjna dla dzieci 4-8 lat z grami, nauką pisania i wirtualnym zwierzakiem.",
               offers: {
                 "@type": "Offer",
                 price: "0",

@@ -34,10 +34,10 @@ export default function ContactPage() {
             className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent mb-3"
             style={{ fontFamily: "var(--font-fredoka)" }}
           >
-            Skontaktuj si\u0119 z nami
+            Skontaktuj się z nami
           </h1>
           <p className="text-text-muted">
-            Masz pytanie lub sugesti\u0119? Ch\u0119tnie pomo\u017Cemy!
+            Masz pytanie lub sugestię? Chętnie pomożemy!
           </p>
         </motion.div>
 
@@ -52,10 +52,10 @@ export default function ContactPage() {
               className="text-2xl font-bold text-text mb-2"
               style={{ fontFamily: "var(--font-fredoka)" }}
             >
-              Wiadomo\u015B\u0107 wys\u0142ana!
+              Wiadomość wysłana!
             </h2>
             <p className="text-text-muted">
-              Odpowiemy najszybciej jak to mo\u017Cliwe. Dzi\u0119kujemy za kontakt!
+              Odpowiemy najszybciej jak to możliwe. Dziękujemy za kontakt!
             </p>
           </motion.div>
         ) : (
@@ -72,13 +72,13 @@ export default function ContactPage() {
                   htmlFor="name"
                   className="mb-1.5 block text-sm font-bold text-text"
                 >
-                  Imi\u0119
+                  Imię
                 </label>
                 <input
                   id="name"
                   type="text"
                   required
-                  placeholder="Twoje imi\u0119"
+                  placeholder="Twoje imię"
                   className="w-full rounded-xl border-2 border-gray-100 bg-gray-50 px-4 py-3 text-text transition-all focus:border-pink-300 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
                   htmlFor="message"
                   className="mb-1.5 block text-sm font-bold text-text"
                 >
-                  Wiadomo\u015B\u0107
+                  Wiadomość
                 </label>
                 <textarea
                   id="message"
@@ -125,7 +125,7 @@ export default function ContactPage() {
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 ) : (
                   <>
-                    Wy\u015Blij wiadomo\u015B\u0107
+                    Wyślij wiadomość
                     <Send className="h-4 w-4" />
                   </>
                 )}
@@ -136,7 +136,7 @@ export default function ContactPage() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-text-muted">
-            Mo\u017Cesz te\u017C napisa\u0107 bezpo\u015Brednio na{" "}
+            Możesz też napisać bezpośrednio na{" "}
             <a
               href={`mailto:${SITE_CONFIG.email}`}
               className="inline-flex items-center gap-1 text-pink-500 hover:underline font-semibold"

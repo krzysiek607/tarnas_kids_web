@@ -63,6 +63,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Fix descender clipping for gradient text (bg-clip-text cuts off g, y, j, p, q) */
+.bg-clip-text {
+  padding-bottom: 0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
 ::selection {
   background-color: #FF6B9D;
   color: white;

@@ -14,69 +14,69 @@ const posts: Record<
   }
 > = {
   "jak-nauczyc-dziecko-liter": {
-    title: "Jak skutecznie nauczy\u0107 dziecko liter?",
+    title: "Jak skutecznie nauczyć dziecko liter?",
     date: "2026-01-28",
     readTime: "5 min",
     category: "Edukacja",
     content: `
-Nauka liter to jeden z najwa\u017Cniejszych etap\u00F3w w rozwoju dziecka. Oto 5 sprawdzonych metod:
+Nauka liter to jeden z najważniejszych etapów w rozwoju dziecka. Oto 5 sprawdzonych metod:
 
-**1. Multisensoryczne podej\u015Bcie**
-Dzieci ucz\u0105 si\u0119 najlepiej, gdy angażuj\u0105 wiele zmys\u0142\u00F3w jednocze\u015Bnie. W Tarnas Kids dziecko \u015Bledzi liter\u0119 palcem po ekranie, s\u0142yszy jej brzmienie i widzi animacj\u0119 nagrody.
+**1. Multisensoryczne podejście**
+Dzieci uczą się najlepiej, gdy angażują wiele zmysłów jednocześnie. W Tarnas Kids dziecko śledzi literę palcem po ekranie, słyszy jej brzmienie i widzi animację nagrody.
 
 **2. Powtarzanie w kontekście zabawy**
-Zamiast nudnych powt\u00F3rek, ka\u017Cda litera to mini-przygoda. Dziecko nie czuje, \u017Ce si\u0119 uczy \u2013 po prostu si\u0119 bawi.
+Zamiast nudnych powtórek, każda litera to mini-przygoda. Dziecko nie czuje, że się uczy – po prostu się bawi.
 
-**3. System nagr\u00F3d**
-Gwiazdki, odznaki i post\u0119p ewolucji zwierzaka \u2013 pozytywne wzmocnienia motywuj\u0105 do dalszej nauki.
+**3. System nagród**
+Gwiazdki, odznaki i postęp ewolucji zwierzaka – pozytywne wzmocnienia motywują do dalszej nauki.
 
-**4. W\u0142asne tempo**
-Ka\u017Cde dziecko uczy si\u0119 inaczej. Tarnas Kids nie wymusza tempa \u2013 dziecko mo\u017Ce powtarza\u0107 literki tyle razy, ile potrzebuje.
+**4. Własne tempo**
+Każde dziecko uczy się inaczej. Tarnas Kids nie wymusza tempa – dziecko może powtarzać literki tyle razy, ile potrzebuje.
 
 **5. Zaangażowanie rodzica**
-Panel rodzica pozwala \u015Bledzi\u0107 post\u0119py i wsp\u00F3lnie cieszy\u0107 si\u0119 z osi\u0105gni\u0119\u0107 dziecka.
+Panel rodzica pozwala śledzić postępy i wspólnie cieszyć się z osiągnięć dziecka.
     `,
   },
   "bezpieczenstwo-dzieci-w-sieci": {
-    title: "Bezpiecze\u0144stwo dzieci w sieci - poradnik dla rodzic\u00F3w",
+    title: "Bezpieczeństwo dzieci w sieci - poradnik dla rodziców",
     date: "2026-01-20",
     readTime: "7 min",
-    category: "Bezpiecze\u0144stwo",
+    category: "Bezpieczeństwo",
     content: `
-Bezpiecze\u0144stwo cyfrowe dzieci to priorytet ka\u017Cdego rodzica. Oto na co zwr\u00F3ci\u0107 uwag\u0119:
+Bezpieczeństwo cyfrowe dzieci to priorytet każdego rodzica. Oto na co zwrócić uwagę:
 
-**Polityka prywatno\u015Bci**
-Zawsze czytaj polityk\u0119 prywatno\u015Bci aplikacji dla dzieci. Szukaj zgodno\u015Bci z RODO i COPPA.
+**Polityka prywatności**
+Zawsze czytaj politykę prywatności aplikacji dla dzieci. Szukaj zgodności z RODO i COPPA.
 
 **Reklamy i zakupy**
-Unikaj aplikacji z reklamami targetowanymi i ukrytymi mikrop\u0142atno\u015Bciami. W Tarnas Kids nie ma \u017Cadnych reklam.
+Unikaj aplikacji z reklamami targetowanymi i ukrytymi mikropłatnościami. W Tarnas Kids nie ma żadnych reklam.
 
 **Kontrola rodzicielska**
-Dobra aplikacja oferuje panel rodzica z mo\u017Cliwo\u015Bci\u0105 ustawiania limit\u00F3w czasu i \u015Bledzenia post\u0119p\u00F3w.
+Dobra aplikacja oferuje panel rodzica z możliwością ustawiania limitów czasu i śledzenia postępów.
 
 **Szyfrowanie danych**
-Dane dziecka musz\u0105 by\u0107 szyfrowane zar\u00F3wno podczas przesy\u0142ania, jak i przechowywania.
+Dane dziecka muszą być szyfrowane zarówno podczas przesyłania, jak i przechowywania.
     `,
   },
   "gamifikacja-w-edukacji": {
-    title: "Gamifikacja w edukacji - dlaczego dzia\u0142a?",
+    title: "Gamifikacja w edukacji - dlaczego działa?",
     date: "2026-01-12",
     readTime: "6 min",
     category: "Nauka",
     content: `
-Badania naukowe potwierdzaj\u0105, \u017Ce gamifikacja znacz\u0105co poprawia efekty nauki u dzieci.
+Badania naukowe potwierdzają, że gamifikacja znacząco poprawia efekty nauki u dzieci.
 
-**Co m\u00F3wi\u0105 badania?**
-Uniwersytet Stanford wykaza\u0142, \u017Ce dzieci ucz\u0105ce si\u0119 przez gry zapamiętuj\u0105 o 40% wi\u0119cej materia\u0142u.
+**Co mówią badania?**
+Uniwersytet Stanford wykazał, że dzieci uczące się przez gry zapamiętują o 40% więcej materiału.
 
 **Dopamina i motywacja**
-System nagr\u00F3d w grach aktywuje uk\u0142ad dopaminowy, tworz\u0105c pozytywne skojarzenia z nauk\u0105.
+System nagród w grach aktywuje układ dopaminowy, tworząc pozytywne skojarzenia z nauką.
 
 **Ewolucja zwierzaka w Tarnas Kids**
-Nasz system ewolucji to przyk\u0142ad gamifikacji \u2013 dziecko uczy si\u0119 liter, bo chce zobaczy\u0107 jak jego zwierzak ewoluuje.
+Nasz system ewolucji to przykład gamifikacji – dziecko uczy się liter, bo chce zobaczyć jak jego zwierzak ewoluuje.
 
 **Flow state**
-Dobre gry edukacyjne utrzymuj\u0105 dziecko w stanie flow \u2013 zadania nie s\u0105 ani za \u0142atwe, ani za trudne.
+Dobre gry edukacyjne utrzymują dziecko w stanie flow – zadania nie są ani za łatwe, ani za trudne.
     `,
   },
 }

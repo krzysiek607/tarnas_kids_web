@@ -22,7 +22,7 @@ const posts: Record<
 Nauka liter to jeden z najważniejszych etapów w rozwoju dziecka. Oto 5 sprawdzonych metod:
 
 **1. Multisensoryczne podejście**
-Dzieci uczą się najlepiej, gdy angażują wiele zmysłów jednocześnie. W Tarnas Kids dziecko śledzi literę palcem po ekranie, słyszy jej brzmienie i widzi animację nagrody.
+Dzieci uczą się najlepiej, gdy angażują wiele zmysłów jednocześnie. W TaLu Kids dziecko śledzi literę palcem po ekranie, słyszy jej brzmienie i widzi animację nagrody.
 
 **2. Powtarzanie w kontekście zabawy**
 Zamiast nudnych powtórek, każda litera to mini-przygoda. Dziecko nie czuje, że się uczy – po prostu się bawi.
@@ -31,7 +31,7 @@ Zamiast nudnych powtórek, każda litera to mini-przygoda. Dziecko nie czuje, ż
 Gwiazdki, odznaki i postęp ewolucji zwierzaka – pozytywne wzmocnienia motywują do dalszej nauki.
 
 **4. Własne tempo**
-Każde dziecko uczy się inaczej. Tarnas Kids nie wymusza tempa – dziecko może powtarzać literki tyle razy, ile potrzebuje.
+Każde dziecko uczy się inaczej. TaLu Kids nie wymusza tempa – dziecko może powtarzać literki tyle razy, ile potrzebuje.
 
 **5. Zaangażowanie rodzica**
 Panel rodzica pozwala śledzić postępy i wspólnie cieszyć się z osiągnięć dziecka.
@@ -49,7 +49,7 @@ Bezpieczeństwo cyfrowe dzieci to priorytet każdego rodzica. Oto na co zwróci�
 Zawsze czytaj politykę prywatności aplikacji dla dzieci. Szukaj zgodności z RODO i COPPA.
 
 **Reklamy i zakupy**
-Unikaj aplikacji z reklamami targetowanymi i ukrytymi mikropłatnościami. W Tarnas Kids nie ma żadnych reklam.
+Unikaj aplikacji z reklamami targetowanymi i ukrytymi mikropłatnościami. W TaLu Kids nie ma żadnych reklam.
 
 **Kontrola rodzicielska**
 Dobra aplikacja oferuje panel rodzica z możliwością ustawiania limitów czasu i śledzenia postępów.
@@ -72,7 +72,7 @@ Uniwersytet Stanford wykazał, że dzieci uczące się przez gry zapamiętują o
 **Dopamina i motywacja**
 System nagród w grach aktywuje układ dopaminowy, tworząc pozytywne skojarzenia z nauką.
 
-**Ewolucja zwierzaka w Tarnas Kids**
+**Ewolucja zwierzaka w TaLu Kids**
 Nasz system ewolucji to przykład gamifikacji – dziecko uczy się liter, bo chce zobaczyć jak jego zwierzak ewoluuje.
 
 **Flow state**

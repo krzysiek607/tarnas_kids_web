@@ -6,7 +6,7 @@ import { Newsletter } from "@/components/sections/newsletter"
 export const metadata: Metadata = {
   title: "Dla rodziców",
   description:
-    "Bezpieczeństwo, kontrola rodzicielska i raporty postępów. Dowiedz się, jak Tarnas Kids chroni Twoje dziecko.",
+    "Bezpieczeństwo, kontrola rodzicielska i raporty postępów. Dowiedz się, jak TaLu Kids chroni Twoje dziecko.",
 }
 
 export default function ForParentsPage() {

@@ -4,7 +4,7 @@ import { Shield } from "lucide-react"
 export const metadata: Metadata = {
   title: "Polityka prywatności",
   description:
-    "Polityka prywatności Tarnas Kids. Dowiedz się, jak chronimy dane Twojego dziecka.",
+    "Polityka prywatności TaLu Kids. Dowiedz się, jak chronimy dane Twojego dziecka.",
 }
 
 export default function PrivacyPolicyPage() {
@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
                 1. Informacje ogólne
               </h2>
               <p>
-                Tarnas Kids (&ldquo;my&rdquo;, &ldquo;nas&rdquo;, &ldquo;nasz&rdquo;) szanuje prywatność użytkowników,
+                TaLu Kids (&ldquo;my&rdquo;, &ldquo;nas&rdquo;, &ldquo;nasz&rdquo;) szanuje prywatność użytkowników,
                 a w szczególności dzieci korzystających z naszej aplikacji. Niniejsza
                 Polityka Prywatności opisuje, w jaki sposób zbieramy, wykorzystujemy i
                 chronimy dane osobowe.
@@ -120,10 +120,10 @@ export default function PrivacyPolicyPage() {
               <p>
                 W sprawach dotyczących prywatności prosimy o kontakt na adres:{" "}
                 <a
-                  href="mailto:kontakt@tarnaskids.pl"
+                  href="mailto:kontakt@talukids.pl"
                   className="text-pink-500 hover:underline font-semibold"
                 >
-                  kontakt@tarnaskids.pl
+                  kontakt@talukids.pl
                 </a>
               </p>
             </section>

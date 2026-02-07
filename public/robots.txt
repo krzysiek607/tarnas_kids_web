@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://krzysiek607.github.io/tarnas_kids_web/sitemap.xml
+Sitemap: https://krzysiek607.github.io/talu_kids_web/sitemap.xml

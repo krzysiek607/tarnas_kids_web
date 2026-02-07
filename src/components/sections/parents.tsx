@@ -62,7 +62,7 @@ export function Parents() {
             </h2>
             <p className="text-lg text-text-muted mb-8 leading-relaxed">
               Wiemy, jak ważne jest bezpieczeństwo Twojego dziecka w sieci.
-              Dlatego Tarnas Kids zostało zaprojektowane z myślą o spokoju
+              Dlatego TaLu Kids zostało zaprojektowane z myślą o spokoju
               rodziców. Żadnych niespodzianek.
             </p>
 

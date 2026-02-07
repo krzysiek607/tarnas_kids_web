@@ -5,7 +5,7 @@ import { href } from "@/lib/utils"
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Porady dotyczące edukacji dzieci, rozwój przez zabawę i aktualności Tarnas Kids.",
+    "Porady dotyczące edukacji dzieci, rozwój przez zabawę i aktualności TaLu Kids.",
 }
 
 const posts = [
@@ -13,7 +13,7 @@ const posts = [
     slug: "jak-nauczyc-dziecko-liter",
     title: "Jak skutecznie nauczyć dziecko liter?",
     excerpt:
-      "5 sprawdzonych metod nauki alfabetu, które sprawiają, że dzieci uczą się z radością. Dowiedz się, jak Tarnas Kids wspiera ten proces.",
+      "5 sprawdzonych metod nauki alfabetu, które sprawiają, że dzieci uczą się z radością. Dowiedz się, jak TaLu Kids wspiera ten proces.",
     date: "2026-01-28",
     readTime: "5 min",
     category: "Edukacja",
@@ -50,7 +50,7 @@ export default function BlogPage() {
             className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent mb-3 sm:text-5xl"
             style={{ fontFamily: "var(--font-fredoka)" }}
           >
-            Blog Tarnas Kids
+            Blog TaLu Kids
           </h1>
           <p className="text-lg text-text-muted">
             Porady, inspiracje i aktualności ze świata edukacji dzieci

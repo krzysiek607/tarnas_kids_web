@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/tarnas_kids_web"
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/talu_kids_web"
 
 export function href(path: string): string {
   if (path.startsWith("#") || path.startsWith("mailto:") || path.startsWith("http")) {

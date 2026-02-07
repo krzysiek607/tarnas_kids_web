@@ -34,10 +34,10 @@ const baloo = Baloo_2({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tarnaskids.pl"),
+  metadataBase: new URL("https://talukids.pl"),
   title: {
-    default: "Tarnas Kids - Partner Twojego Dziecka | Edukacja przez zabawę",
-    template: "%s | Tarnas Kids",
+    default: "TaLu Kids - Partner Twojego Dziecka | Edukacja przez zabawę",
+    template: "%s | TaLu Kids",
   },
   description:
     "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrzeń do rozwoju. Bez reklam, zgodna z RODO.",
@@ -49,18 +49,18 @@ export const metadata: Metadata = {
     "nauka liter",
     "gry dla przedszkolaków",
     "bezpieczna aplikacja",
-    "tarnas kids",
+    "talu kids",
     "wirtualny zwierzak",
     "nauka przez zabawę",
   ],
-  authors: [{ name: "Tarnas Kids" }],
-  creator: "Tarnas Kids",
+  authors: [{ name: "TaLu Kids" }],
+  creator: "TaLu Kids",
   openGraph: {
     type: "website",
     locale: "pl_PL",
-    url: "https://tarnaskids.pl",
-    siteName: "Tarnas Kids",
-    title: "Tarnas Kids - Partner Twojego Dziecka",
+    url: "https://talukids.pl",
+    siteName: "TaLu Kids",
+    title: "TaLu Kids - Partner Twojego Dziecka",
     description:
       "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania, wirtualny zwierzak i bezpieczna przestrzeń do rozwoju.",
     images: [
@@ -68,13 +68,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Tarnas Kids - Edukacja przez zabawę",
+        alt: "TaLu Kids - Edukacja przez zabawę",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tarnas Kids - Partner Twojego Dziecka",
+    title: "TaLu Kids - Partner Twojego Dziecka",
     description:
       "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, nauka pisania i wirtualny zwierzak.",
     images: ["/og-image.png"],
@@ -110,7 +110,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "MobileApplication",
-              name: "Tarnas Kids",
+              name: "TaLu Kids",
               operatingSystem: "Android, iOS",
               applicationCategory: "EducationalApplication",
               audience: {

@@ -90,7 +90,7 @@ export function Gallery() {
             className="text-4xl font-bold sm:text-5xl bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 bg-clip-text text-transparent mb-4"
             style={{ fontFamily: "var(--font-fredoka)" }}
           >
-            Zobacz Tarnas Kids w akcji
+            Zobacz TaLu Kids w akcji
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-text-muted">
             Pięknie zaprojektowane ekrany, które dzieci uwielbiają

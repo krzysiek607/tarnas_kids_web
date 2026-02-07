@@ -1,12 +1,12 @@
 export const SITE_CONFIG = {
-  name: "Tarnas Kids",
+  name: "TaLu Kids",
   tagline: "Partner Twojego Dziecka",
   description:
     "Aplikacja edukacyjna dla dzieci 4-8 lat. Gry, zabawy, bajki i rozwoj przez zabawę z wirtualnym zwierzakiem.",
-  url: "https://tarnaskids.pl",
-  email: "kontakt@tarnaskids.pl",
+  url: "https://talukids.pl",
+  email: "kontakt@talukids.pl",
   ageRange: "4-8 lat",
-  copyright: `© ${new Date().getFullYear()} Tarnas Kids. Wszelkie prawa zastrzeżone.`,
+  copyright: `© ${new Date().getFullYear()} TaLu Kids. Wszelkie prawa zastrzeżone.`,
 } as const
 
 export const NAV_LINKS = [
@@ -104,7 +104,7 @@ export const TESTIMONIALS = [
   {
     name: "Marta D.",
     role: "Mama 4-latka i 7-latki",
-    text: "Obie córki uwielbiają Tarnas Kids, mimo różnicy wieku. Starsza pomaga młodszej opiewać się nad zwierzakiem. Cudowne!",
+    text: "Obie córki uwielbiają TaLu Kids, mimo różnicy wieku. Starsza pomaga młodszej opiewać się nad zwierzakiem. Cudowne!",
     avatar: "MD",
     rating: 5,
   },
@@ -112,9 +112,9 @@ export const TESTIMONIALS = [
 
 export const FAQ_ITEMS = [
   {
-    question: "Dla jakiego wieku jest Tarnas Kids?",
+    question: "Dla jakiego wieku jest TaLu Kids?",
     answer:
-      "Tarnas Kids jest zaprojektowane dla dzieci w wieku 4-8 lat. Zadania są dostosowane do poziomu rozwoju dziecka i stopniowo się utrudniają.",
+      "TaLu Kids jest zaprojektowane dla dzieci w wieku 4-8 lat. Zadania są dostosowane do poziomu rozwoju dziecka i stopniowo się utrudniają.",
   },
   {
     question: "Czy aplikacja jest bezpieczna dla mojego dziecka?",
@@ -129,7 +129,7 @@ export const FAQ_ITEMS = [
   {
     question: "Na jakich urządzeniach działa aplikacja?",
     answer:
-      "Tarnas Kids działa na telefonach i tabletach z Androidem oraz iOS. Aplikacja jest zoptymalizowana pod tablety – idealne do nauki pisania palcem po ekranie.",
+      "TaLu Kids działa na telefonach i tabletach z Androidem oraz iOS. Aplikacja jest zoptymalizowana pod tablety – idealne do nauki pisania palcem po ekranie.",
   },
   {
     question: "Czy mogę śledzić postępy mojego dziecka?",
@@ -137,7 +137,7 @@ export const FAQ_ITEMS = [
       "Tak! Panel rodzica pozwala zobaczyć, które litery dziecko opanowało, ile czasu spędza w aplikacji i jakie nagrody zdobyło. Raporty są przejrzyste i łatwe do zrozumienia.",
   },
   {
-    question: "Ile kosztuje Tarnas Kids?",
+    question: "Ile kosztuje TaLu Kids?",
     answer:
       "Podstawowa wersja aplikacji jest darmowa i zawiera pełen zestaw gier edukacyjnych. W przyszłości planujemy wersję premium z dodatkowymi treściami i zwierzakami.",
   },

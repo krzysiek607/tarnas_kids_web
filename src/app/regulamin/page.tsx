@@ -3,7 +3,7 @@ import { FileText } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Regulamin",
-  description: "Regulamin korzystania z aplikacji Tarnas Kids.",
+  description: "Regulamin korzystania z aplikacji TaLu Kids.",
 }
 
 export default function TermsPage() {
@@ -36,7 +36,7 @@ export default function TermsPage() {
               1. Postanowienia ogólne
             </h2>
             <p>
-              Niniejszy regulamin określa zasady korzystania z aplikacji Tarnas
+              Niniejszy regulamin określa zasady korzystania z aplikacji TaLu
               Kids. Korzystając z aplikacji, akceptujesz poniższe warunki.
             </p>
           </section>
@@ -49,7 +49,7 @@ export default function TermsPage() {
               2. Korzystanie z aplikacji
             </h2>
             <p>
-              Tarnas Kids jest przeznaczony dla dzieci w wieku 4-8 lat pod
+              TaLu Kids jest przeznaczony dla dzieci w wieku 4-8 lat pod
               nadzorem rodzica lub opiekuna. Rodzic/opiekun jest odpowiedzialny
               za założenie konta i nadzór nad korzystaniem z aplikacji.
             </p>
@@ -77,7 +77,7 @@ export default function TermsPage() {
               4. Własność intelektualna
             </h2>
             <p>
-              Wszelkie treści, grafiki, dźwięki i kod źródłowy aplikacji Tarnas
+              Wszelkie treści, grafiki, dźwięki i kod źródłowy aplikacji TaLu
               Kids są chronione prawem autorskim i stanowią własność twórców
               aplikacji.
             </p>
@@ -93,10 +93,10 @@ export default function TermsPage() {
             <p>
               Pytania dotyczące regulaminu prosimy kierować na:{" "}
               <a
-                href="mailto:kontakt@tarnaskids.pl"
+                href="mailto:kontakt@talukids.pl"
                 className="text-pink-500 hover:underline font-semibold"
               >
-                kontakt@tarnaskids.pl
+                kontakt@talukids.pl
               </a>
             </p>
           </section>

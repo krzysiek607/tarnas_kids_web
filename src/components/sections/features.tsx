@@ -85,7 +85,7 @@ export function Features() {
             Świat pełen przygód i nauki
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-text-muted">
-            Każdy dzień z Tarnas Kids to nowa przygoda. 7 gier edukacyjnych,
+            Każdy dzień z TaLu Kids to nowa przygoda. 7 gier edukacyjnych,
             nauka całego polskiego alfabetu i wirtualny przyjaciel.
           </p>
         </motion.div>

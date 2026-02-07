@@ -30,7 +30,7 @@ export function Testimonials() {
             Rodzice polecają
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-text-muted">
-            Zobacz, co mówią rodzice, którzy już wybrali Tarnas Kids dla swoich
+            Zobacz, co mówią rodzice, którzy już wybrali TaLu Kids dla swoich
             dzieci
           </p>
         </motion.div>

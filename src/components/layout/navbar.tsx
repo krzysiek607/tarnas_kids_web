@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Sparkles } from "lucide-react"
+import Image from "next/image"
+import { Menu, X } from "lucide-react"
 import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants"
 import { cn, href } from "@/lib/utils"
 
@@ -40,11 +41,15 @@ export function Navbar() {
             : "bg-transparent"
         )}
       >
-        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8 sm:px-6">
           <a href={href("/")} className="flex items-center gap-2 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-purple-500 transition-transform group-hover:scale-110 group-hover:rotate-6">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
+            <Image
+              src={href("/images/talu_kids_icon.png")}
+              alt="TaLu Kids"
+              width={44}
+              height={44}
+              className="rounded-xl transition-transform group-hover:scale-110 group-hover:rotate-3"
+            />
             <span
               className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 bg-clip-text text-transparent"
               style={{ fontFamily: "var(--font-fredoka)" }}
@@ -79,7 +84,7 @@ export function Navbar() {
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-text transition-colors hover:bg-pink-50 lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-text transition-colors hover:bg-pink-50 lg:hidden"
             aria-label={isMobileOpen ? "Zamknij menu" : "Otwórz menu"}
           >
             {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
